@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Lịch sử đánh giá</title>
+<link rel="stylesheet" th:href="@{/css/user-orders.css}">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div th:replace="layout/header :: header"></div>
+<h2>⭐ Lịch sử đánh giá</h2>
+
+<table>
+<tr>
+    <th>Sản phẩm</th>
+    <th>Số sao</th>
+    <th>Ghi chú</th>
+</tr>
+
+<tr th:each="r : ${reviews}">
+    <td th:text="${r.productName}"></td>
+    <td th:text="${r.rating} + ' ⭐'"></td>
+    <td th:text="${r.comment}"></td>
+</tr>
+
+</table>
+
+</body>
+</html>

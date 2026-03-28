@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chi tiết đơn hàng</title>
+    <link rel="stylesheet" th:href="@{/css/admin-order-detail.css}">
+</head>
+<body>
+
+<div class="order-detail-container">
+
+    <h1>CHI TIẾT ĐƠN HÀNG #<span th:text="${order.id}"></span></h1>
+
+    <!-- Thông tin khách hàng -->
+    <div class="order-info">
+        <div class="info-box">
+            <p><strong>Khách hàng:</strong> <span th:text="${order.fullname}"></span></p>
+            <p><strong>Email:</strong> <span th:text="${order.email}"></span></p>
+            <p><strong>SĐT:</strong> <span th:text="${order.phone}"></span></p>
+            <p><strong>Địa chỉ:</strong> <span th:text="${order.address}"></span></p>
+        </div>
+
+        <div class="info-box">
+            <p><strong>Ngày đặt:</strong>
+                <span th:text="${#temporals.format(order.createdDate, 'dd/MM/yyyy HH:mm')}"></span>
+
+            </p>
+            <p><strong>Trạng thái:</strong>
+                <span class="status" th:text="${order.status}"></span>
+            </p>
+            <p><strong>Tổng tiền:</strong>
+                <span class="total-price"
+                      th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')} + ' đ'">
+                </span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Danh sách sản phẩm -->
+    <h2>Sản phẩm đã đặt</h2>
+
+    <table class="order-table">
+        <thead>
+        <tr>
+            <th>Tên sản phẩm</th>
+            <th>Giá</th>
+            <th>Số lượng</th>
+            <th>Thành tiền</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="item : ${items}">
+            <td th:text="${item.product.name}"></td>
+
+            <td th:text="${#numbers.formatDecimal(item.price,0,'COMMA',0,'POINT')} + ' đ'"></td>
+
+            <td th:text="${item.quantity}"></td>
+
+            <td th:text="${#numbers.formatDecimal(item.subtotal,0,'COMMA',0,'POINT')} + ' đ'"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="back-btn">
+        <a th:href="@{/admin/orders}">← Quay lại danh sách</a>
+    </div>
+
+</div>
+
+</body>
+</html>

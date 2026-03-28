@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<header class="admin-header" th:fragment="header">
+    <h2>🔐 ADMIN PANEL</h2>
+
+    <div class="admin-user">
+        Xin chào,
+        <span th:text="${session.user.fullName}">Admin</span>
+        |
+        <a th:href="@{/logout}">Đăng xuất</a>
+    </div>
+</header>
+
+</body>
+</html>

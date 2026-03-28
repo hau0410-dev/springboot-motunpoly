@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title th:text="${product.name}">Chi tiết sản phẩm</title>
+
+<link rel="stylesheet" th:href="@{/css/product-detail.css}">
+
+</head>
+<body>
+
+<div class="container">
+
+    <!-- breadcrumb -->
+    <div class="breadcrumb">
+        <a href="/">Trang chủ</a> /
+        <span th:text="${product.category.name}"></span> /
+        <span th:text="${product.name}"></span>
+    </div>
+
+
+    <div class="product-detail">
+
+        <!-- LEFT IMAGE -->
+        <div class="product-image">
+
+            <img class="main-img"
+                 th:src="@{'/imges/' + ${product.image}}">
+
+        </div>
+
+
+        <!-- RIGHT INFO -->
+        <div class="product-info">
+
+            <h1 th:text="${product.name}"></h1>
+
+            <div class="rating">
+                ⭐ 4.9 | 297 đánh giá
+            </div>
+
+
+            <div class="price-box">
+
+                <div class="price"
+                     th:text="${#numbers.formatDecimal(product.price,0,'COMMA',0,'POINT')} + 'đ'">
+                </div>
+
+            </div>
+
+
+            <div class="description">
+                <h3>Mô tả sản phẩm</h3>
+
+                <p th:text="${product.description}">
+                </p>
+            </div>
+
+
+            <!-- add to cart -->
+            <form th:action="@{/cart/add/{id}(id=${product.id})}"
+                  method="post">
+
+                <input type="hidden" name="qty" value="1">
+
+                <button class="btn-cart" type="submit">
+                    🛒 Thêm vào giỏ hàng
+                </button>
+
+            </form>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

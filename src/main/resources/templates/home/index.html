@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <meta charset="UTF-8">
+    <title>MotunPoLy</title>
+</head>
+<body>
+
+
+<h1>Chào mừng đến với MotunPoLy</h1>
+<p>Website bán phụ tùng xe máy</p>
+
+<!-- ===== DANH MỤC ===== -->
+<div class="section">
+    <h2>Danh mục nổi bật</h2>
+
+    <div class="category-grid">
+        <div class="category-item"
+             th:each="c : ${categories}"
+             th:text="${c.name}">
+            Tên danh mục
+        </div>
+    </div>
+</div>
+
+	
+
+
+<!-- ===== GỢI Ý CHO BẠN ===== -->
+<div class="section">
+    <h2>Gợi ý cho bạn</h2>
+
+    <div class="product-grid">
+		 <div class="product-card"
+		     th:each="p : ${products}">
+		
+		    <!-- CLICK VÀO ẢNH -->
+		    <a th:href="@{/product/detail(id=${p.id})}">
+		        <img th:src="@{'/imges/' + ${p.image}}">
+		    </a>
+		
+		    <!-- CLICK VÀO TÊN -->
+		    <a th:href="@{/product/detail(id=${p.id})}">
+		        <h3 th:text="${p.name}">Tên sản phẩm</h3>
+		    </a>
+		
+		    <p class="price"
+		       th:text="${#numbers.formatDecimal(p.price,0,'COMMA',0,'POINT')} + 'đ'">
+		        Giá
+		    </p>
+		
+		    <!-- THÊM VÀO GIỎ -->
+		    <form th:action="@{/cart/add/{id}(id=${p.id})}"
+		          method="post">
+		        <input type="hidden" name="qty" value="1">
+		        <button type="submit">Thêm vào giỏ</button>
+		    </form>
+		
+		</div>
+    </div>
+</div>
+
+</body>
+</html>

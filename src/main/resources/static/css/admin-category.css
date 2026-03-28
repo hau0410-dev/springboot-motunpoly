@@ -1,0 +1,105 @@
+/* ===== BODY ===== */
+
+body{
+    font-family: "Segoe UI", Arial;
+    background:#f4f6fb;
+    margin:0;
+}
+
+/* ===== TITLE ===== */
+
+h2{
+    text-align:center;
+    margin:25px 0;
+    color:#5664d2;
+}
+
+/* ===== CONTAINER ===== */
+
+.container{
+    width:95%;
+    margin:auto;
+}
+
+/* ===== GRID LAYOUT ===== */
+
+.layout{
+    display:grid;
+    grid-template-columns:320px 1fr;
+    gap:25px;
+}
+
+/* ===== CARD ===== */
+
+.card{
+    background:white;
+    border-radius:12px;
+    padding:20px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.08);
+}
+
+/* ===== FORM ===== */
+
+.form-box form{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+label{
+    font-weight:600;
+    color:#5664d2;
+}
+
+input,select{
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #e0e6ed;
+}
+
+/* ===== BUTTON ===== */
+
+button{
+    padding:10px;
+    border:none;
+    border-radius:8px;
+    background:#5664d2;
+    color:white;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#3f4dd1;
+}
+
+/* ===== TABLE ===== */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    background:#5664d2;
+    color:white;
+    padding:12px;
+}
+
+td{
+    padding:12px;
+    border-bottom:1px solid #eee;
+}
+
+tr:hover{
+    background:#f5f7ff;
+}
+
+/* ===== DELETE ===== */
+
+a[href*="delete"]{
+    background:#ff4d4d;
+    color:white;
+    padding:6px 12px;
+    border-radius:6px;
+    text-decoration:none;
+}

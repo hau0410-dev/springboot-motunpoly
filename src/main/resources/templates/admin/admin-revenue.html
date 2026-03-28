@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Quản lý doanh thu</title>
+
+<link rel="stylesheet" th:href="@{/css/admin-revenue.css}">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+<body>
+
+<div class="container">
+
+<h2 class="title">QUẢN LÝ DOANH THU</h2>
+
+<div class="dashboard">
+
+    <!-- LEFT SIDE -->
+    <div class="main-content">
+
+        <div class="card">
+
+           <div class="filters">
+
+		    <form action="/admin/revenue/filter" class="filter-group">
+		        <label>Ngày</label>
+		        <input type="date" name="date">
+		        <button class="btn">Lọc</button>
+		    </form>
+		
+		    <form action="/admin/revenue/search" class="filter-group">
+		        <label>Doanh thu</label>
+		        <input type="number" name="amount" placeholder=">= VNĐ">
+		        <button class="btn">Tìm</button>
+		    </form>
+		
+		</div>
+
+            <table>
+                <tr>
+                    <th>Khách hàng</th>
+                    <th>Sản phẩm</th>
+                    <th>Giá</th>
+                    <th>Số lượng</th>
+                    <th>Thành tiền</th>
+                    <th>Ngày</th>
+                    <th>Xóa</th>
+                </tr>
+
+                <tr th:each="r : ${revenues}">
+                    <td th:text="${r.customerName}"></td>
+                    <td th:text="${r.productName}"></td>
+                    <td th:text="${r.price}"></td>
+                    <td th:text="${r.quantity}"></td>
+                    <td th:text="${r.subtotal}"></td>
+                    <td th:text="${r.createdDate}"></td>
+                    <td>
+                        <a th:href="@{'/admin/revenue/delete/' + ${r.id}}">
+                            <button class="btn btn-danger">Xóa</button>
+                        </a>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+
+
+        <div class="card">
+            <h3>Biểu đồ doanh thu</h3>
+            <canvas id="revenueChart"></canvas>
+        </div>
+
+    </div>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+    let labels = /*[[${chartLabels}]]*/ [];
+    let data = /*[[${chartData}]]*/ [];
+
+    new Chart(document.getElementById('revenueChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Doanh thu',
+                data: data
+            }]
+        }
+    });
+/*]]>*/
+</script>
+
+<!-- RIGHT SIDE -->
+    <div class="sidebar">
+
+        <div class="card stat">
+            <p>Tổng doanh thu</p>
+            <h3 th:text="${totalRevenue}"></h3>
+        </div>
+
+        <div class="card stat">
+            <p>Giá cao nhất hôm nay</p>
+            <h3 th:text="${maxToday}"></h3>
+        </div>
+
+        <div class="card stat">
+            <p>Giá trung bình</p>
+            <h3 th:text="${avgToday}"></h3>
+        </div>
+
+        <div class="card">
+            <h3>Top sản phẩm</h3>
+
+            <table>
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th>Số lượng</th>
+                </tr>
+
+                <tr th:each="p : ${topProducts}">
+                    <td th:text="${p[0]}"></td>
+                    <td th:text="${p[1]}"></td>
+                </tr>
+
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+</body>
+</html>

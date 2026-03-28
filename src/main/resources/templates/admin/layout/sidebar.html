@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<aside class="sidebar" th:fragment="sidebar">
+    <ul>
+        <li>
+            <a th:href="@{/admin}">🏠 Dashboard</a>
+        </li>
+
+        <li>
+            <a th:href="@{/admin/categories}">📁 Quản lý danh mục</a>
+        </li>
+
+        <li>
+            <a th:href="@{/admin/products}">🛒 Quản lý sản phẩm</a>
+        </li>
+
+        <li>
+            <a th:href="@{/admin/users}">👤 Quản lý người dùng</a>
+        </li>
+
+        <li>
+            <a th:href="@{/admin/orders}">📦 Lịch sử đặt hàng</a>
+        </li>
+
+        <li>
+            <a th:href="@{/admin/reviews}">⭐ Quản lý đánh giá</a>
+        </li>
+
+        <li>
+            <a th:href="@{/admin/revenue}">💰 Quản lý doanh thu</a>
+        </li>
+    </ul>
+</aside>
+
+</body>
+</html>

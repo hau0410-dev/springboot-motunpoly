@@ -1,0 +1,433 @@
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f5f5;
+}
+
+.mp-header {
+    background: #c40000;
+    color: white;
+}
+
+.mp-header-top {
+    display: flex;
+    align-items: center;
+    padding: 10px 30px;
+    gap: 15px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 22px;
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+}
+
+
+.logo img {
+    height: 40px;
+}
+
+.btn-category {
+    background: #a80000;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.search-box {
+    
+    display: flex;
+}
+
+.search-box input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 20px 0 0 20px;
+    border: none;
+    outline: none;
+}
+
+.search-box button {
+    padding: 10px 20px;
+    border-radius: 0 20px 20px 0;
+    border: none;
+    background: black;
+    color: white;
+    cursor: pointer;
+}
+
+.cart {
+    background: black;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+/* ===== SEARCH WRAPPER  ===== */
+
+.search-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.search-suggest {
+    margin-top: 6px;
+    display: flex;
+    gap: 15px;
+    font-size: 13px;
+}
+
+.search-suggest a {
+    color: #ffecec;
+    text-decoration: none;
+    opacity: 0.9;
+    transition: 0.2s;
+}
+
+.search-suggest a:hover {
+    text-decoration: underline;
+    opacity: 1;
+}
+
+
+
+.section {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.category-item {
+    background: #f2f2f2;
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.product-card {
+    border: 1px solid #eee;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.product-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: contain;
+}
+
+.price {
+    color: #c40000;
+    font-weight: bold;
+}
+
+.product-card button {
+    margin-top: 10px;
+    padding: 8px 15px;
+    border: none;
+    background: #c40000;
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
+}
+.mp-header-top{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* đẩy cụm login/register sang sát bên phải */
+.auth-buttons{
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-auth{
+    background: #ffffff;
+    color: #d40000;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.btn-register{
+    background: #ff9800;
+    color: #fff;
+}
+/* ==============================
+   USER DROPDOWN STYLE
+================================ */
+
+.user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.user-trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+    transition: 0.3s;
+}
+
+.user-avatar:hover {
+    transform: scale(1.05);
+}
+
+.username {
+    color: white;
+    font-size: 14px;
+}
+
+/* ===== DROPDOWN ===== */
+
+.user-dropdown {
+    position: absolute;
+    top: 55px;
+    right: 0;
+    width: 230px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    padding: 10px 0;
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.25s ease;
+    z-index: 999;
+}
+
+/* Hover hiển thị */
+.user-menu:hover .user-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.user-dropdown a {
+    display: block;
+    padding: 12px 18px;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.user-dropdown a:hover {
+    background: #f5f5f5;
+}
+
+.user-dropdown hr {
+    margin: 8px 0;
+    border: none;
+    border-top: 1px solid #eee;
+}
+
+.user-dropdown .logout {
+    color: #e60000;
+    font-weight: 500;
+}
+/* =========================
+   FOOTER
+========================= */
+
+.mp-footer {
+    background: #0c1624;
+    color: #ffffff;
+    padding-top: 40px;
+    margin-top: 50px;
+}
+
+.footer-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+    padding: 0 60px;
+}
+
+.footer-col h3 {
+    margin-bottom: 15px;
+    font-size: 16px;
+    color: #ffffff;
+}
+
+.footer-col h4 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #cccccc;
+}
+
+.footer-col p {
+    margin: 6px 0;
+    font-size: 14px;
+    color: #cccccc;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.footer-col p:hover {
+    color: #ffffff;
+}
+
+.payment-methods {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.payment-methods span {
+    background: #ffffff;
+    color: #000;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.footer-bottom {
+    margin-top: 40px;
+    padding: 20px;
+    text-align: center;
+    background: #08101b;
+    font-size: 13px;
+    color: #aaaaaa;
+}
+/* Nút danh mục */
+.btn-category {
+    background: white;
+    color: red;
+    border: 2px solid white;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-category:hover {
+    background: #ffe6e6;
+}
+
+/* Popup lọc */
+.category-popup {
+    position: absolute;
+    top: 70px;
+    left: 20px;
+    width: 300px;
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    display: none;
+    animation: fadeDown 0.3s ease;
+    z-index: 999;
+}
+
+/* Hiện popup */
+.category-popup.show {
+    display: block;
+}
+
+/* Animation */
+@keyframes fadeDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Label */
+.category-popup label {
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Input + select */
+.category-popup input,
+.category-popup select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    outline: none;
+    transition: 0.2s;
+}
+
+/* Focus */
+.category-popup input:focus,
+.category-popup select:focus {
+    border-color: red;
+    box-shadow: 0 0 5px rgba(255,0,0,0.2);
+}
+
+/* Nút lọc */
+.category-popup button {
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: red;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.category-popup button:hover {
+    background: darkred;
+}
+.category-popup input,
+.category-popup select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    outline: none;
+    
+    /* QUAN TRỌNG: làm các ô bằng nhau */
+    box-sizing: border-box;
+}

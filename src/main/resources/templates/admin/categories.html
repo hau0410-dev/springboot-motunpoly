@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" th:href="@{/css/admin-category.css}">
+<title>Quản lý danh mục</title>
+</head>
+
+<body>
+
+<h2>Quản lý danh mục</h2>
+
+<div class="container">
+
+    <div class="layout">
+
+        <!-- FORM -->
+        <div class="form-box card">
+
+            <form th:action="@{/admin/categories/save}" method="post">
+
+                <input type="hidden" name="id" th:value="${category.id}">
+
+                <label>Tên danh mục</label>
+                <input type="text" name="name"
+                       th:value="${category.name}">
+
+                <label>Icon</label>
+                <input type="text" name="icon"
+                       th:value="${category.icon}">
+
+                <label>Hoạt động</label>
+                <select name="isActive">
+                
+                    <option value="true"
+                        th:selected="${category.isActive == true}">
+                        Hoạt động
+                    </option>
+
+                    <option value="false"
+                        th:selected="${category.isActive == false}">
+                        Tắt
+                    </option>
+
+                </select>
+
+                <button type="submit">Lưu</button>
+
+                <a th:href="@{/admin/categories}">
+                    <button type="button">Mới</button>
+                </a>
+
+            </form>
+
+        </div>
+
+        <!-- TABLE -->
+        <div class="card">
+
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên</th>
+                    <th>Icon</th>
+                    <th>Active</th>
+                    <th>Xóa</th>
+                </tr>
+
+                <tr th:each="c : ${categories}">
+
+                    <td th:text="${c.id}"></td>
+
+                    <td>
+                        <a th:href="@{'/admin/categories/edit/' + ${c.id}}"
+                           th:text="${c.name}">
+                        </a>
+                    </td>
+
+                    <td th:text="${c.icon}"></td>
+
+                    <td th:text="${c.isActive}"></td>
+
+                    <td>
+                        <a th:href="@{'/admin/categories/delete/' + ${c.id}}">
+                            Xóa
+                        </a>
+                    </td>
+
+                </tr>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div th:replace="admin/layout/header :: header"></div>
+
+<div class="admin-container">
+
+    <!-- SIDEBAR -->
+    <div th:replace="admin/layout/sidebar :: sidebar"></div>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+        <h3>Chào mừng Admin 👋</h3>
+
+        <p>
+            Đây là trang quản trị hệ thống.
+            Bạn có thể quản lý danh mục, sản phẩm và người dùng tại đây.
+        </p>
+
+        <div class="admin-boxes">
+
+            <div class="box">
+                <h4> <a th:href="@{/admin/categories}">📁 Danh mục</a></h4>
+                <p>Thêm / sửa / xoá Categories</p>
+            </div>
+
+            <div class="box">
+                <h4><a th:href="@{/admin/products}">🛒 Sản phẩm</a></h4>
+                <p>Quản lý bài đăng, sản phẩm</p>
+            </div>
+
+            <div class="box">
+                <h4><a th:href="@{/admin/users}">👤 Người dùng</a></h4>
+                <p>Phân quyền, khoá tài khoản</p>
+            </div>
+            <div class="box">
+                <h4><a th:href="@{/}">🛒 Trang Chủ 📁 </a></h4>
+                <p>Sản Phẩm Người Mua Bán</p>
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

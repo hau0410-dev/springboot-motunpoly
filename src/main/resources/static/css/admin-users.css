@@ -1,0 +1,132 @@
+/* =========================
+ADMIN USERS DASHBOARD
+========================= */
+
+body{
+    font-family: "Segoe UI", sans-serif;
+    background:#f4f8fc;
+    margin:0;
+}
+
+/* TITLE */
+
+.page-title{
+    text-align:center;
+    color:#1d4ed8;
+    margin-bottom:25px;
+}
+
+/* LAYOUT */
+
+.admin-grid{
+    display:grid;
+    grid-template-columns:320px 1fr;
+    gap:25px;
+}
+
+/* CARD */
+
+.form-card,
+.table-card{
+    background:white;
+    padding:25px;
+    border-radius:14px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+
+/* FORM */
+
+form{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+label{
+    font-weight:600;
+    color:#374151;
+}
+
+input,
+select{
+    padding:10px;
+    border-radius:6px;
+    border:1px solid #d1d5db;
+    font-size:14px;
+}
+
+input:focus,
+select:focus{
+    outline:none;
+    border-color:#2563eb;
+    box-shadow:0 0 0 2px rgba(37,99,235,0.15);
+}
+
+/* BUTTON */
+
+button{
+    margin-top:10px;
+    padding:10px;
+    border:none;
+    border-radius:6px;
+    background:#2563eb;
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+button:hover{
+    background:#1e40af;
+}
+
+/* TABLE */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    background:#1d4ed8;
+    color:white;
+    padding:12px;
+    font-size:13px;
+}
+
+td{
+    padding:12px;
+    text-align:center;
+    border-bottom:1px solid #e5e7eb;
+    font-size:14px;
+}
+
+tr:hover{
+    background:#eff6ff;
+}
+
+/* ROLE BADGE */
+
+td:nth-child(5){
+    font-weight:bold;
+}
+
+/* STATUS */
+
+td:nth-child(6){
+    font-weight:bold;
+}
+
+/* ACTION */
+
+td a{
+    padding:5px 10px;
+    border-radius:6px;
+    background:#ef4444;
+    color:white !important;
+    font-size:13px;
+}
+
+td a:hover{
+    background:#b91c1c;
+}

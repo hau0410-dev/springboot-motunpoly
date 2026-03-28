@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<link rel="stylesheet" th:href="@{/css/cart.css}">
+<link rel="stylesheet" href="/css/style.css">
+    <meta charset="UTF-8">
+    <title>Giỏ hàng</title>
+    
+</head>
+<body>
+<div th:replace="layout/header :: header"></div>
+<div class="cart-container">
+
+    <h2 class="cart-title">🛒 Giỏ hàng của bạn</h2>
+
+    <div th:if="${cart == null || cart.empty}" class="cart-empty">
+        Giỏ hàng đang trống.
+    </div>
+
+    <table th:if="${cart != null && !cart.empty}"
+           class="cart-table">
+        <thead>
+        <tr>
+            <th>Sản phẩm</th>
+            <th>Giá</th>
+            <th>Số lượng</th>
+            <th>Thành tiền</th>
+            <th>Thao tác</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="item : ${cart.items}">
+            <td>
+                <img th:src="@{/images/{img}(img=${item.image})}" width="60">
+                <div th:text="${item.productName}"></div>
+            </td>
+
+            <td class="price" th:text="${item.price}"></td>
+
+            <td th:text="${item.quantity}"></td>
+
+            <td class="price" th:text="${item.totalPrice}"></td>
+
+            <td>
+                <a class="btn-remove"
+                   th:href="@{/cart/remove/{id}(id=${item.productId})}">
+                    ❌ Xóa
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div th:if="${cart != null && !cart.empty}"
+         class="cart-total">
+        Tổng tiền:
+        <span th:text="${cart.totalAmount}"></span> ₫
+    </div>
+    <div th:if="${cart != null && !cart.empty}" class="cart-actions">
+    <a class="btn-checkout" th:href="@{/cart/checkout}">
+        🧾 Thanh toán
+    </a>
+</div>
+    
+
+</div>

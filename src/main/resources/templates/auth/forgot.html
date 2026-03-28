@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Quên mật khẩu</title>
+
+<link rel="stylesheet" th:href="@{/css/forgot.css}">
+
+</head>
+<body>
+
+<div class="container">
+
+    <div class="box">
+
+        <h2>🔑 Quên mật khẩu</h2>
+
+        <form th:action="@{/forgot}" method="post">
+
+            <label>Tên đăng nhập</label>
+            <input type="text" name="username" required>
+
+            <label>Email</label>
+            <input type="text" name="email" required>
+
+            <label>Mật khẩu mới</label>
+            <input type="password" name="newPassword" required>
+
+            <button type="submit">
+                Đổi mật khẩu
+            </button>
+
+        </form>
+
+        <p class="error" th:text="${error}"></p>
+        <p class="success" th:text="${success}"></p>
+
+        <a href="/login" class="back">
+            ← Quay lại đăng nhập
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

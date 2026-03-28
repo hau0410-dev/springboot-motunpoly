@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Quản lý đánh giá</title>
+<link rel="stylesheet" th:href="@{/css/admin-reviews.css}">
+
+</head>
+<body>
+
+<h2>Quản lý đánh giá</h2>
+
+<div class="layout">
+
+   <div class="left-card">
+
+    <h3>Bộ lọc</h3>
+
+    <form action="/admin/reviews" method="get">
+
+        <input type="text" name="user" placeholder="Tìm user">
+
+        <input type="text" name="product" placeholder="Tìm sản phẩm">
+
+        <button type="submit" class="btn-save">Tìm</button>
+
+    </form>
+
+</div>
+
+
+    <!-- KHUNG PHẢI -->
+    <div class="right-card">
+
+        <table>
+
+        <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Email</th>
+            <th>Sản phẩm</th>
+            <th>Sao</th>
+            <th>Nhận xét</th>
+            <th>Xóa</th>
+        </tr>
+
+        <tr th:each="r : ${reviews}">
+            <td th:text="${r.id}"></td>
+            <td th:text="${r.fullname}"></td>
+            <td th:text="${r.email}"></td>
+            <td th:text="${r.productName}"></td>
+
+            <td class="stars">
+                <span th:each="i : ${#numbers.sequence(1,r.rating)}">⭐</span>
+            </td>
+
+            <td th:text="${r.comment}"></td>
+
+            <td>
+                <form th:action="@{/admin/reviews/delete/{id}(id=${r.id})}" method="post">
+                    <button type="submit" class="btn-delete">Xóa</button>
+                </form>
+            </td>
+        </tr>
+
+        </table>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,144 @@
+/* =========================
+   ADMIN ORDER DASHBOARD
+========================= */
+
+*{
+box-sizing:border-box;
+font-family:"Segoe UI",Tahoma,sans-serif;
+}
+
+body{
+margin:0;
+background:#f4f6fb;
+padding:30px;
+}
+
+/* TITLE */
+
+h2{
+text-align:center;
+color:#5664d2;
+margin-bottom:25px;
+}
+
+/* CONTAINER */
+
+.container{
+width:95%;
+margin:auto;
+}
+
+/* GRID */
+
+.layout{
+display:grid;
+grid-template-columns:320px 1fr;
+gap:25px;
+}
+
+/* CARD */
+
+.card{
+background:white;
+border-radius:14px;
+padding:20px;
+box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+
+/* FILTER */
+
+.filter-card h3{
+margin-top:0;
+color:#5664d2;
+}
+
+.filter-card form{
+display:flex;
+flex-direction:column;
+gap:12px;
+}
+
+label{
+font-weight:600;
+color:#5664d2;
+}
+
+input,select{
+padding:10px;
+border-radius:8px;
+border:1px solid #e0e6ed;
+}
+
+/* BUTTON */
+
+button{
+padding:10px;
+border:none;
+border-radius:8px;
+background:#5664d2;
+color:white;
+cursor:pointer;
+}
+
+button:hover{
+background:#3f4dd1;
+}
+
+/* TABLE */
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th{
+background:#5664d2;
+color:white;
+padding:14px;
+font-size:14px;
+}
+
+td{
+padding:12px;
+text-align:center;
+border-bottom:1px solid #eee;
+}
+
+tr:hover{
+background:#f5f7ff;
+}
+
+/* STATUS */
+
+.status-dang{
+color:#f59e0b;
+background:#fff7ed;
+padding:6px 12px;
+border-radius:20px;
+font-weight:bold;
+}
+
+.status-da{
+color:#16a34a;
+background:#ecfdf5;
+padding:6px 12px;
+border-radius:20px;
+font-weight:bold;
+}
+
+/* ACTION */
+
+td a{
+display:inline-block;
+padding:6px 10px;
+border-radius:6px;
+background:#2563eb;
+color:white;
+text-decoration:none;
+font-size:13px;
+margin:2px;
+}
+
+td a:hover{
+background:#1e40af;
+}

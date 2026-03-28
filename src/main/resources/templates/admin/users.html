@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Quản lý người dùng</title>
+
+<link rel="stylesheet" th:href="@{/css/admin-users.css}">
+
+</head>
+<body>
+
+<div class="container">
+
+<h2 class="page-title">👤 Quản lý người dùng</h2>
+
+<div class="admin-grid">
+
+<!-- FORM CARD -->
+<div class="form-card">
+
+<form th:action="@{/admin/users/save}" th:object="${user}" method="post">
+
+    <input type="hidden" th:field="*{id}">
+
+    <label>Username</label>
+    <input type="text" th:field="*{username}" required>
+
+    <label>Password</label>
+    <input type="password" th:field="*{password}" required>
+
+    <label>Họ tên</label>
+    <input type="text" th:field="*{fullName}">
+
+    <label>Email</label>
+    <input type="email" th:field="*{email}">
+
+    <label>Role</label>
+    <select th:field="*{role}">
+        <option value="USER">USER</option>
+        <option value="ADMIN">ADMIN</option>
+    </select>
+
+    <label>Enabled</label>
+    <select th:field="*{enabled}">
+        <option th:value="true">Hoạt động</option>
+        <option th:value="false">Khoá</option>
+    </select>
+
+    <button type="submit">💾 Lưu</button>
+
+    <a th:href="@{/admin/users}">
+        <button type="button">➕ Thêm mới</button>
+    </a>
+
+</form>
+
+</div>
+
+
+<!-- TABLE CARD -->
+<div class="table-card">
+
+<table>
+
+<thead>
+<tr>
+    <th>ID</th>
+    <th>Username</th>
+    <th>Họ tên</th>
+    <th>Email</th>
+    <th>Role</th>
+    <th>Enabled</th>
+    <th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+<tr th:each="u : ${users}">
+    <td th:text="${u.id}"></td>
+
+    <td>
+        <a th:href="@{/admin/users/edit/{id}(id=${u.id})}"
+           style="color:blue; font-weight:bold;">
+           <span th:text="${u.username}"></span>
+        </a>
+    </td>
+
+    <td th:text="${u.fullName}"></td>
+    <td th:text="${u.email}"></td>
+    <td th:text="${u.role}"></td>
+    <td th:text="${u.enabled ? 'Hoạt động' : 'Khoá'}"></td>
+
+    <td>
+        <a th:href="@{/admin/users/delete/{id}(id=${u.id})}"
+           onclick="return confirm('Xóa người dùng?')"
+           style="color:red;">
+           Xóa
+        </a>
+    </td>
+</tr>
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+</div>
+
+</body>
+</html>

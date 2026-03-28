@@ -1,0 +1,101 @@
+body{
+    font-family: Arial;
+    background:#f5f7fb;
+    margin:0;
+}
+
+/* title */
+
+h2{
+    text-align:center;
+    color:#5a67d8;
+    margin:20px 0;
+}
+
+/* layout */
+
+.layout{
+    width:92%;
+    margin:auto;
+    display:grid;
+    grid-template-columns:280px 1fr;
+    gap:30px;
+}
+
+/* left card */
+
+.left-card{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+}
+
+.left-card h3{
+    color:#5a67d8;
+}
+
+.left-card input{
+    width:100%;
+    padding:10px;
+    margin-bottom:12px;
+    border-radius:6px;
+    border:1px solid #ddd;
+}
+
+.btn-save{
+    width:100%;
+    padding:10px;
+    background:linear-gradient(90deg,#5a6bd8,#5663c7);
+    border:none;
+    color:white;
+    border-radius:8px;
+}
+
+/* right card */
+
+.right-card{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* table */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    background:linear-gradient(90deg,#5a6bd8,#5663c7);
+    color:white;
+    padding:12px;
+}
+
+td{
+    padding:12px;
+    border-bottom:1px solid #eee;
+    text-align:center;
+}
+
+tr:hover{
+    background:#f7f9ff;
+}
+
+/* stars */
+
+.stars{
+    color:#f4b400;
+}
+
+/* delete */
+
+.btn-delete{
+    background:#ff4d4f;
+    border:none;
+    padding:6px 14px;
+    border-radius:6px;
+    color:white;
+}

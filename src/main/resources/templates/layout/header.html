@@ -1,0 +1,113 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<header class="mp-header" th:fragment="header">
+    <div class="mp-header-top">
+
+       <a th:href="@{/}" class="logo">
+    		<img th:src="@{/imges/logo.png}" alt="ChittyDetailing">
+    		<span>TyRacing</span>
+		</a>
+
+
+        <button class="btn-category" onclick="toggleFilter()">
+		    ☰ Danh mục
+		</button>
+        <div class="category-popup" id="filterBox">
+
+				<form action="/" method="get">
+			
+			    <label>Tên sản phẩm</label>
+			    <input type="text" name="keyword">
+			
+			    <label>Danh mục</label>
+			    <select name="category">
+			        <option value="">Tất cả</option>
+			        <option th:each="c : ${categories}"
+			                th:value="${c.id}"
+			                th:text="${c.name}">
+			        </option>
+			    </select>
+			
+			    <label>Giá từ</label>
+			    <input type="number" name="min">
+			
+			    <label>Đến</label>
+			    <input type="number" name="max">
+			
+			    <button type="submit">Lọc</button>
+			
+			</form>
+		
+		</div>
+
+        <!-- SEARCH -->
+        <div class="search-wrapper">
+            <form class="search-box" th:action="@{/}" method="get">
+                <input type="text"
+                       name="keyword"
+                       placeholder="Tìm phụ tùng xe máy, nhớt, lốp, phanh..."
+                       th:value="${keyword}">
+                <button type="submit">🔍</button>
+            </form>
+
+            
+            
+        </div>
+
+        <!-- CART -->
+        <div class="cart">
+            <a th:href="@{/cart}" style="color:white; text-decoration:none;">
+                🛒 Giỏ hàng
+                <span th:if="${session.cart != null}">
+                    (<b th:text="${#lists.size(session.cart.items)}"></b>)
+                </span>
+            </a>
+        </div>
+
+        <!-- AUTH -->
+        <div class="auth-buttons">
+
+            <div th:if="${session.user == null}">
+                <a th:href="@{/login}" class="btn-auth">Đăng nhập</a>
+                <a th:href="@{/register}" class="btn-auth btn-register">Đăng ký</a>
+            </div>
+
+            <div th:if="${session.user != null}" class="user-menu">
+                <div class="user-trigger">
+                    <img src="/imges/avatar.png" class="user-avatar" alt="avatar">
+                    <span class="username">
+                        Xin chào, <b th:text="${session.user.username}"></b>
+                    </span>
+                </div>
+
+                <div class="user-dropdown">
+                    <a th:href="@{/profile}">👤 Thông tin cá nhân</a>
+                    <a th:href="@{/orders}">📦 Lịch sử đặt hàng</a>
+                    <a th:href="@{/reviews}">⭐ Lịch sử đánh giá</a>
+                    <a href="/change-password">🔒 Đổi mật khẩu</a>
+                    
+					<a th:if="${session.user != null and session.user.role == 'ADMIN'}"
+					   th:href="@{/admin}">
+					    👤 Quản trị
+					</a>
+					
+					<hr th:if="${session.user != null and session.user.role == 'ADMIN'}">
+                    <a th:href="@{/logout}" class="logout">🚪 Đăng xuất</a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</header>
+<script>
+function toggleFilter() {
+    var box = document.getElementById("filterBox");
+
+    if(box.style.display === "block"){
+        box.style.display = "none";
+    }else{
+        box.style.display = "block";
+    }
+}
+</script>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Chi tiết đơn hàng</title>
+<link rel="stylesheet" th:href="@{/css/user-order-detail.css}">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div th:replace="layout/header :: header"></div>
+<div class="box">
+
+<h2>CHI TIẾT ĐƠN HÀNG #<span th:text="${order.id}"></span></h2>
+
+<p><b>Khách hàng:</b> <span th:text="${order.fullname}"></span></p>
+<p><b>Email:</b> <span th:text="${order.email}"></span></p>
+<p><b>SĐT:</b> <span th:text="${order.phone}"></span></p>
+<p><b>Địa chỉ:</b> <span th:text="${order.address}"></span></p>
+<p><b>Trạng thái:</b> <span th:text="${order.status}"></span></p>
+<p><b>Tổng tiền:</b> <span th:text="${order.totalAmount}"></span></p>
+
+<h3>Sản phẩm</h3>
+
+<table>
+<tr>
+    <th>Tên sản phẩm</th>
+    <th>Giá</th>
+    <th>Số lượng</th>
+    <th>Thành tiền</th>
+</tr>
+
+<tr th:each="i : ${items}">
+    <td th:text="${i.product.name}"></td>
+    <td th:text="${i.price}"></td>
+    <td th:text="${i.quantity}"></td>
+    <td th:text="${i.subtotal}"></td>
+</tr>
+
+</table>
+<h3>Đánh giá sản phẩm</h3>
+
+<div th:each="i : ${items}">
+
+<form action="/review/save" method="post">
+
+    <input type="hidden"
+           name="productName"
+           th:value="${i.product.name}">
+
+    <p>
+        <b th:text="${i.product.name}"></b>
+    </p>
+
+    <label>Số sao:</label>
+    <select name="rating">
+        <option value="1">1 ⭐</option>
+        <option value="2">2 ⭐</option>
+        <option value="3">3 ⭐</option>
+        <option value="4">4 ⭐</option>
+        <option value="5">5 ⭐</option>
+    </select>
+
+    <br><br>
+
+    <label>Ghi chú:</label>
+    <input type="text" name="comment">
+
+    <br><br>
+
+    <button type="submit" class="btn">
+        Gửi đánh giá
+    </button>
+
+</form>
+
+<hr>
+
+</div>
+
+<br>
+
+<a href="/orders" class="btn">Quay lại</a>
+
+</div>
+
+</body>
+</html>

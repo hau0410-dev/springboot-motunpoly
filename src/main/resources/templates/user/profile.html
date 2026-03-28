@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+<meta charset="UTF-8">
+<title>Thông tin cá nhân</title>
+
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<link rel="stylesheet" th:href="@{/css/profile.css}">
+
+</head>
+<body>
+
+<div th:replace="layout/header :: header"></div>
+
+<div class="profile-container">
+
+    <!-- LEFT AVATAR -->
+    <div class="profile-left">
+
+        <img th:src="@{/imges/{img}(img=${user.avatar})}" />
+
+        <h3 th:text="${user.fullName}"></h3>
+
+        <p th:text="${user.email}"></p>
+
+    </div>
+
+
+    <!-- RIGHT FORM -->
+    <div class="profile-right">
+		<div th:if="${message}" class="alert-success">
+		    <span th:text="${message}"></span>
+		</div>
+		
+        <h2>Thông tin cá nhân</h2>
+
+        <form th:action="@{/profile/update}" method="post">
+
+            <input type="hidden" name="id" th:value="${user.id}"/>
+
+            <div class="profile-row">
+                <label>Username</label>
+                <input name="username" th:value="${user.username}" readonly>
+            </div>
+
+            <div class="profile-row">
+                <label>Họ tên</label>
+                <input name="fullName" th:value="${user.fullName}">
+            </div>
+
+            <div class="profile-row">
+                <label>Email</label>
+                <input name="email" th:value="${user.email}">
+            </div>
+
+            <div class="profile-row">
+                <label>Avatar (tên file)</label>
+                <input name="avatar" th:value="${user.avatar}">
+            </div>
+
+            <button class="btn-save">💾 Cập nhật</button>
+
+        </form>
+
+        <a href="/forgot" class="forgot">Quên mật khẩu?</a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

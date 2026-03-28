@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Quản lý sản phẩm</title>
+<link rel="stylesheet" th:href="@{/css/admin-product.css}">
+</head>
+<body>
+
+<h2>QUẢN LÝ SẢN PHẨM</h2>
+
+<div class="container">
+
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+
+        <!-- SEARCH -->
+        <div class="card">
+            <h3>Tìm sản phẩm</h3>
+
+            <input type="text" placeholder="Nhập tên sản phẩm">
+
+            <button>Tìm</button>
+        </div>
+
+        <!-- ADD -->
+        <div class="card">
+            <h3>Thêm sản phẩm</h3>
+
+            <a class="btn-add" th:href="@{/admin/products/create}">
+                ➕ Thêm sản phẩm
+            </a>
+        </div>
+
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+
+        <div class="table-card">
+
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên</th>
+                    <th>Giá</th>
+                    <th>Hình</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+
+                <tr th:each="p : ${products}">
+                    <td th:text="${p.id}"></td>
+                    <td th:text="${p.name}"></td>
+                    <td th:text="${p.price}"></td>
+
+                    <td>
+                        <img th:src="@{/images/{img}(img=${p.image})}">
+                    </td>
+
+                    <td th:text="${p.active}"></td>
+
+                    <td class="action">
+
+                        <a class="edit"
+                           th:href="@{/admin/products/edit/{id}(id=${p.id})}">
+                            ✏️
+                        </a>
+
+                        <a class="delete"
+                           th:href="@{/admin/products/delete/{id}(id=${p.id})}"
+                           onclick="return confirm('Xóa sản phẩm?')">
+                            🗑️
+                        </a>
+
+                    </td>
+
+                </tr>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

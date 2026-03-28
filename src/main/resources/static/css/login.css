@@ -1,0 +1,74 @@
+.login-page {
+    background: linear-gradient(135deg, #fff5f5, #ffeaea);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+}
+
+.login-box {
+    background: #ffffff;
+    padding: 30px 40px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(255, 0, 0, 0.08);
+    border: 1px solid #ffd6d6;
+    width: 350px;
+}
+
+.login-box h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #cc0000;
+}
+
+.login-box .error {
+    color: #e00000;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.login-box input {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ffcccc;
+    border-radius: 6px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.login-box input:focus {
+    border-color: #ff4d4d;
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.2);
+}
+
+.login-box button {
+    width: 100%;
+    padding: 10px;
+    background: #e60000;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.login-box button:hover {
+    background: #cc0000;
+}
+
+.login-box .register-link {
+    display: block;
+    text-align: center;
+    margin-top: 12px;
+    color: #cc0000;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.login-box .register-link:hover {
+    text-decoration: underline;
+}
