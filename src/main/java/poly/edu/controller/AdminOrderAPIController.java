@@ -73,7 +73,7 @@ public class AdminOrderAPIController {
 
     // ===== DELETE =====
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable Integer id) {
+    public String delete(@PathVariable("id") Integer id) {
         orderRepo.deleteById(id); // gọi thẳng repo
         return "Deleted successfully";
     }

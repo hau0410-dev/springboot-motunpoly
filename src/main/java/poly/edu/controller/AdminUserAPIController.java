@@ -23,7 +23,7 @@ public class AdminUserAPIController {
 
     // ===== 2. CHI TIẾT ===== (giống edit())
     @GetMapping("/{id}")
-    public User getById(@PathVariable Integer id) {
+    public User getById(@PathVariable("id") Integer id) {
         return userRepo.findById(id).orElse(null);
     }
 
@@ -35,21 +35,19 @@ public class AdminUserAPIController {
 
     // ===== 4. UPDATE =====
     @PutMapping("/{id}")
-    public User update(@PathVariable Integer id, @RequestBody User user) {
-
+    public User update(@PathVariable("id") Integer id, @RequestBody User user) {
         User old = userRepo.findById(id).orElse(null);
 
         if (old != null) {
             user.setId(id);
             return userRepo.save(user);
         }
-
         return null;
     }
 
     // ===== 5. DELETE ===== (giống delete())
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable Integer id) {
+    public String delete(@PathVariable("id") Integer id) {
         userRepo.deleteById(id);
         return "Deleted successfully";
     }
