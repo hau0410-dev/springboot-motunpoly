@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 
 import poly.edu.entity.Product;
 import poly.edu.service.ProductService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/api/admin/products")
@@ -72,13 +74,14 @@ public class AdminProductAPIController {
 
     // ===== 7. FILTER ===== (giống query repo của bạn)
     @GetMapping("/filter")
-    public List<Product> filter(
+    public Page<Product> filter(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Integer categoryId,
             @RequestParam(required = false) Double min,
-            @RequestParam(required = false) Double max) {
-
-        return productService.filter(keyword, categoryId, min, max);
+            @RequestParam(required = false) Double max, 
+    		@RequestParam(required = false) Pageable pageable) {
+    			
+        return productService.filter(keyword, categoryId, min, max, pageable );
     }
 
     // ===== 8. SUGGEST =====

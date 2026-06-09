@@ -3,6 +3,8 @@ package poly.edu.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import poly.edu.entity.Product;
@@ -64,11 +66,15 @@ public class ProductServiceImpl implements ProductService {
         productRepository.deleteById(id);
     }
     @Override
-    public List<Product> filter(String keyword, Integer categoryId, Double min, Double max) {
-        return productRepo.filter(keyword, categoryId, min, max);
+    public Page<Product> filter(String keyword, Integer categoryId, Double min, Double max, Pageable pageable) {
+        return productRepository.filter(keyword, categoryId, min, max, pageable);
     }
     @Override
     public Product findByName(String name) {
         return productRepo.findByName(name);
+    }
+    @Override
+    public Page<Product> getSuggestProducts(Pageable pageable) {
+        return productRepository.findSuggestProducts(pageable);
     }
 }

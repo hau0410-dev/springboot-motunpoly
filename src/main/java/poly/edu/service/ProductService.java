@@ -4,6 +4,9 @@ import java.util.List;
 
 import poly.edu.entity.Order;
 import poly.edu.entity.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 
 public interface ProductService {
 
@@ -19,9 +22,14 @@ public interface ProductService {
 	
 	void deleteById(Integer id);
 	
-	List<Product> filter(String keyword, Integer categoryId, Double min, Double max);
+	
 	
 	Product findByName(String name);
+	
+	Page<Product> filter(String keyword, Integer categoryId, Double min, Double max, Pageable pageable);
+	
+	Page<Product> getSuggestProducts(Pageable pageable);
+
 	
 	
 	
