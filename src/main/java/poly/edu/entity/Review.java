@@ -9,7 +9,14 @@ public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    
+    @ManyToOne
+    @JoinColumn(name="user_id")
+    private User user;
 
+    @ManyToOne
+    @JoinColumn(name="product_id")
+    private Product product;
     private String username;
     private String fullname;
     private String email;
@@ -72,5 +79,20 @@ public class Review {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
     }
 }

@@ -27,4 +27,5 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     		        @Param("min") Double min,
     		        @Param("max") Double max
     		);
+    Product findByName(String name);
 }

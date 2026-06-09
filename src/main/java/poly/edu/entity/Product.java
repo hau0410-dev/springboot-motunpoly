@@ -19,6 +19,8 @@ public class Product {
     private String description;
 
     private Boolean active;
+    
+    private Integer stock;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -79,6 +81,14 @@ public class Product {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+    
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
     }
     
 }

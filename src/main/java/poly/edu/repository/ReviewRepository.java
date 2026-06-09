@@ -21,4 +21,5 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
             @Param("user") String user,
             @Param("product") String product
     );
+    List<Review> findByUser_Id(Integer userId);
 }

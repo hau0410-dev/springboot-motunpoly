@@ -135,6 +135,29 @@ public class AdminController {
         productService.deleteById(id);
         return "redirect:/admin/products";
     }
+    @GetMapping("/product/detail/{id}")
+    public String detail(
+            @PathVariable Integer id,
+            Model model,
+            HttpSession session){
+
+        Product product =
+                productService.findById(id);
+
+        model.addAttribute("product", product);
+
+        String stockMessage =
+                (String) session.getAttribute("stockMessage");
+
+        model.addAttribute(
+                "stockMessage",
+                stockMessage
+        );
+
+        session.removeAttribute("stockMessage");
+
+        return "product/detail";
+    }
 
 
 }

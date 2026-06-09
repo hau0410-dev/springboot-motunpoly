@@ -18,6 +18,30 @@
 <p><b>Địa chỉ:</b> <span th:text="${order.address}"></span></p>
 <p><b>Trạng thái:</b> <span th:text="${order.status}"></span></p>
 <p><b>Tổng tiền:</b> <span th:text="${order.totalAmount}"></span></p>
+<p>
+    <strong>Phương thức thanh toán:</strong>
+
+    <span th:if="${payment != null}"
+          th:text="${order.payment.paymentMethod}">
+    </span>
+</p>
+
+<p>
+    <strong>Trạng thái thanh toán:</strong>
+
+    <span th:if="${payment != null and payment.paymentStatus == 'CHO_THANH_TOAN'}">
+        ⏳ Chờ thanh toán
+    </span>
+
+    <span th:if="${payment != null and payment.paymentStatus == 'DA_THANH_TOAN'}">
+        ✅ Đã thanh toán
+    </span>
+    <span th:if="${payment != null and payment.paymentStatus == 'CHO_XAC_NHAN'}">
+    	🏦 Chờ xác nhận chuyển khoản
+</span>
+    
+    
+</p>
 
 <h3>Sản phẩm</h3>
 

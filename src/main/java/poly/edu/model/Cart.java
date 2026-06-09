@@ -6,11 +6,25 @@ public class Cart {
     private Map<Integer, CartItem> items = new HashMap<>();
 
     public void add(CartItem item) {
+
         CartItem existed = items.get(item.getProductId());
+
         if (existed == null) {
+
             items.put(item.getProductId(), item);
+
         } else {
-            existed.setQuantity(existed.getQuantity() + item.getQuantity());
+
+            int newQty =
+                    existed.getQuantity()
+                    + item.getQuantity();
+
+            if(newQty > existed.getStock()){
+
+                newQty = existed.getStock();
+            }
+
+            existed.setQuantity(newQty);
         }
     }
 

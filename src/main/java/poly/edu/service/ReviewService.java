@@ -11,4 +11,5 @@ public interface ReviewService {
     List<Review> findAll();
     void deleteById(Integer id);
     List<Review> search(String user, String product);
+    List<Review> findByUserId(Integer userId);
 }

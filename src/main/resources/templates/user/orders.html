@@ -16,9 +16,11 @@
         <th>Khách hàng</th>
         <th>Email</th>
         <th>SDT</th>
-        <th>Tổng tiền</th>
-        <th>Trạng thái</th>
-        <th>Thao tác</th>
+       <th>Tổng tiền</th>
+		<th>Thanh toán</th>
+		<th>TT Thanh toán</th>
+		<th>Trạng thái</th>
+		<th>Thao tác</th>
     </tr>
 
     <tr th:each="o : ${orders}">
@@ -27,13 +29,35 @@
         <td th:text="${o.email}"></td>
         <td th:text="${o.phone}"></td>
         <td th:text="${o.totalAmount}"></td>
-        <td th:text="${o.status}"></td>
-        <td>
-            <a th:href="@{/orders/{id}(id=${o.id})}" class="btn">
-                Xem
-            </a>
-        </td>
-    </tr>
+
+		<td th:text="${o.payment.paymentMethod}"></td>
+		
+		<td>
+
+		    <span th:if="${o.payment != null and o.payment.paymentStatus == 'CHO_THANH_TOAN'}">
+		        ⏳ Chờ thanh toán
+		    </span>
+		
+		    <span th:if="${o.payment != null and o.payment.paymentStatus == 'DA_THANH_TOAN'}">
+		        ✅ Đã thanh toán
+		    </span>
+		     <span th:if="${o.payment.paymentStatus == 'CHO_XAC_NHAN'}">
+		        🏦 Chờ xác nhận
+		    </span>
+		
+		    <span th:if="${o.payment == null}">
+		        Chưa có
+		    </span>
+		
+		</td>
+		
+		<td th:text="${o.status}"></td>
+		        <td>
+		            <a th:href="@{/orders/{id}(id=${o.id})}" class="btn">
+		                Xem
+		            </a>
+		        </td>
+		    </tr>
 
 </table>
 

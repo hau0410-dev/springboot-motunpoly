@@ -38,9 +38,36 @@
             <div class="rating">
                 ⭐ 4.9 | 297 đánh giá
             </div>
+			<div class="stock-info">
 
+			    <span th:if="${product.stock > 0}">
+			        Còn lại:
+			        <b th:text="${product.stock}"></b>
+			        sản phẩm
+			    </span>
+			
+			    <span th:if="${product.stock <= 0}"
+			          style="color:red;font-weight:bold;">
+			        Hết hàng
+			    </span>
+			
+			</div>
 
             <div class="price-box">
+            	<div class="stock-info">
+
+				    <span th:if="${product.stock > 0}">
+				        Còn lại:
+				        <b th:text="${product.stock}"></b>
+				        sản phẩm
+				    </span>
+				
+				    <span th:if="${product.stock <= 0}"
+				          style="color:red;font-weight:bold;">
+				        Hết hàng
+				    </span>
+				
+				</div>
 
                 <div class="price"
                      th:text="${#numbers.formatDecimal(product.price,0,'COMMA',0,'POINT')} + 'đ'">
@@ -59,15 +86,26 @@
 
             <!-- add to cart -->
             <form th:action="@{/cart/add/{id}(id=${product.id})}"
-                  method="post">
-
-                <input type="hidden" name="qty" value="1">
-
-                <button class="btn-cart" type="submit">
-                    🛒 Thêm vào giỏ hàng
-                </button>
-
-            </form>
+			      method="post">
+			
+			    <input type="hidden" name="qty" value="1">
+			
+			    <button
+			        class="btn-cart"
+			        type="submit"
+			        th:disabled="${product.stock <= 0}">
+			
+			        <span th:if="${product.stock > 0}">
+			            🛒 Thêm vào giỏ hàng
+			        </span>
+			
+			        <span th:if="${product.stock <= 0}">
+			            ❌ Hết hàng
+			        </span>
+			
+			    </button>
+			
+			</form>
 
 
         </div>

@@ -1,8 +1,48 @@
 /* =========================
    ADMIN ORDER DASHBOARD
 ========================= */
+/* STATUS COLUMN */
 
-*{
+.status-column{
+min-width:180px;
+}
+
+/* STATUS */
+
+.status{
+display:inline-block;
+padding:8px 18px;
+border-radius:30px;
+font-size:14px;
+font-weight:600;
+white-space:nowrap;
+min-width:130px;
+text-align:center;
+}
+
+/* CHỜ XÁC NHẬN */
+
+.status-cho{
+color:#d97706;
+background:#fff7ed;
+border:1px solid #fdba74;
+}
+
+/* ĐANG GIAO */
+
+.status-dang{
+color:#2563eb;
+background:#eff6ff;
+border:1px solid #93c5fd;
+}
+
+/* ĐÃ GIAO */
+
+.status-da{
+color:#16a34a;
+background:#ecfdf5;
+border:1px solid #86efac;
+}*{
 box-sizing:border-box;
 font-family:"Segoe UI",Tahoma,sans-serif;
 }

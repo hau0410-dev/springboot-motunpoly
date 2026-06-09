@@ -4,11 +4,11 @@
 <title>Lịch sử đặt hàng</title>
 
 <link rel="stylesheet" th:href="@{/css/historyorder.css}">
-
+<link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
 
 <body>
-
+<div th:replace="admin/layout/header :: header"></div>
 <h2>📦 Lịch sử đặt hàng</h2>
 
 <div class="container">
@@ -30,15 +30,20 @@
 				
 				<option value="">Tất cả</option>
 				
-				<option value="ĐANG_GIAO"
-					th:selected="${status == 'ĐANG_GIAO'}">
-					ĐANG_GIAO
-				</option>
-				
-				<option value="DA_GIAO"
-					th:selected="${status == 'DA_GIAO'}">
-					DA_GIAO
-				</option>
+				 <option value="CHO_XAC_NHAN"
+			        th:selected="${status == 'CHO_XAC_NHAN'}">
+			        Chờ xác nhận
+			    </option>
+			
+			    <option value="DANG_GIAO"
+			        th:selected="${status == 'DANG_GIAO'}">
+			        Đang giao
+			    </option>
+			
+			    <option value="DA_GIAO"
+			        th:selected="${status == 'DA_GIAO'}">
+			        Đã giao
+			    </option>
 				
 				</select>
 				
@@ -53,46 +58,66 @@
         <div class="card">
 
             <table>
-                <tr>
-                    <th>ID</th>
-                    <th>Khách hàng</th>
-                    <th>Email</th>
-                    <th>SĐT</th>
-                    <th>Tổng tiền</th>
-                    <th>Trạng thái</th>
-                    <th>Thao tác</th>
-                </tr>
+			    <tr>
+			       <th>ID</th>
+					<th>Khách hàng</th>
+					<th>Email</th>
+					<th>SĐT</th>
+					<th>Tổng tiền</th>
+					
+					<th>Thanh toán</th>
+					<th>TT Thanh toán</th>
+					
+					<th>Trạng thái</th>
+					<th>Thao tác</th>
+			    </tr>
+			
+			    <tr th:each="o : ${orders}">
+			        <td th:text="${o.id}"></td>
+			        <td th:text="${o.fullname}"></td>
+			        <td th:text="${o.email}"></td>
+			        <td th:text="${o.phone}"></td>
+			        <td th:text="${o.totalAmount}"></td>
+			        <td th:text="${o.payment.paymentMethod}"></td>
 
-                <tr th:each="o : ${orders}">
-                    <td th:text="${o.id}"></td>
-                    <td th:text="${o.fullname}"></td>
-                    <td th:text="${o.email}"></td>
-                    <td th:text="${o.phone}"></td>
-                    <td th:text="${o.totalAmount}"></td>
 
-                    <td>
-                        <span th:if="${o.status == 'ĐANG_GIAO'}"
-                              class="status-dang"
-                              th:text="${o.status}"></span>
-
-                        <span th:if="${o.status == 'DA_GIAO'}"
-                              class="status-da"
-                              th:text="${o.status}"></span>
-                    </td>
-
-                    <td>
-                        <a th:href="@{/admin/orders/update/{id}(id=${o.id})}">
-                            🔄 Đổi trạng thái
-                        </a>
-
-                        <a th:href="@{/admin/orders/{id}(id=${o.id})}">
-                            👁 Xem
-                        </a>
-                    </td>
-                </tr>
-
-            </table>
-
+					<td><span th:text="${o.payment.paymentStatus}"></span></td>
+			
+			        <td class="status-column">
+			
+			            <span th:if="${o.status == 'CHO_XAC_NHAN'}"
+			                  class="status status-cho">
+			                Chờ xác nhận
+			            </span>
+			
+			            <span th:if="${o.status == 'DANG_GIAO'}"
+			                  class="status status-dang">
+			                Đang giao
+			            </span>
+			             <span th:if="${o.payment.paymentStatus == 'CHO_XAC_NHAN'}">
+						        🏦 Chờ xác nhận
+						  </span>
+			
+			            <span th:if="${o.status == 'DA_GIAO'}"
+			                  class="status status-da">
+			                Đã giao
+			            </span>
+			
+			        </td>
+			
+			        <td>
+			            <a th:href="@{/admin/orders/update/{id}(id=${o.id})}">
+			                🔄 Đổi trạng thái
+			            </a>
+			
+			            <a th:href="@{/admin/orders/{id}(id=${o.id})}">
+			                👁 Xem
+			            </a>
+			            
+			        </td>
+			    </tr>
+			
+			</table>
         </div>
 
     </div>

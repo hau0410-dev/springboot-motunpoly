@@ -46,7 +46,7 @@ public class AdminOrderAPIController {
     }
 
     // ===== UPDATE STATUS =====
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public Order updateStatus(@PathVariable("id") Integer id) {
 
         Order order = orderService.findById(id);

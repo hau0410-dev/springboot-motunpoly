@@ -16,11 +16,15 @@ import jakarta.servlet.http.HttpSession;
 import poly.edu.entity.Order;
 import poly.edu.entity.OrderItem;
 import poly.edu.entity.Product;
+import poly.edu.entity.User;
 import poly.edu.model.Cart;
 import poly.edu.model.CartItem;
 import poly.edu.repository.OrderItemRespository;
 import poly.edu.service.OrderService;
 import poly.edu.service.ProductService;
+
+import poly.edu.entity.Payment;
+import poly.edu.service.PaymentService;
 
 @Controller
 @RequestMapping("/cart")
@@ -34,7 +38,9 @@ public class CartController {
     
     @Autowired
     private OrderItemRespository orderItemRepo;
-
+    
+    @Autowired
+    private PaymentService paymentService;
     
     
     @GetMapping
@@ -57,14 +63,30 @@ public class CartController {
             HttpSession session) {
 
         Cart cart = (Cart) session.getAttribute("cart");
+
         if (cart == null) {
             cart = new Cart();
-            session.setAttribute("cart", cart); // ✅ QUAN TRỌNG
+            session.setAttribute("cart", cart);
         }
 
         Product p = productService.findById(id);
+
         if (p == null) {
-            return "redirect:/"; // ✅ tránh 500
+            return "redirect:/";
+        }
+
+        // ===== KIỂM TRA TỒN KHO =====
+        if (p.getStock() == null) {
+            p.setStock(0);
+        }
+
+        if (qty > p.getStock()) {
+            session.setAttribute(
+                "stockMessage",
+                "Sản phẩm chỉ còn " + p.getStock() + " trong kho!"
+            );
+
+            return "redirect:/cart";
         }
 
         CartItem item = new CartItem();
@@ -73,12 +95,12 @@ public class CartController {
         item.setPrice(p.getPrice());
         item.setImage(p.getImage());
         item.setQuantity(qty);
+        item.setStock(p.getStock());
 
-        cart.add(item); // giả sử add() đã xử lý cộng số lượng
+        cart.add(item);
 
         return "redirect:/cart";
     }
-
     @GetMapping("/remove/{id}")
     public String remove(@PathVariable("id") Integer id, HttpSession session) {
         Cart cart = (Cart) session.getAttribute("cart");
@@ -101,6 +123,7 @@ public class CartController {
     }
     @PostMapping("/pay")
     public String pay(
+    		@RequestParam("paymentMethod") String paymentMethod,
             @RequestParam("fullname") String fullname,
             @RequestParam("email") String email,
             @RequestParam("phone") String phone,
@@ -111,31 +134,100 @@ public class CartController {
         if (cart == null || cart.isEmpty()) {
             return "redirect:/cart";
         }
+     // ===== KIỂM TRA TOÀN BỘ TỒN KHO TRƯỚC =====
+
+        for (CartItem c : cart.getItems()) {
+
+            Product product =
+                    productService.findById(c.getProductId());
+
+            if (product == null) {
+
+                session.setAttribute(
+                        "stockMessage",
+                        "Sản phẩm không tồn tại!"
+                );
+
+                return "redirect:/cart";
+            }
+
+            if (product.getStock() == null) {
+                product.setStock(0);
+            }
+
+            if (product.getStock() < c.getQuantity()) {
+
+                session.setAttribute(
+                        "stockMessage",
+                        product.getName()
+                        + " chỉ còn "
+                        + product.getStock()
+                        + " sản phẩm trong kho!"
+                );
+
+                return "redirect:/cart";
+            }
+        }
         
         // ===== 1. TẠO ORDER =====
         
         Order order = new Order();
+
+        User user = (User) session.getAttribute("user");
+
+        if(user != null){
+            order.setUser(user);
+        }
+
         order.setFullname(fullname);
         order.setEmail(email);
         order.setPhone(phone);
         order.setAddress(address);
         order.setTotalAmount(cart.getTotalAmount());
-        order.setStatus("ĐANG_GIAO");
+        order.setStatus("CHO_XAC_NHAN");
         order.setCreatedDate(LocalDateTime.now());
+       
 
         orderService.save(order);
+        
+        Payment payment = new Payment();
+
+        payment.setOrder(order);
+        payment.setPaymentMethod(paymentMethod);
+
+        if("COD".equals(paymentMethod)){
+            payment.setPaymentStatus("CHO_THANH_TOAN");
+        }
+
+        if("BANKING".equals(paymentMethod)){
+            payment.setPaymentStatus("CHO_XAC_NHAN");
+        }
+
+        payment.setPaymentDate(LocalDateTime.now());
+
+        paymentService.save(payment);
         
         for (CartItem c : cart.getItems()) {
 
             OrderItem item = new OrderItem();
 
-            Product product = productService.findById(c.getProductId());
+            Product product =
+                    productService.findById(c.getProductId());
 
-            item.setOrder(order); 
+            // ===== TRỪ TỒN KHO =====
+
+            product.setStock(
+                    product.getStock() - c.getQuantity()
+            );
+
+            productService.save(product);
+
+            item.setOrder(order);
             item.setProduct(product);
             item.setQuantity(c.getQuantity());
             item.setPrice(c.getPrice());
             item.setSubtotal(c.getQuantity() * c.getPrice());
+            
 
             orderItemRepo.save(item);
         }

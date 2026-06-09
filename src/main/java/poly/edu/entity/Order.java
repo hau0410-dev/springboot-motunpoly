@@ -15,16 +15,30 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
     
+    @ManyToOne
+    @JoinColumn(name="user_id")
+    private User user;
+    
+    @ManyToOne
+    @JoinColumn(name = "shipper_id")
+    private User shipper;
+    
+    @OneToOne(mappedBy = "order")
+    private Payment payment;
+    
     private String fullname;
     private String email;
     private String phone;
     private String address;
+    
 
     private Double totalAmount;
 
     private String status; // ĐANG_GIAO / DA_GIAO
 
     private LocalDateTime createdDate;
+    
+    
 
     // ===== Getter & Setter =====
 
@@ -102,4 +116,27 @@ public class Order {
     public void prePersist() {
         this.createdDate = LocalDateTime.now();
     }
+    public User getShipper() {
+        return shipper;
+    }
+
+    public void setShipper(User shipper) {
+        this.shipper = shipper;
+    }
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+    
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
+    }
+   
 }

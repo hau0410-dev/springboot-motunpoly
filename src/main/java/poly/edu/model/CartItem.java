@@ -7,7 +7,8 @@ public class CartItem {
     private double price;
     private int quantity;
     private String image;
-
+    private Integer stock;
+    
     public double getTotalPrice() {
         return price * quantity;
     }
@@ -51,5 +52,12 @@ public class CartItem {
 
     public void setImage(String image) {
         this.image = image;
+    }
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
     }
 }

@@ -1,6 +1,8 @@
 package poly.edu.service;
 
 import java.util.List;
+
+import poly.edu.entity.Order;
 import poly.edu.entity.Product;
 
 public interface ProductService {
@@ -18,5 +20,9 @@ public interface ProductService {
 	void deleteById(Integer id);
 	
 	List<Product> filter(String keyword, Integer categoryId, Double min, Double max);
+	
+	Product findByName(String name);
+	
+	
 	
 }

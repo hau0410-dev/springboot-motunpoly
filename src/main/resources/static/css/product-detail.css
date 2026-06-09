@@ -94,3 +94,26 @@ body{
 .btn-cart:hover{
     background:#b80014;
 }
+.stock-info{
+    margin:10px 0 15px;
+    font-size:16px;
+}
+
+.stock-info b{
+    color:#d32f2f;
+}
+
+.alert-stock{
+    background:#fff3f3;
+    border-left:4px solid #d32f2f;
+    color:#d32f2f;
+    padding:12px;
+    margin:15px 0;
+    border-radius:8px;
+}
+
+.btn-cart:disabled{
+    background:#999;
+    cursor:not-allowed;
+    opacity:.8;
+}

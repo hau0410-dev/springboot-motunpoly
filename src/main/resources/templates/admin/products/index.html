@@ -4,9 +4,10 @@
 <meta charset="UTF-8">
 <title>Quản lý sản phẩm</title>
 <link rel="stylesheet" th:href="@{/css/admin-product.css}">
+<link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
 <body>
-
+<div th:replace="admin/layout/header :: header"></div>
 <h2>QUẢN LÝ SẢN PHẨM</h2>
 
 <div class="container">
@@ -44,7 +45,8 @@
                     <th>ID</th>
                     <th>Tên</th>
                     <th>Giá</th>
-                    <th>Hình</th>
+					<th>Tồn kho</th>
+					<th>Hình</th>
                     <th>Trạng thái</th>
                     <th>Hành động</th>
                 </tr>
@@ -52,7 +54,8 @@
                 <tr th:each="p : ${products}">
                     <td th:text="${p.id}"></td>
                     <td th:text="${p.name}"></td>
-                    <td th:text="${p.price}"></td>
+                    <td th:text="${#numbers.formatDecimal(p.price,0,'COMMA',0,'POINT')} + ' ₫'"></td>
+                    <td th:text="${p.stock}"></td>
 
                     <td>
                         <img th:src="@{/images/{img}(img=${p.image})}">

@@ -31,12 +31,76 @@
             <b th:text="${cart.totalAmount}"></b> ₫
         </div>
 
-        <button type="submit" class="btn-checkout">
-            🚚 Giao hàng & Thanh toán
-        </button>
+        <div class="payment-buttons">
+
+		    <button type="submit"
+		            name="paymentMethod"
+		            value="COD"
+		            class="btn-checkout">
+		        💵 Thanh toán tiền mặt
+		    </button>
+		
+		    <button type="button"
+		            onclick="document.getElementById('bankingModal').style.display='flex'"
+		            class="btn-checkout">
+		        🏦 Thanh toán Banking
+		    </button>
+
+		</div>
     </form>
 
 </div>
+<div id="bankingModal" class="banking-modal">
 
+    <div class="banking-box">
+
+        <h3>🏦 Thanh toán chuyển khoản</h3>
+
+        <div class="bank-info">
+            <p><b>Ngân hàng:</b> MB BANK</p>
+            <p><b>Chủ tài khoản:</b> NGUYỄN HOÀNG THIÊN HẬU</p>
+            <p><b>Số tài khoản:</b> 0565032567</p>
+        </div>
+
+        <form th:action="@{/cart/pay}" method="post">
+
+            <input type="hidden"
+                   name="paymentMethod"
+                   value="BANKING">
+
+            <label>Họ tên khách hàng</label>
+            <input type="text" name="fullname" required>
+
+            <label>Email</label>
+            <input type="email" name="email" required>
+
+            <label>Số điện thoại</label>
+            <input type="text" name="phone" required>
+
+            <label>Địa chỉ giao hàng</label>
+            <textarea name="address" required></textarea>
+
+            <label>Ngân hàng của bạn</label>
+            <input type="text" name="customerBank">
+
+            <label>Số tài khoản của bạn</label>
+            <input type="text" name="customerAccount">
+
+            <button type="submit" class="btn-bank-submit">
+                ✅ Tôi đã chuyển khoản
+            </button>
+
+        </form>
+
+        <button
+            class="btn-close-bank"
+            onclick="document.getElementById('bankingModal').style.display='none'">
+            Đóng
+        </button>
+
+    </div>
+
+
+</div>
 </body>
 </html>

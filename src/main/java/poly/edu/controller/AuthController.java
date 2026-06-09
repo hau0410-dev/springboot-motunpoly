@@ -38,10 +38,14 @@ public class AuthController {
 
         // lưu user vào session
         session.setAttribute("user", user);
-
+        
         // ✅ PHÂN QUYỀN ADMIN
         if ("ADMIN".equalsIgnoreCase(user.getRole())) {
             return "redirect:/admin";
+        }
+        // Shipper 
+        if ("SHIPPER".equalsIgnoreCase(user.getRole())) {
+            return "redirect:/shipper/index";
         }
 
         // user thường

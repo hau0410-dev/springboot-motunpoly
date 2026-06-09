@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Shipper Dashboard</title>
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<link rel="stylesheet"
+      th:href="@{/css/shipper.css}">
+</head>
+
+<body>
+<div th:replace="layout/header :: header"></div>
+<div class="container">
+
+    <h1>Danh sách đơn hàng cần giao</h1>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Mã đơn</th>
+                <th>Khách hàng</th>
+                <th>SĐT</th>
+                <th>Địa chỉ</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            <tr th:each="o : ${orders}">
+
+                <td th:text="${o.id}"></td>
+
+                <td th:text="${o.fullname}"></td>
+
+                <td th:text="${o.phone}"></td>
+
+                <td th:text="${o.address}"></td>
+
+                <td th:text="${o.totalAmount}"></td>
+
+                <td>
+
+                    <span th:if="${o.status == 'DANG_GIAO'}">
+                        Đang giao
+                    </span>
+
+                    <span th:if="${o.status == 'DA_GIAO'}">
+                        Đã giao
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <a th:href="@{'/shipper/detail/' + ${o.id}}">
+                        Chi tiết
+                    </a>
+
+                    <a th:if="${o.status == 'DANG_GIAO'}"
+                       th:href="@{'/shipper/delivered/' + ${o.id}}">
+                        Đã giao
+                    </a>
+
+                </td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
+
+</body>
+</html>

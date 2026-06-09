@@ -213,3 +213,130 @@ body {
     margin-bottom: 25px;
 }
 
+/* ===== MODAL ===== */
+.banking-modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+    backdrop-filter: blur(3px);
+}
+
+/* ===== BOX ===== */
+.banking-box{
+    width:600px;
+    max-width:95%;
+    background:#fff;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 15px 40px rgba(0,0,0,.25);
+}
+
+/* HEADER */
+.banking-box h3{
+    margin:0;
+    padding:18px;
+    text-align:center;
+    background:#c62828;
+    color:white;
+    font-size:22px;
+}
+
+/* INFO BANK */
+.bank-info{
+    margin:20px;
+    padding:18px;
+    background:#fff5f5;
+    border:2px solid #ffcdd2;
+    border-radius:12px;
+}
+
+.bank-info p{
+    margin:10px 0;
+    font-size:15px;
+}
+
+.bank-info b{
+    color:#c62828;
+}
+
+/* FORM */
+.banking-box form{
+    padding:0 20px 20px;
+}
+
+.banking-box label{
+    display:block;
+    margin-top:12px;
+    margin-bottom:6px;
+    font-weight:600;
+    color:#444;
+}
+
+.banking-box input,
+.banking-box textarea{
+    width:100%;
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    font-size:14px;
+    transition:.2s;
+}
+
+.banking-box input:focus,
+.banking-box textarea:focus{
+    outline:none;
+    border-color:#c62828;
+    box-shadow:0 0 0 3px rgba(198,40,40,.15);
+}
+
+.banking-box textarea{
+    min-height:90px;
+    resize:none;
+}
+
+/* BUTTON */
+.btn-bank-submit{
+    width:100%;
+    margin-top:18px;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    background:#c62828;
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.btn-bank-submit:hover{
+    background:#b71c1c;
+}
+
+/* CLOSE */
+.btn-close-bank{
+    width:100%;
+    border:none;
+    padding:14px;
+    background:#f5f5f5;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.btn-close-bank:hover{
+    background:#e0e0e0;
+}
+
+.stock-alert{
+    background:#ffebee;
+    color:#c62828;
+    border-left:5px solid #c62828;
+    padding:12px;
+    margin-bottom:15px;
+    border-radius:6px;
+    font-weight:bold;
+}

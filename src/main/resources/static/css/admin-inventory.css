@@ -1,0 +1,51 @@
+body{
+    background:#f5f6fa;
+    font-family:Arial,sans-serif;
+}
+
+.content{
+    padding:25px;
+}
+
+.content h2{
+    color:#c62828;
+    margin-bottom:20px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+
+th{
+    background:#c62828;
+    color:white;
+    padding:12px;
+}
+
+td{
+    padding:12px;
+    border:1px solid #eee;
+}
+
+input[type=number]{
+    width:120px;
+    padding:8px;
+    border:1px solid #ccc;
+    border-radius:6px;
+}
+
+button{
+    background:#c62828;
+    color:white;
+    border:none;
+    padding:8px 15px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#a81f1f;
+}

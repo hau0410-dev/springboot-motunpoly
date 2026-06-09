@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+
+<title>Chi tiết đơn hàng</title>
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<link rel="stylesheet"
+      th:href="@{/css/shipper.css}">
+</head>
+
+<body>
+<div th:replace="layout/header :: header"></div>
+<div class="container">
+
+    <h1>Chi tiết đơn hàng</h1>
+
+    <p>Mã đơn:
+        <span th:text="${order.id}"></span>
+    </p>
+
+    <p>Khách hàng:
+        <span th:text="${order.fullname}"></span>
+    </p>
+
+    <p>SĐT:
+        <span th:text="${order.phone}"></span>
+    </p>
+
+    <p>Địa chỉ:
+        <span th:text="${order.address}"></span>
+    </p>
+
+    <p>Trạng thái:
+        <span th:text="${order.status}"></span>
+    </p>
+
+    <hr>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Giá</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            <tr th:each="i : ${items}">
+
+                <td th:text="${i.product.name}"></td>
+
+                <td th:text="${i.quantity}"></td>
+
+                <td th:text="${i.price}"></td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
+
+</body>
+</html>

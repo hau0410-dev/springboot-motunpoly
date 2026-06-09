@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <title>Chi tiết đơn hàng</title>
     <link rel="stylesheet" th:href="@{/css/admin-order-detail.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
 <body>
-
+<div th:replace="admin/layout/header :: header"></div>
 <div class="order-detail-container">
 
     <h1>CHI TIẾT ĐƠN HÀNG #<span th:text="${order.id}"></span></h1>
@@ -28,6 +29,47 @@
             <p><strong>Trạng thái:</strong>
                 <span class="status" th:text="${order.status}"></span>
             </p>
+            <p>
+			    <strong>Phương thức thanh toán:</strong>
+			
+			    <span th:if="${payment != null}"
+			          th:text="${order.payment.paymentMethod}">
+			    </span>
+			
+			    <span th:if="${payment == null}">
+			        Chưa có thông tin
+			    </span>
+			</p>
+			
+			<p>
+			    <strong>TT thanh toán:</strong>
+			
+			    <span th:if="${payment != null and payment.paymentStatus == 'CHO_THANH_TOAN'}">
+			        ⏳ Chờ thanh toán
+			    </span>
+			
+			    <span th:if="${payment != null and payment.paymentStatus == 'DA_THANH_TOAN'}">
+			        ✅ Đã thanh toán
+			    </span>
+			   <div th:if="${payment != null and payment.paymentStatus == 'CHO_XAC_NHAN'}">
+
+				    <a th:href="@{/admin/orders/confirm-payment/{id}(id=${order.id})}"
+				       class="btn-confirm">
+				
+				        ✅ Xác nhận đã nhận tiền
+				
+				    </a>
+
+				</div>
+			</p>
+			
+			<p>
+			    <strong>Ngày thanh toán:</strong>
+			
+			    <span th:if="${payment != null}"
+			          th:text="${#temporals.format(payment.paymentDate,'dd/MM/yyyy HH:mm')}">
+			    </span>
+			</p>
             <p><strong>Tổng tiền:</strong>
                 <span class="total-price"
                       th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')} + ' đ'">

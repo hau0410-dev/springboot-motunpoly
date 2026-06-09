@@ -15,7 +15,6 @@ public class OrderService {
     OrderRepository repo;
 
     public void save(Order order) {
-        order.setCreatedDate(LocalDateTime.now());
         repo.save(order);
     }
 
@@ -42,5 +41,8 @@ public class OrderService {
         }
 
         return repo.findAll();
+    }
+    public List<Order> findByUserId(Integer userId){
+        return repo.findByUser_Id(userId);
     }
 }

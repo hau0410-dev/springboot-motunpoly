@@ -67,4 +67,8 @@ public class ProductServiceImpl implements ProductService {
     public List<Product> filter(String keyword, Integer categoryId, Double min, Double max) {
         return productRepo.filter(keyword, categoryId, min, max);
     }
+    @Override
+    public Product findByName(String name) {
+        return productRepo.findByName(name);
+    }
 }

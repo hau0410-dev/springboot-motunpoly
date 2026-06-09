@@ -13,10 +13,16 @@ import poly.edu.repository.OrderRepository;
 import poly.edu.repository.OrderItemRespository;
 import poly.edu.service.OrderService;
 
+import poly.edu.entity.Payment;
+import poly.edu.service.PaymentService;
+
 @Controller
 @RequestMapping("/admin/orders")
 public class AdminOrderController {
-
+	
+	@Autowired
+	private PaymentService paymentService;
+	
     @Autowired
     private OrderRepository orderRepo;
 
@@ -45,31 +51,89 @@ public class AdminOrderController {
     // ===== CHI TIẾT ĐƠN HÀNG =====
     @GetMapping("/{id}")
     public String orderDetail(@PathVariable("id") Integer id, Model model) {
-
-        Order order = orderService.findById(id);
-        List<OrderItem> items = orderItemRepo.findByOrderId(id);
-
+    	
+    	
+    	
+        Order order = 
+        		orderService.findById(id);
+        
+        List<OrderItem> items = 
+        		orderItemRepo.findByOrderId(id);
+        
+        Payment payment =
+                paymentService.findByOrderId(id);
+        
         model.addAttribute("order", order);
         model.addAttribute("items", items);
-
+        model.addAttribute("payment", payment);
+        
         return "admin/order-detail";
+        
     }
 
     @GetMapping("/update/{id}")
     public String updateStatus(@PathVariable("id") Integer id) {
 
         Order order = orderService.findById(id);
+        
+        Payment payment =
+                paymentService.findByOrderId(id);
 
-        if (order != null) {
-            if ("ĐANG_GIAO".equals(order.getStatus())) {
-                order.setStatus("DA_GIAO");
-            } else {
-                order.setStatus("ĐANG_GIAO");
+        if(payment != null){
+
+            if("CHO_THANH_TOAN".equals(payment.getPaymentStatus())){
+
+                payment.setPaymentStatus("DA_THANH_TOAN");
+
+            }else{
+
+                payment.setPaymentStatus("CHO_THANH_TOAN");
+
             }
+
+            paymentService.save(payment);
+        }
+        
+        if (order != null) {
+
+            // CHỜ XÁC NHẬN -> ĐANG GIAO
+            if ("CHO_XAC_NHAN".equals(order.getStatus())) {
+
+                order.setStatus("DANG_GIAO");
+
+            }
+
+            // ĐANG GIAO -> ĐÃ GIAO
+            else if ("DANG_GIAO".equals(order.getStatus())) {
+
+                order.setStatus("DA_GIAO");
+
+            }
+
+            // ĐÃ GIAO -> CHỜ XÁC NHẬN
+            else if ("DA_GIAO".equals(order.getStatus())) {
+
+                order.setStatus("CHO_XAC_NHAN");
+
+            }
+
             orderService.save(order);
         }
 
         return "redirect:/admin/orders";
+    }
+    @GetMapping("/confirm-payment/{id}")
+    public String confirmPayment(
+            @PathVariable("id") Integer id) {
+
+        Payment payment = paymentService.findByOrderId(id);
+
+        if (payment != null) {
+            payment.setPaymentStatus("DA_THANH_TOAN");
+            paymentService.save(payment);
+        }
+
+        return "redirect:/admin/orders/" + id;
     }
 
 }

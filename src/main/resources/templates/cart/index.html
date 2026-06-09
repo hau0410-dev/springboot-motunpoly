@@ -12,7 +12,13 @@
 <div class="cart-container">
 
     <h2 class="cart-title">🛒 Giỏ hàng của bạn</h2>
-
+	
+	<div th:if="${session.stockMessage}"
+	     class="stock-alert">
+	
+	    <span th:text="${session.stockMessage}"></span>
+	
+	</div>
     <div th:if="${cart == null || cart.empty}" class="cart-empty">
         Giỏ hàng đang trống.
     </div>
@@ -24,6 +30,7 @@
             <th>Sản phẩm</th>
             <th>Giá</th>
             <th>Số lượng</th>
+            <th>Tồn Kho</th>
             <th>Thành tiền</th>
             <th>Thao tác</th>
         </tr>
@@ -39,6 +46,8 @@
             <td class="price" th:text="${item.price}"></td>
 
             <td th:text="${item.quantity}"></td>
+            
+            <td th:text="${item.stock}"></td>
 
             <td class="price" th:text="${item.totalPrice}"></td>
 

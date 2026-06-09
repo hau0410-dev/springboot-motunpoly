@@ -37,4 +37,8 @@ public class ReviewServiceImpl implements ReviewService {
     public List<Review> search(String user, String product) {
         return reviewRepository.search(user, product);
     }
+    @Override
+    public List<Review> findByUserId(Integer userId) {
+        return reviewRepository.findByUser_Id(userId);
+    }
 }
