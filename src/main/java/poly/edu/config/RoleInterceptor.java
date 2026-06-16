@@ -68,8 +68,9 @@ public class RoleInterceptor implements HandlerInterceptor {
                 uri.startsWith("/profile")
                 || uri.startsWith("/orders")
                 || uri.startsWith("/reviews")
-                || uri.startsWith("/promotions")
-                || uri.equals("/");
+                || uri.startsWith("/promotions");
+            // Lưu ý: ADMIN được vào "/" (trang chủ) để xem giao diện
+            // SHIPPER cũng được vào trang chủ để xem sản phẩm
 
             if (userOnlyPage) {
                 if ("ADMIN".equals(role)) {

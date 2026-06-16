@@ -26,7 +26,8 @@ public interface ProductService {
 	
 	Product findByName(String name);
 	
-	Page<Product> filter(String keyword, Integer categoryId, Double min, Double max, Pageable pageable);
+	Page<Product> filter(String keyword, Integer categoryId, Double min, Double max,
+	        String brand, String vehicleType, String partsBrand, Pageable pageable);
 	
 	Page<Product> getSuggestProducts(Pageable pageable);
 

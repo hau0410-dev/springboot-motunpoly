@@ -85,8 +85,8 @@
                 <!-- TOP PRODUCTS -->
                 <div class="card">
                     <h3 style="margin:0 0 14px;font-size:15px;border-left:4px solid #f59e0b;padding-left:10px;">🏆 Top sản phẩm</h3>
-                    <table>
-                        <thead><tr><th>Sản phẩm</th><th>SL</th></tr></thead>
+                    <table style="min-width:0;">
+                        <thead><tr><th style="text-align:left;">Sản phẩm</th><th>SL</th></tr></thead>
                         <tbody>
                             <tr th:each="p : ${topProducts}">
                                 <td style="text-align:left;" th:text="${p[0]}"></td>

@@ -2,58 +2,68 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Đăng nhập</title>
+    <title>Đăng nhập — MotunPoly</title>
     <link rel="stylesheet" th:href="@{/css/login.css}">
 </head>
 <body>
+<div class="auth-page">
 
-<div class="login-page">
-    <form action="/login" method="post" class="login-box">
+    <!-- HERO IMAGE LEFT -->
+    <div class="auth-hero">
+        <div class="auth-hero-content">
+            <div class="auth-hero-brand">
+                <img th:src="@{/imges/logomotunpoly.png}" alt="MotunPoly">
+                MotunPoly
+            </div>
+            <p class="auth-hero-tagline">Phụ tùng xe máy chính hãng — Hàng ngàn sản phẩm, giá cạnh tranh, giao nhanh toàn quốc.</p>
+        </div>
+    </div>
 
-        <a th:href="@{/}" class="auth-brand">
-            <img th:src="@{/imges/logomotunpoly.png}" alt="MotunPoly">
-            <span>MotunPoly</span>
-        </a>
-
-        <h2>Đăng nhập</h2>
-        <p class="auth-subtitle">Chào mừng bạn trở lại 👋</p>
+    <!-- FORM RIGHT -->
+    <div class="auth-panel">
+        <h2 class="auth-panel-title">Đăng nhập</h2>
+        <p class="auth-panel-sub">Chào mừng bạn trở lại MotunPoly</p>
 
         <p class="alert success" th:if="${success}" th:text="${success}"></p>
-        <p class="alert error" th:if="${error}" th:text="${error}"></p>
+        <p class="alert error"   th:if="${error}"   th:text="${error}"></p>
 
-        <div class="input-box">
-            <span>👤</span>
-            <input name="username" placeholder="Tên đăng nhập">
-        </div>
+        <form action="/login" method="post">
 
-        <div class="input-box">
-            <span>🔒</span>
-            <input type="password" name="password" placeholder="Mật khẩu" id="loginPassword">
-            <span class="toggle-eye" onclick="togglePassword('loginPassword', this)">👁️</span>
-        </div>
+            <div class="input-group">
+                <label>Tên đăng nhập</label>
+                <div class="input-box">
+                    <span class="input-icon">👤</span>
+                    <input name="username" placeholder="username" required>
+                </div>
+            </div>
 
-        <button type="submit">Đăng nhập</button>
+            <div class="input-group">
+                <label>Mật khẩu</label>
+                <div class="input-box">
+                    <span class="input-icon">🔒</span>
+                    <input type="password" name="password" id="loginPw" placeholder="••••••••" required>
+                    <span class="toggle-eye" onclick="togglePw('loginPw',this)">👁️</span>
+                </div>
+            </div>
+
+            <button type="submit" class="auth-btn">Đăng nhập →</button>
+
+        </form>
 
         <div class="auth-links">
-            <a href="/forgot" class="forgot-link">Quên mật khẩu?</a>
-            <a href="/register" class="register-link">Tạo tài khoản mới</a>
+            <a href="/forgot" class="auth-link">Quên mật khẩu?</a>
+            <a href="/register" class="auth-link auth-link-primary">Tạo tài khoản mới</a>
         </div>
 
-    </form>
+    </div>
 </div>
 
 <script>
-function togglePassword(id, el){
+function togglePw(id, el) {
     var input = document.getElementById(id);
-    if(input.type === "password"){
-        input.type = "text";
-        el.textContent = "🙈";
-    } else {
-        input.type = "password";
-        el.textContent = "👁️";
-    }
+    input.type = input.type === 'password' ? 'text' : 'password';
+    el.textContent = input.type === 'password' ? '👁️' : '🙈';
 }
 </script>
-
 </body>
 </html>

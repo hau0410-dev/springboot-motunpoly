@@ -90,5 +90,23 @@ public class Product {
     public void setStock(Integer stock) {
         this.stock = stock;
     }
-    
+
+    @Column(name = "brand")
+    private String brand; // Hãng xe: Honda, Yamaha, Suzuki
+
+    @Column(name = "vehicle_type")
+    private String vehicleType; // Loại xe: Xe tay ga, Xe số, Xe côn tay
+
+    @Column(name = "parts_brand")
+    private String partsBrand; // Hãng phụ tùng: Brembo, NGK, Michelin
+
+    public String getBrand() { return brand; }
+    public void setBrand(String brand) { this.brand = brand; }
+
+    public String getVehicleType() { return vehicleType; }
+    public void setVehicleType(String vehicleType) { this.vehicleType = vehicleType; }
+
+    public String getPartsBrand() { return partsBrand; }
+    public void setPartsBrand(String partsBrand) { this.partsBrand = partsBrand; }
+
 }

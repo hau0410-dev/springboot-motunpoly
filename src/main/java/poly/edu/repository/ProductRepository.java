@@ -15,27 +15,35 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     List<Product> findTop12ByActiveTrueOrderByIdDesc();
 
     List<Product> findByNameContainingIgnoreCaseAndActiveTrue(String name);
+
     @Query("""
-    	    SELECT p FROM Product p
-    	    WHERE p.active = true
-    	    ORDER BY p.id DESC
-    	""")
-    	Page<Product> findSuggestProducts(Pageable pageable);
-    
+        SELECT p FROM Product p
+        WHERE p.active = true
+        ORDER BY p.id DESC
+    """)
+    Page<Product> findSuggestProducts(Pageable pageable);
+
     @Query("""
-    		SELECT p FROM Product p
-    		WHERE
-    		(:keyword IS NULL OR p.name LIKE %:keyword%)
-    		AND (:categoryId IS NULL OR p.category.id = :categoryId)
-    		AND (:min IS NULL OR p.price >= :min)
-    		AND (:max IS NULL OR p.price <= :max)
-    		""")
-    		Page<Product> filter(
-    		        @Param("keyword") String keyword,
-    		        @Param("categoryId") Integer categoryId,
-    		        @Param("min") Double min,
-    		        @Param("max") Double max,
-    		        Pageable pageable
-    		);
+        SELECT p FROM Product p
+        WHERE p.active = true
+        AND (:keyword IS NULL OR p.name LIKE %:keyword%)
+        AND (:categoryId IS NULL OR p.category.id = :categoryId)
+        AND (:min IS NULL OR p.price >= :min)
+        AND (:max IS NULL OR p.price <= :max)
+        AND (:brand IS NULL OR p.brand = :brand)
+        AND (:vehicleType IS NULL OR p.vehicleType = :vehicleType)
+        AND (:partsBrand IS NULL OR p.partsBrand = :partsBrand)
+    """)
+    Page<Product> filter(
+        @Param("keyword") String keyword,
+        @Param("categoryId") Integer categoryId,
+        @Param("min") Double min,
+        @Param("max") Double max,
+        @Param("brand") String brand,
+        @Param("vehicleType") String vehicleType,
+        @Param("partsBrand") String partsBrand,
+        Pageable pageable
+    );
+
     Product findByName(String name);
 }

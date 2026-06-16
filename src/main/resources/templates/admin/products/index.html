@@ -26,8 +26,10 @@
                             <th>Hình</th>
                             <th>Tên sản phẩm</th>
                             <th>Giá</th>
+                            <th>Hãng xe</th>
+                            <th>Loại xe</th>
+                            <th>Hãng PT</th>
                             <th>Tồn kho</th>
-                            <th>Trạng thái</th>
                             <th>Thao tác</th>
                         </tr>
                     </thead>
@@ -42,13 +44,27 @@
                             <td style="color:#d97706;font-weight:700;"
                                 th:text="${#numbers.formatDecimal(p.price,0,'COMMA',0,'POINT')} + 'đ'"></td>
                             <td>
+                                <span th:if="${p.brand != null && !p.brand.isEmpty()}"
+                                      class="badge badge-info" th:text="${p.brand}"></span>
+                                <span th:unless="${p.brand != null && !p.brand.isEmpty()}"
+                                      style="color:#ccc;font-size:12px;">—</span>
+                            </td>
+                            <td>
+                                <span th:if="${p.vehicleType != null && !p.vehicleType.isEmpty()}"
+                                      class="badge badge-muted" th:text="${p.vehicleType}"></span>
+                                <span th:unless="${p.vehicleType != null && !p.vehicleType.isEmpty()}"
+                                      style="color:#ccc;font-size:12px;">—</span>
+                            </td>
+                            <td>
+                                <span th:if="${p.partsBrand != null && !p.partsBrand.isEmpty()}"
+                                      class="badge badge-pending" th:text="${p.partsBrand}"></span>
+                                <span th:unless="${p.partsBrand != null && !p.partsBrand.isEmpty()}"
+                                      style="color:#ccc;font-size:12px;">—</span>
+                            </td>
+                            <td>
                                 <span th:if="${p.stock > 10}" class="badge badge-success" th:text="${p.stock}"></span>
                                 <span th:if="${p.stock > 0 and p.stock <= 10}" class="badge badge-wait-xn" th:text="${p.stock}"></span>
                                 <span th:if="${p.stock <= 0}" class="badge badge-danger">Hết</span>
-                            </td>
-                            <td>
-                                <span th:if="${p.active}" class="badge badge-success">✅ Hiện</span>
-                                <span th:unless="${p.active}" class="badge badge-muted">Ẩn</span>
                             </td>
                             <td>
                                 <a th:href="@{/admin/products/edit/{id}(id=${p.id})}" class="btn btn-sm btn-secondary">✏️ Sửa</a>

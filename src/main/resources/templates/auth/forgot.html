@@ -1,47 +1,71 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Quên mật khẩu</title>
-
-<link rel="stylesheet" th:href="@{/css/forgot.css}">
-
+    <meta charset="UTF-8">
+    <title>Quên mật khẩu — MotunPoly</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
 </head>
 <body>
+<div class="auth-page">
 
-<div class="container">
+    <div class="auth-hero">
+        <div class="auth-hero-content">
+            <div class="auth-hero-brand">
+                <img th:src="@{/imges/logomotunpoly.png}" alt="MotunPoly">
+                MotunPoly
+            </div>
+            <p class="auth-hero-tagline">Đặt lại mật khẩu để tiếp tục mua sắm tại MotunPoly.</p>
+        </div>
+    </div>
 
-    <div class="box">
+    <div class="auth-panel">
+        <h2 class="auth-panel-title">Quên mật khẩu</h2>
+        <p class="auth-panel-sub">Nhập thông tin tài khoản để đặt lại mật khẩu</p>
 
-        <h2>🔑 Quên mật khẩu</h2>
+        <p class="alert success" th:if="${success}" th:text="${success}"></p>
+        <p class="alert error"   th:if="${error}"   th:text="${error}"></p>
 
         <form th:action="@{/forgot}" method="post">
 
-            <label>Tên đăng nhập</label>
-            <input type="text" name="username" required>
+            <div class="input-group">
+                <label>Tên đăng nhập</label>
+                <div class="input-box">
+                    <span class="input-icon">👤</span>
+                    <input type="text" name="username" placeholder="username" required>
+                </div>
+            </div>
 
-            <label>Email</label>
-            <input type="text" name="email" required>
+            <div class="input-group">
+                <label>Email đã đăng ký</label>
+                <div class="input-box">
+                    <span class="input-icon">📧</span>
+                    <input type="email" name="email" placeholder="email@example.com" required>
+                </div>
+            </div>
 
-            <label>Mật khẩu mới</label>
-            <input type="password" name="newPassword" required>
+            <div class="input-group">
+                <label>Mật khẩu mới</label>
+                <div class="input-box">
+                    <span class="input-icon">🔒</span>
+                    <input type="password" name="newPassword" id="newPw" placeholder="Mật khẩu mới" required>
+                    <span class="toggle-eye" onclick="togglePw('newPw',this)">👁️</span>
+                </div>
+            </div>
 
-            <button type="submit">
-                Đổi mật khẩu
-            </button>
+            <button type="submit" class="auth-btn">Đặt lại mật khẩu →</button>
 
         </form>
 
-        <p class="error" th:text="${error}"></p>
-        <p class="success" th:text="${success}"></p>
-
-        <a href="/login" class="back">
-            ← Quay lại đăng nhập
-        </a>
-
+        <a href="/login" class="auth-back">← Quay lại đăng nhập</a>
     </div>
-
 </div>
 
+<script>
+function togglePw(id, el) {
+    var input = document.getElementById(id);
+    input.type = input.type === 'password' ? 'text' : 'password';
+    el.textContent = input.type === 'password' ? '👁️' : '🙈';
+}
+</script>
 </body>
 </html>

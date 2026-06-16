@@ -27,30 +27,29 @@
 
         <!-- AUTH -->
         <div class="auth-buttons">
-
             <div th:if="${session.user == null}" style="display:flex;gap:10px;">
                 <a th:href="@{/login}" class="btn-auth">Đăng nhập</a>
                 <a th:href="@{/register}" class="btn-auth btn-register">Đăng ký</a>
             </div>
 
             <div th:if="${session.user != null}" class="user-menu">
-                <div class="user-menu-toggle">
+                <button class="user-menu-toggle" type="button">
                     <span>👤</span>
                     <span th:text="${session.user.fullName ?: session.user.username}">User</span>
-                    <span style="opacity:.5;font-size:12px;">▾</span>
-                </div>
+                    <span class="menu-arrow">▾</span>
+                </button>
                 <div class="user-dropdown">
+                  <div class="user-dropdown-inner">
                     <a th:href="@{/profile}">👤 Thông tin cá nhân</a>
                     <a th:href="@{/orders}">📦 Lịch sử đặt hàng</a>
                     <a th:href="@{/reviews}">⭐ Lịch sử đánh giá</a>
                     <a th:href="@{/promotions}">🎁 Ưu đãi của tôi</a>
                     <a th:href="@{/change-password}">🔒 Đổi mật khẩu</a>
-                    <a th:if="${session.user.role == 'ADMIN'}" th:href="@{/admin}"
-                       style="color:#d97706;font-weight:700;">⚙️ Quản trị</a>
-                    <a th:href="@{/logout}" style="color:#e11d48;font-weight:700;">🚪 Đăng xuất</a>
+                    <a th:if="${session.user.role == 'ADMIN'}" th:href="@{/admin}" class="dd-admin">⚙️ Quản trị</a>
+                    <a th:href="@{/logout}" class="dd-logout">🚪 Đăng xuất</a>
+                  </div>
                 </div>
             </div>
-
         </div>
 
     </div>

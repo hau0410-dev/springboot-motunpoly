@@ -81,7 +81,7 @@ public class AdminProductAPIController {
             @RequestParam(required = false) Double max, 
     		@RequestParam(required = false) Pageable pageable) {
     			
-        return productService.filter(keyword, categoryId, min, max, pageable );
+        return productService.filter(keyword, categoryId, min, max, keyword, keyword, keyword, pageable );
     }
 
     // ===== 8. SUGGEST =====

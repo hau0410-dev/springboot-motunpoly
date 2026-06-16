@@ -66,9 +66,11 @@ public class ProductServiceImpl implements ProductService {
         productRepository.deleteById(id);
     }
     @Override
-    public Page<Product> filter(String keyword, Integer categoryId, Double min, Double max, Pageable pageable) {
-        return productRepository.filter(keyword, categoryId, min, max, pageable);
+    public Page<Product> filter(String keyword, Integer categoryId, Double min, Double max,
+            String brand, String vehicleType, String partsBrand, Pageable pageable) {
+        return productRepository.filter(keyword, categoryId, min, max, brand, vehicleType, partsBrand, pageable);
     }
+    
     @Override
     public Product findByName(String name) {
         return productRepo.findByName(name);

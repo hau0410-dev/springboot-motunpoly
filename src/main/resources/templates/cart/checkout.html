@@ -2,112 +2,142 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Thanh toán</title>
+    <title>Thanh toán — MotunPoly</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/css/cart.css}">
-    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 <div th:replace="layout/header :: header"></div>
-<div class="cart-container">
 
-    <h2>🧾 Xác nhận đơn hàng</h2>
+<div class="checkout-wrap">
 
-    <!-- ===== 1. TỔNG TIỀN ===== -->
-    <div class="cart-total checkout-total">
-        Tổng tiền:
-        <span th:text="${#numbers.formatDecimal(cart.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></span>
-    </div>
+    <!-- LEFT: FORM -->
+    <div>
 
-    <!-- ===== 2. SẢN PHẨM ===== -->
-    <div class="checkout-products">
-        <div class="checkout-product-item" th:each="item : ${cart.items}">
+        <!-- PHƯƠNG THỨC THANH TOÁN -->
+        <div class="checkout-card" style="margin-bottom:20px;">
+            <div class="checkout-card-title">Phương thức thanh toán</div>
+            <div class="payment-method-grid" id="paymentGrid">
+                <label class="pm-option">
+                    <input type="radio" name="paymentMethodSelect" value="COD" checked onchange="togglePayment('COD')">
+                    <span class="pm-icon">💵</span>
+                    <div>
+                        <div style="font-weight:700;">COD</div>
+                        <div style="font-size:11px;font-weight:400;color:#888;">Thanh toán khi nhận hàng</div>
+                    </div>
+                </label>
+                <label class="pm-option">
+                    <input type="radio" name="paymentMethodSelect" value="BANKING" onchange="togglePayment('BANKING')">
+                    <span class="pm-icon">🏦</span>
+                    <div>
+                        <div style="font-weight:700;">Banking</div>
+                        <div style="font-size:11px;font-weight:400;color:#888;">Chuyển khoản ngân hàng</div>
+                    </div>
+                </label>
+            </div>
 
-            <img th:src="@{/imges/{img}(img=${item.image})}" class="product-thumb">
-
-            <div class="cpi-info">
-                <div class="cpi-name" th:text="${item.productName}"></div>
-                <div class="cpi-meta">
-                    <span th:text="${#numbers.formatDecimal(item.price,0,'COMMA',0,'POINT')} + 'đ'"></span>
-                    &nbsp;×&nbsp;
-                    <span th:text="${item.quantity}"></span>
+            <!-- Banking info -->
+            <div id="bankingInfo" style="display:none;">
+                <div class="bank-info-card">
+                    <h4>Thông tin chuyển khoản</h4>
+                    <div class="bank-row"><span>Ngân hàng</span><b>MB BANK</b></div>
+                    <div class="bank-row"><span>Chủ tài khoản</span><b>NGUYỄN HOÀNG THIÊN HẬU</b></div>
+                    <div class="bank-row"><span>Số tài khoản</span><b>0565032567</b></div>
                 </div>
             </div>
+        </div>
 
-            <div class="cpi-subtotal price"
-                 th:text="${#numbers.formatDecimal(item.totalPrice,0,'COMMA',0,'POINT')} + 'đ'"></div>
+        <!-- CHI TIẾT GIAO HÀNG -->
+        <div class="checkout-card">
+            <div class="checkout-card-title">Thông tin giao hàng</div>
 
+            <form th:action="@{/cart/pay}" method="post" id="checkoutForm">
+                <input type="hidden" name="mode" th:value="${mode}">
+                <input type="hidden" name="paymentMethod" id="paymentMethodHidden" value="COD">
+                <input type="hidden" name="customerBank" id="bankInput" value="">
+                <input type="hidden" name="customerAccount" id="accountInput" value="">
+
+                <label>Họ và tên</label>
+                <input type="text" name="fullname" th:value="${savedFullname}" placeholder="Nguyễn Văn A" required>
+
+                <label>Email</label>
+                <input type="email" name="email" th:value="${savedEmail}" placeholder="email@example.com" required>
+
+                <label>Số điện thoại</label>
+                <input type="text" name="phone" placeholder="0901 234 567" required>
+
+                <label>Địa chỉ giao hàng</label>
+                <textarea name="address" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/TP" required></textarea>
+
+                <!-- Ô nhập bank info (ẩn, chỉ hiện khi Banking) -->
+                <div id="bankFields" style="display:none;">
+                    <label>Ngân hàng của bạn</label>
+                    <input type="text" id="bankInputVisible" th:value="${savedBank}" placeholder="VD: MB Bank, Vietcombank...">
+
+                    <label>Số tài khoản của bạn</label>
+                    <input type="text" id="accountInputVisible" th:value="${savedAccount}" placeholder="Số tài khoản dùng để chuyển">
+                </div>
+
+                <button type="submit" class="btn-place-order" onclick="syncBankFields()">
+                    Đặt hàng
+                </button>
+            </form>
         </div>
     </div>
 
-    <form th:action="@{/cart/pay}" method="post" class="checkout-form" id="checkoutForm">
+    <!-- RIGHT: ORDER SUMMARY -->
+    <div class="checkout-card" style="position:sticky;top:80px;">
+        <div class="checkout-card-title">Đơn hàng (<span th:text="${cart.items.size()}"></span> sản phẩm)</div>
 
-        <input type="hidden" name="mode" th:value="${mode}">
-
-        <!-- ===== 3. PHƯƠNG THỨC THANH TOÁN ===== -->
-        <h3 class="checkout-subtitle">💳 Phương thức thanh toán</h3>
-
-        <div class="payment-method-grid">
-
-            <label class="pm-option">
-                <input type="radio" name="paymentMethod" value="COD" checked onchange="togglePayment()">
-                <span class="pm-icon">💵</span>
-                <span class="pm-label">Thanh toán khi nhận hàng (COD)</span>
-            </label>
-
-            <label class="pm-option">
-                <input type="radio" name="paymentMethod" value="BANKING" onchange="togglePayment()">
-                <span class="pm-icon">🏦</span>
-                <span class="pm-label">Chuyển khoản ngân hàng</span>
-            </label>
-
-        </div>
-
-        <!-- ===== 4. CHI TIẾT THANH TOÁN ===== -->
-        <h3 class="checkout-subtitle">📋 Chi tiết thanh toán</h3>
-
-        <label>Họ và tên</label>
-        <input type="text" name="fullname" th:value="${savedFullname}" required>
-
-        <label>Email</label>
-        <input type="email" name="email" th:value="${savedEmail}" required>
-
-        <label>Số điện thoại</label>
-        <input type="text" name="phone" required>
-
-        <label>Địa chỉ giao hàng</label>
-        <textarea name="address" required></textarea>
-
-        <!-- thông tin chuyển khoản, chỉ hiện khi chọn Banking -->
-        <div id="bankingFields" class="banking-fields">
-
-            <div class="bank-info">
-                <p><b>Ngân hàng:</b> MB BANK</p>
-                <p><b>Chủ tài khoản:</b> NGUYỄN HOÀNG THIÊN HẬU</p>
-                <p><b>Số tài khoản:</b> 0565032567</p>
+        <div class="checkout-summary-items">
+            <div class="checkout-item" th:each="item : ${cart.items}">
+                <img th:src="@{/imges/{img}(img=${item.image})}" th:alt="${item.productName}">
+                <div style="flex:1;min-width:0;">
+                    <div class="ci-name" th:text="${item.productName}"></div>
+                    <div class="ci-meta" th:text="'x' + ${item.quantity}"></div>
+                </div>
+                <div class="ci-price" th:text="${#numbers.formatDecimal(item.totalPrice,0,'COMMA',0,'POINT')} + 'đ'"></div>
             </div>
-
-            <label>Ngân hàng của bạn</label>
-            <input type="text" name="customerBank" th:value="${savedBank}" placeholder="VD: MB Bank, Vietcombank...">
-
-            <label>Số tài khoản của bạn</label>
-            <input type="text" name="customerAccount" th:value="${savedAccount}" placeholder="Số tài khoản dùng để chuyển">
-
         </div>
 
-        <button type="submit" class="btn-checkout btn-place-order">✅ Đặt hàng</button>
-
-    </form>
+        <div class="checkout-subtotal">
+            <span>Tạm tính</span>
+            <span th:text="${#numbers.formatDecimal(cart.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></span>
+        </div>
+        <div class="checkout-subtotal">
+            <span>Vận chuyển</span>
+            <span style="color:#16a34a;font-weight:700;">Miễn phí</span>
+        </div>
+        <div class="checkout-grand-total">
+            <span>Tổng cộng</span>
+            <span th:text="${#numbers.formatDecimal(cart.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></span>
+        </div>
+    </div>
 
 </div>
 
+<div th:replace="layout/footer"></div>
+
 <script>
-    function togglePayment() {
-        var banking = document.querySelector('input[name="paymentMethod"]:checked').value === 'BANKING';
-        document.getElementById('bankingFields').style.display = banking ? 'block' : 'none';
+function togglePayment(method) {
+    document.getElementById('paymentMethodHidden').value = method;
+    var bankInfo  = document.getElementById('bankingInfo');
+    var bankFields = document.getElementById('bankFields');
+    if (method === 'BANKING') {
+        bankInfo.style.display  = 'block';
+        bankFields.style.display = 'block';
+    } else {
+        bankInfo.style.display  = 'none';
+        bankFields.style.display = 'none';
     }
+}
 
-    togglePayment();
+function syncBankFields() {
+    document.getElementById('bankInput').value    = document.getElementById('bankInputVisible').value;
+    document.getElementById('accountInput').value = document.getElementById('accountInputVisible').value;
+}
+
+togglePayment('COD');
 </script>
-
 </body>
 </html>

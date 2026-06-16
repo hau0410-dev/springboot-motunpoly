@@ -7,6 +7,7 @@
 </head>
 <body>
 
+<!-- TOPBAR -->
 <div class="sh-topbar">
     <div class="sh-brand">🛵 MotunPoly <span>Shipper</span></div>
     <div class="sh-user">
@@ -20,50 +21,108 @@
 
     <a th:href="@{/shipper/index}" class="sh-back">← Quay lại danh sách</a>
 
-    <div class="sh-section">
-
-        <div class="sh-card-head" style="margin-bottom:14px;">
-            <h2 style="margin:0;">🧾 Đơn hàng #<span th:text="${order.id}"></span></h2>
-
-            <span th:if="${order.status == 'CHO_LAY_HANG'}" class="sh-badge sh-badge-wait">Chờ lấy hàng</span>
-            <span th:if="${order.status == 'DANG_GIAO'}" class="sh-badge sh-badge-going">Đang giao</span>
-            <span th:if="${order.status == 'DA_GIAO'}" class="sh-badge sh-badge-done">Đã giao</span>
+    <!-- HEADER ĐƠN HÀNG -->
+    <div class="sh-detail-header">
+        <div class="sh-detail-title">
+            <span class="sh-detail-id">#<span th:text="${order.id}"></span></span>
+            <span th:if="${order.status == 'CHO_LAY_HANG'}" class="sh-badge sh-badge-wait">📦 Chờ lấy hàng</span>
+            <span th:if="${order.status == 'DANG_GIAO'}"    class="sh-badge sh-badge-going">🚚 Đang giao</span>
+            <span th:if="${order.status == 'DA_GIAO'}"      class="sh-badge sh-badge-done">✅ Đã giao</span>
+            <span th:if="${order.status == 'HOAN_THANH'}"   class="sh-badge sh-badge-done">🏁 Hoàn thành</span>
         </div>
 
-        <div class="sh-info-grid">
-            <div class="sh-info-box">
-                <p><span>Khách hàng</span><b th:text="${order.fullname}"></b></p>
-                <p><span>SĐT</span><b th:text="${order.phone}"></b></p>
-                <p><span>Địa chỉ</span><b th:text="${order.address}"></b></p>
-            </div>
-            <div class="sh-info-box">
-                <p><span>Phương thức TT</span><b th:text="${order.payment != null ? order.payment.paymentMethod : '—'}"></b></p>
-                <p><span>Tổng tiền</span><b class="sh-amount" th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></b></p>
-            </div>
-        </div>
-
-        <h3>Sản phẩm</h3>
-
-        <div class="sh-products">
-            <div class="sh-product-item" th:each="i : ${items}">
-                <span th:text="${i.product.name}"></span>
-                <span th:text="'x' + ${i.quantity}"></span>
-                <span class="sh-amount" th:text="${#numbers.formatDecimal(i.subtotal,0,'COMMA',0,'POINT')} + 'đ'"></span>
-            </div>
-        </div>
-
-        <div class="sh-card-actions" style="margin-top:20px;">
+        <!-- NÚT ACTION NỔI BẬT -->
+        <div class="sh-detail-actions" th:if="${order.status == 'CHO_LAY_HANG' or order.status == 'DANG_GIAO'}">
             <a th:if="${order.status == 'CHO_LAY_HANG'}"
-               th:href="@{/shipper/pickup/{id}(id=${order.id})}" class="sh-btn sh-btn-primary">
-                🛵 Lấy hàng
+               th:href="@{/shipper/pickup/{id}(id=${order.id})}"
+               class="sh-action-btn sh-action-pickup">
+                🛵 Nhận lấy hàng ngay
             </a>
-
             <a th:if="${order.status == 'DANG_GIAO'}"
-               th:href="@{/shipper/delivered/{id}(id=${order.id})}" class="sh-btn sh-btn-success">
-                ✅ Giao thành công
+               th:href="@{/shipper/delivered/{id}(id=${order.id})}"
+               class="sh-action-btn sh-action-delivered">
+                ✅ Xác nhận giao thành công
             </a>
         </div>
+    </div>
 
+    <!-- INFO GRID 2 CỘT -->
+    <div class="sh-detail-grid">
+
+        <!-- THÔNG TIN KHÁCH -->
+        <div class="sh-detail-card">
+            <div class="sh-detail-card-title">👤 Thông tin nhận hàng</div>
+            <div class="sh-detail-row">
+                <span>Khách hàng</span>
+                <b th:text="${order.fullname}"></b>
+            </div>
+            <div class="sh-detail-row">
+                <span>Số điện thoại</span>
+                <b th:text="${order.phone}"></b>
+            </div>
+            <div class="sh-detail-row">
+                <span>Địa chỉ giao</span>
+                <b th:text="${order.address}"></b>
+            </div>
+            <div class="sh-detail-row" th:if="${order.email != null}">
+                <span>Email</span>
+                <b th:text="${order.email}"></b>
+            </div>
+        </div>
+
+        <!-- THÔNG TIN THANH TOÁN -->
+        <div class="sh-detail-card">
+            <div class="sh-detail-card-title">💳 Thanh toán</div>
+            <div class="sh-detail-row">
+                <span>Phương thức</span>
+                <b th:text="${order.payment != null ? order.payment.paymentMethod : '—'}"></b>
+            </div>
+            <div class="sh-detail-row">
+                <span>Trạng thái TT</span>
+                <span th:if="${order.payment != null and order.payment.paymentStatus == 'DA_THANH_TOAN'}"
+                      class="sh-badge sh-badge-done" style="font-size:11px;">✅ Đã TT</span>
+                <span th:if="${order.payment != null and order.payment.paymentStatus == 'CHO_THANH_TOAN'}"
+                      class="sh-badge sh-badge-wait" style="font-size:11px;">⏳ Chờ TT</span>
+                <span th:if="${order.payment != null and order.payment.paymentStatus == 'CHO_XAC_NHAN'}"
+                      class="sh-badge sh-badge-going" style="font-size:11px;">🏦 Chờ XN</span>
+                <span th:if="${order.payment == null}" style="color:#aaa;">—</span>
+            </div>
+            <div class="sh-detail-total">
+                <span>Tổng tiền</span>
+                <b th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></b>
+            </div>
+            <div th:if="${order.payment != null and order.payment.paymentMethod == 'COD'}"
+                 class="sh-cod-note">
+                💵 Thu tiền mặt khi giao hàng
+            </div>
+        </div>
+
+    </div>
+
+    <!-- DANH SÁCH SẢN PHẨM -->
+    <div class="sh-detail-products">
+        <div class="sh-detail-products-title">🛒 Sản phẩm trong đơn</div>
+        <div class="sh-product-table">
+            <div class="sh-product-table-head">
+                <span>Tên sản phẩm</span>
+                <span>Số lượng</span>
+                <span>Thành tiền</span>
+            </div>
+            <div class="sh-product-table-row" th:each="i : ${items}">
+                <span class="sh-product-name" th:text="${i.product.name}"></span>
+                <span class="sh-product-qty" th:text="'× ' + ${i.quantity}"></span>
+                <span class="sh-product-price sh-amount"
+                      th:text="${#numbers.formatDecimal(i.subtotal,0,'COMMA',0,'POINT')} + 'đ'"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- GHI CHÚ CHO SHIPPER -->
+    <div class="sh-note" th:if="${order.status == 'CHO_LAY_HANG'}">
+        ⚡ Vui lòng lấy hàng đúng hẹn và xác nhận ngay khi nhận được hàng từ kho.
+    </div>
+    <div class="sh-note sh-note-blue" th:if="${order.status == 'DANG_GIAO'}">
+        🚚 Bạn đang trên đường giao đơn này. Bấm "Giao thành công" sau khi khách nhận hàng.
     </div>
 
 </div>

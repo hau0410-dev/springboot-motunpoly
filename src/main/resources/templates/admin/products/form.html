@@ -48,6 +48,39 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label>🏍️ Hãng xe áp dụng</label>
+                            <select th:field="*{brand}">
+                                <option value="">-- Tất cả hãng --</option>
+                                <option value="Honda">Honda</option>
+                                <option value="Yamaha">Yamaha</option>
+                                <option value="Suzuki">Suzuki</option>
+                                <option value="Kawasaki">Kawasaki</option>
+                                <option value="SYM">SYM</option>
+                                <option value="Piaggio">Piaggio</option>
+                                <option value="Đa hãng">Đa hãng</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>🛵 Loại xe</label>
+                            <select th:field="*{vehicleType}">
+                                <option value="">-- Tất cả loại xe --</option>
+                                <option value="Xe tay ga">Xe tay ga</option>
+                                <option value="Xe số">Xe số</option>
+                                <option value="Xe côn tay">Xe côn tay</option>
+                                <option value="Xe phân khối lớn">Xe phân khối lớn</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>🔧 Hãng phụ tùng</label>
+                            <select th:field="*{partsBrand}">
+                                <option value="">-- Không xác định --</option>
+                                <option value="Brembo">Brembo</option>
+                                <option value="NGK">NGK</option>
+                                <option value="Michelin">Michelin</option>
+                                <option value="Hàng chính hãng">Hàng chính hãng</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label>Ảnh đại diện</label>
                             <input type="file" name="imageFile" accept="image/*">
                             <div th:if="${product.image != null}" class="current-image">

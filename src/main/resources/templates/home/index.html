@@ -28,6 +28,33 @@
     </div>
 </div>
 
+<!-- ===== FILTER HÃNG XE ===== -->
+<div class="section" style="padding-top:20px;padding-bottom:0;">
+    <div class="brand-filter-bar">
+        <span class="brand-filter-label">🏍️ Hãng xe:</span>
+        <a th:href="@{/}" th:classappend="${selectedBrand == null} ? 'active' : ''" class="brand-btn">Tất cả</a>
+        <a th:href="@{/(brand='Honda')}" th:classappend="${selectedBrand == 'Honda'} ? 'active' : ''" class="brand-btn">Honda</a>
+        <a th:href="@{/(brand='Yamaha')}" th:classappend="${selectedBrand == 'Yamaha'} ? 'active' : ''" class="brand-btn">Yamaha</a>
+        <a th:href="@{/(brand='Suzuki')}" th:classappend="${selectedBrand == 'Suzuki'} ? 'active' : ''" class="brand-btn">Suzuki</a>
+        <a th:href="@{/(brand='Kawasaki')}" th:classappend="${selectedBrand == 'Kawasaki'} ? 'active' : ''" class="brand-btn">Kawasaki</a>
+        <a th:href="@{/(brand='SYM')}" th:classappend="${selectedBrand == 'SYM'} ? 'active' : ''" class="brand-btn">SYM</a>
+        <a th:href="@{/(brand='Piaggio')}" th:classappend="${selectedBrand == 'Piaggio'} ? 'active' : ''" class="brand-btn">Piaggio</a>
+        <a th:href="@{/(brand='Đa hãng')}" th:classappend="${selectedBrand == 'Đa hãng'} ? 'active' : ''" class="brand-btn">Đa hãng</a>
+
+        <span style="color:#ccc;margin:0 4px;">|</span>
+        <span class="brand-filter-label">Loại xe:</span>
+        <a th:href="@{/(vehicleType='Xe tay ga')}" th:classappend="${selectedVehicleType == 'Xe tay ga'} ? 'active' : ''" class="brand-btn">🛵 Tay ga</a>
+        <a th:href="@{/(vehicleType='Xe số')}" th:classappend="${selectedVehicleType == 'Xe số'} ? 'active' : ''" class="brand-btn">🏍️ Xe số</a>
+        <a th:href="@{/(vehicleType='Xe côn tay')}" th:classappend="${selectedVehicleType == 'Xe côn tay'} ? 'active' : ''" class="brand-btn">🔥 Côn tay</a>
+
+        <span style="color:#ccc;margin:0 4px;">|</span>
+        <span class="brand-filter-label">Hãng PT:</span>
+        <a th:href="@{/(partsBrand='Brembo')}" th:classappend="${selectedPartsBrand == 'Brembo'} ? 'active' : ''" class="brand-btn">Brembo</a>
+        <a th:href="@{/(partsBrand='NGK')}" th:classappend="${selectedPartsBrand == 'NGK'} ? 'active' : ''" class="brand-btn">NGK</a>
+        <a th:href="@{/(partsBrand='Michelin')}" th:classappend="${selectedPartsBrand == 'Michelin'} ? 'active' : ''" class="brand-btn">Michelin</a>
+    </div>
+</div>
+
 <!-- ===== ƯU ĐÃI NỔI BẬT ===== -->
 <div class="section" th:if="${allPromotions != null && !allPromotions.isEmpty()}">
     <div class="section-header">
@@ -82,6 +109,15 @@
             <a th:href="@{/product/detail(id=${p.id})}">
                 <h3 th:text="${p.name}">Tên sản phẩm</h3>
             </a>
+
+            <div class="product-tags">
+                <span th:if="${p.brand != null && !p.brand.isEmpty()}"
+                      class="product-tag tag-brand" th:text="${p.brand}"></span>
+                <span th:if="${p.vehicleType != null && !p.vehicleType.isEmpty()}"
+                      class="product-tag tag-type" th:text="${p.vehicleType}"></span>
+                <span th:if="${p.partsBrand != null && !p.partsBrand.isEmpty()}"
+                      class="product-tag tag-parts" th:text="${p.partsBrand}"></span>
+            </div>
 
             <div class="price-wrap"
                  th:if="${promoMap.containsKey(p.id) && (promoMap.get(p.id).discountType == 'PERCENT' || promoMap.get(p.id).discountType == 'AMOUNT')}">

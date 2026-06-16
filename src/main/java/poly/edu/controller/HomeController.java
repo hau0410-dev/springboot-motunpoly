@@ -48,47 +48,50 @@ public class HomeController {
             @RequestParam(name = "category", required = false) Integer categoryId,
             @RequestParam(name = "min", required = false) Double min,
             @RequestParam(name = "max", required = false) Double max,
+            @RequestParam(name = "brand", required = false) String brand,
+            @RequestParam(name = "vehicleType", required = false) String vehicleType,
+            @RequestParam(name = "partsBrand", required = false) String partsBrand,
             @RequestParam(name = "page", defaultValue = "0") int page,
             HttpSession session,
             Model model) {
 
-        model.addAttribute("categories",
-                categoryService.getActiveCategories());
+        model.addAttribute("categories", categoryService.getActiveCategories());
 
-        Pageable pageable = PageRequest.of(page, 8); // 8 sản phẩm / trang
+        Pageable pageable = PageRequest.of(page, 8);
 
         Page<Product> productPage;
 
-        if ((keyword != null && !keyword.isEmpty()) ||
-            categoryId != null ||
-            min != null ||
-            max != null) {
+        boolean hasFilter = (keyword != null && !keyword.isEmpty())
+            || categoryId != null || min != null || max != null
+            || (brand != null && !brand.isEmpty())
+            || (vehicleType != null && !vehicleType.isEmpty())
+            || (partsBrand != null && !partsBrand.isEmpty());
 
-            productPage = productService.filter(keyword, categoryId, min, max, pageable);
-
+        if (hasFilter) {
+            productPage = productService.filter(
+                keyword, categoryId, min, max,
+                (brand != null && brand.isEmpty()) ? null : brand,
+                (vehicleType != null && vehicleType.isEmpty()) ? null : vehicleType,
+                (partsBrand != null && partsBrand.isEmpty()) ? null : partsBrand,
+                pageable);
             model.addAttribute("title", "Kết quả lọc");
             model.addAttribute("isSearch", true);
-
         } else {
-
             productPage = productService.getSuggestProducts(pageable);
-
             model.addAttribute("title", "MotunPoLy - Phụ tùng xe máy");
             model.addAttribute("isSearch", false);
         }
 
         model.addAttribute("products", productPage.getContent());
-
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", productPage.getTotalPages());
-
         model.addAttribute("keyword", keyword);
+        model.addAttribute("selectedBrand", brand);
+        model.addAttribute("selectedVehicleType", vehicleType);
+        model.addAttribute("selectedPartsBrand", partsBrand);
         model.addAttribute("content", "home/index");
 
-        // ===== KHUYẾN MÃI THEO KHÁCH HÀNG (cá nhân hoá, cần đăng nhập) =====
         model.addAttribute("promoMap", buildPromoMap(productPage.getContent(), session));
-
-        // ===== KHU "ƯU ĐÃI NỔI BẬT" - hiện cho mọi người, không cần đăng nhập =====
         model.addAttribute("allPromotions", promotionService.findActive());
 
         return "layout/main";

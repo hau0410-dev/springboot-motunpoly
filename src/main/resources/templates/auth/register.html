@@ -2,83 +2,90 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Đăng ký</title>
+    <title>Đăng ký — MotunPoly</title>
     <link rel="stylesheet" th:href="@{/css/login.css}">
 </head>
 <body>
+<div class="auth-page">
 
-<div class="login-page">
-    <form th:action="@{/register}" method="post" class="login-box" onsubmit="return checkPasswords()">
+    <div class="auth-hero">
+        <div class="auth-hero-content">
+            <div class="auth-hero-brand">
+                <img th:src="@{/imges/logomotunpoly.png}" alt="MotunPoly">
+                MotunPoly
+            </div>
+            <p class="auth-hero-tagline">Tạo tài khoản để mua sắm nhanh hơn, nhận ưu đãi riêng và theo dõi đơn hàng dễ dàng.</p>
+        </div>
+    </div>
 
-        <a th:href="@{/}" class="auth-brand">
-            <img th:src="@{/imges/logo.png}" alt="MotunPoly">
-            <span>MotunPoly</span>
-        </a>
-
-        <h2>Tạo tài khoản</h2>
-        <p class="auth-subtitle">Đăng ký để mua sắm và nhận ưu đãi 🎁</p>
+    <div class="auth-panel">
+        <h2 class="auth-panel-title">Tạo tài khoản</h2>
+        <p class="auth-panel-sub">Đăng ký miễn phí — chỉ mất 30 giây</p>
 
         <p class="alert success" th:if="${success}" th:text="${success}"></p>
-        <p class="alert error" th:if="${error}" th:text="${error}"></p>
-        <p class="alert error" id="pwMismatch" style="display:none">Mật khẩu nhập lại không khớp!</p>
+        <p class="alert error"   th:if="${error}"   th:text="${error}"></p>
+        <p class="alert error" id="pwMismatch" style="display:none;">Mật khẩu nhập lại không khớp!</p>
 
-        <div class="input-box">
-            <span>👤</span>
-            <input name="username" placeholder="Tên đăng nhập" required>
-        </div>
+        <form th:action="@{/register}" method="post" onsubmit="return checkPasswords()">
 
-        <div class="input-box">
-            <span>📧</span>
-            <input type="email" name="email" placeholder="Email" required>
-        </div>
+            <div class="input-group">
+                <label>Tên đăng nhập</label>
+                <div class="input-box">
+                    <span class="input-icon">👤</span>
+                    <input name="username" placeholder="username" required>
+                </div>
+            </div>
 
-        <div class="input-box">
-            <span>🔒</span>
-            <input type="password" name="password" id="regPassword" placeholder="Mật khẩu" required>
-            <span class="toggle-eye" onclick="togglePassword('regPassword', this)">👁️</span>
-        </div>
+            <div class="input-group">
+                <label>Email</label>
+                <div class="input-box">
+                    <span class="input-icon">📧</span>
+                    <input type="email" name="email" placeholder="email@example.com" required>
+                </div>
+            </div>
 
-        <div class="input-box">
-            <span>🔒</span>
-            <input type="password" id="regConfirm" placeholder="Nhập lại mật khẩu" required>
-            <span class="toggle-eye" onclick="togglePassword('regConfirm', this)">👁️</span>
-        </div>
+            <div class="input-group">
+                <label>Mật khẩu</label>
+                <div class="input-box">
+                    <span class="input-icon">🔒</span>
+                    <input type="password" name="password" id="regPw" placeholder="Tối thiểu 6 ký tự" required>
+                    <span class="toggle-eye" onclick="togglePw('regPw',this)">👁️</span>
+                </div>
+            </div>
 
-        <button type="submit">Đăng ký</button>
+            <div class="input-group">
+                <label>Nhập lại mật khẩu</label>
+                <div class="input-box">
+                    <span class="input-icon">🔒</span>
+                    <input type="password" id="regConfirm" placeholder="••••••••" required>
+                    <span class="toggle-eye" onclick="togglePw('regConfirm',this)">👁️</span>
+                </div>
+            </div>
+
+            <button type="submit" class="auth-btn">Đăng ký →</button>
+
+        </form>
 
         <div class="auth-links">
-            <a th:href="@{/login}" class="register-link">Đã có tài khoản? Đăng nhập</a>
+            <a th:href="@{/login}" class="auth-link">Đã có tài khoản? <b>Đăng nhập</b></a>
         </div>
-
-    </form>
+    </div>
 </div>
 
 <script>
-function togglePassword(id, el){
+function togglePw(id, el) {
     var input = document.getElementById(id);
-    if(input.type === "password"){
-        input.type = "text";
-        el.textContent = "🙈";
-    } else {
-        input.type = "password";
-        el.textContent = "👁️";
-    }
+    input.type = input.type === 'password' ? 'text' : 'password';
+    el.textContent = input.type === 'password' ? '👁️' : '🙈';
 }
 
-function checkPasswords(){
-    var pw = document.getElementById('regPassword').value;
-    var confirm = document.getElementById('regConfirm').value;
-    var warning = document.getElementById('pwMismatch');
-
-    if(pw !== confirm){
-        warning.style.display = "block";
-        return false;
-    }
-
-    warning.style.display = "none";
-    return true;
+function checkPasswords() {
+    var pw = document.getElementById('regPw').value;
+    var cf = document.getElementById('regConfirm').value;
+    var msg = document.getElementById('pwMismatch');
+    if (pw !== cf) { msg.style.display='block'; return false; }
+    msg.style.display='none'; return true;
 }
 </script>
-
 </body>
 </html>

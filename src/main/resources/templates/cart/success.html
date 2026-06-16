@@ -2,24 +2,23 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Thành công</title>
+    <title>Đặt hàng thành công — MotunPoly</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/css/cart.css}">
-    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 <div th:replace="layout/header :: header"></div>
-<div class="cart-container success">
 
-    <div class="success-icon">✓</div>
-
+<div class="success-page">
+    <div class="success-check">✓</div>
     <h2>Đặt hàng thành công!</h2>
-    <p>Cảm ơn bạn đã mua hàng tại MotunPoly. Chúng tôi sẽ liên hệ và giao hàng trong thời gian sớm nhất.</p>
-
+    <p>Cảm ơn bạn đã tin tưởng MotunPoly. Chúng tôi sẽ xác nhận và giao hàng trong thời gian sớm nhất.</p>
     <div class="success-actions">
-        <a href="/" class="btn-checkout">🏠 Về trang chủ</a>
-        <a href="/orders" class="btn-outline">📦 Xem đơn hàng của tôi</a>
+        <a href="/" class="btn-success-primary">🏠 Tiếp tục mua sắm</a>
+        <a href="/orders" class="btn-success-outline">📦 Xem đơn hàng</a>
     </div>
 </div>
 
+<div th:replace="layout/footer"></div>
 </body>
 </html>
