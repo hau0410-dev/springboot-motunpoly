@@ -3,107 +3,157 @@
 <head>
 <meta charset="UTF-8">
 <title>Chi tiết đơn hàng</title>
+<link rel="stylesheet" th:href="@{/css/style.css}">
 <link rel="stylesheet" th:href="@{/css/user-order-detail.css}">
-<link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 <div th:replace="layout/header :: header"></div>
-<div class="box">
 
-<h2>CHI TIẾT ĐƠN HÀNG #<span th:text="${order.id}"></span></h2>
+<div class="order-detail-page">
 
-<p><b>Khách hàng:</b> <span th:text="${order.fullname}"></span></p>
-<p><b>Email:</b> <span th:text="${order.email}"></span></p>
-<p><b>SĐT:</b> <span th:text="${order.phone}"></span></p>
-<p><b>Địa chỉ:</b> <span th:text="${order.address}"></span></p>
-<p><b>Trạng thái:</b> <span th:text="${order.status}"></span></p>
-<p><b>Tổng tiền:</b> <span th:text="${order.totalAmount}"></span></p>
-<p>
-    <strong>Phương thức thanh toán:</strong>
+    <!-- TIÊU ĐỀ -->
+    <div class="order-detail-header">
+        <h2>🧾 Chi tiết đơn hàng <span th:text="'#' + ${order.id}"></span></h2>
 
-    <span th:if="${payment != null}"
-          th:text="${order.payment.paymentMethod}">
-    </span>
-</p>
+        <span th:if="${order.status == 'CHO_XAC_NHAN'}" class="badge badge-pending">⏳ Chờ xác nhận</span>
+        <span th:if="${order.status == 'CHO_LAY_HANG'}" class="badge badge-info">📦 Chờ lấy hàng</span>
+        <span th:if="${order.status == 'DANG_GIAO'}" class="badge badge-info">🚚 Đang giao</span>
+        <span th:if="${order.status == 'DA_GIAO'}" class="badge badge-pending">📬 Chờ bạn xác nhận</span>
+        <span th:if="${order.status == 'HOAN_THANH'}" class="badge badge-success">✅ Hoàn thành</span>
+        <span th:if="${order.status == 'KHIEU_NAI'}" class="badge badge-danger">🚨 Đơn rủi ro</span>
+        <span th:unless="${order.status == 'CHO_XAC_NHAN' or order.status == 'CHO_LAY_HANG' or order.status == 'DANG_GIAO' or order.status == 'DA_GIAO' or order.status == 'HOAN_THANH' or order.status == 'KHIEU_NAI'}"
+              class="badge badge-muted" th:text="${order.status}"></span>
+    </div>
 
-<p>
-    <strong>Trạng thái thanh toán:</strong>
+    <!-- THÔNG TIN ĐƠN HÀNG -->
+    <div class="order-info-grid">
 
-    <span th:if="${payment != null and payment.paymentStatus == 'CHO_THANH_TOAN'}">
-        ⏳ Chờ thanh toán
-    </span>
+        <div class="card">
+            <h3>👤 Thông tin nhận hàng</h3>
+            <div class="info-row"><span>Khách hàng</span><b th:text="${order.fullname}"></b></div>
+            <div class="info-row"><span>Email</span><b th:text="${order.email}"></b></div>
+            <div class="info-row"><span>SĐT</span><b th:text="${order.phone}"></b></div>
+            <div class="info-row"><span>Địa chỉ</span><b th:text="${order.address}"></b></div>
+        </div>
 
-    <span th:if="${payment != null and payment.paymentStatus == 'DA_THANH_TOAN'}">
-        ✅ Đã thanh toán
-    </span>
-    <span th:if="${payment != null and payment.paymentStatus == 'CHO_XAC_NHAN'}">
-    	🏦 Chờ xác nhận chuyển khoản
-</span>
-    
-    
-</p>
+        <div class="card">
+            <h3>💳 Thanh toán</h3>
 
-<h3>Sản phẩm</h3>
+            <div class="info-row">
+                <span>Phương thức</span>
+                <b th:text="${payment != null ? payment.paymentMethod : '—'}"></b>
+            </div>
 
-<table>
-<tr>
-    <th>Tên sản phẩm</th>
-    <th>Giá</th>
-    <th>Số lượng</th>
-    <th>Thành tiền</th>
-</tr>
+            <div class="info-row">
+                <span>Trạng thái thanh toán</span>
 
-<tr th:each="i : ${items}">
-    <td th:text="${i.product.name}"></td>
-    <td th:text="${i.price}"></td>
-    <td th:text="${i.quantity}"></td>
-    <td th:text="${i.subtotal}"></td>
-</tr>
+                <span th:if="${payment != null and payment.paymentStatus == 'CHO_THANH_TOAN'}"
+                      class="badge badge-pending">⏳ Chờ thanh toán</span>
 
-</table>
-<h3>Đánh giá sản phẩm</h3>
+                <span th:if="${payment != null and payment.paymentStatus == 'DA_THANH_TOAN'}"
+                      class="badge badge-success">✅ Đã thanh toán</span>
 
-<div th:each="i : ${items}">
+                <span th:if="${payment != null and payment.paymentStatus == 'CHO_XAC_NHAN'}"
+                      class="badge badge-info">🏦 Chờ xác nhận chuyển khoản</span>
 
-<form action="/review/save" method="post">
+                <span th:if="${payment == null}" class="badge badge-muted">Chưa có</span>
+            </div>
 
-    <input type="hidden"
-           name="productName"
-           th:value="${i.product.name}">
+            <div class="order-total">
+                <span>Tổng tiền</span>
+                <b th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></b>
+            </div>
+        </div>
 
-    <p>
-        <b th:text="${i.product.name}"></b>
-    </p>
+    </div>
 
-    <label>Số sao:</label>
-    <select name="rating">
-        <option value="1">1 ⭐</option>
-        <option value="2">2 ⭐</option>
-        <option value="3">3 ⭐</option>
-        <option value="4">4 ⭐</option>
-        <option value="5">5 ⭐</option>
-    </select>
+    <!-- SẢN PHẨM -->
+    <div class="card">
+        <h3>🛒 Sản phẩm đã mua</h3>
 
-    <br><br>
+        <table>
+            <tr>
+                <th>Tên sản phẩm</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+                <th>Thành tiền</th>
+            </tr>
 
-    <label>Ghi chú:</label>
-    <input type="text" name="comment">
+            <tr th:each="i : ${items}">
+                <td class="product-name" th:text="${i.product.name}"></td>
+                <td th:text="${#numbers.formatDecimal(i.price,0,'COMMA',0,'POINT')} + 'đ'"></td>
+                <td th:text="${i.quantity}"></td>
+                <td class="price" th:text="${#numbers.formatDecimal(i.subtotal,0,'COMMA',0,'POINT')} + 'đ'"></td>
+            </tr>
+        </table>
+    </div>
 
-    <br><br>
+    <!-- XÁC NHẬN GIAO HÀNG (khi shipper báo đã giao, chờ khách xác nhận) -->
+    <div class="card confirm-delivery" th:if="${order.status == 'DA_GIAO'}">
+        <h3>📬 Shipper báo đã giao hàng cho bạn</h3>
+        <p>Bạn đã nhận được sản phẩm chưa? Vui lòng xác nhận để hoàn tất đơn hàng.</p>
 
-    <button type="submit" class="btn">
-        Gửi đánh giá
-    </button>
+        <div class="confirm-delivery-actions">
+            <a th:href="@{/orders/confirm-received/{id}(id=${order.id})}" class="btn btn-confirm-yes">
+                ✅ Đã nhận được hàng
+            </a>
+            <a th:href="@{/orders/report-issue/{id}(id=${order.id})}" class="btn btn-confirm-no">
+                ❌ Chưa nhận được hàng
+            </a>
+        </div>
+    </div>
 
-</form>
+    <!-- KHIẾU NẠI -->
+    <div class="card complaint-box" th:if="${order.status == 'KHIEU_NAI'}">
+        <h3>⚠️ Đơn hàng đang được xử lý vì chưa nhận được hàng</h3>
+        <p>Bạn đã báo chưa nhận được hàng. Bộ phận hỗ trợ sẽ liên hệ và xử lý đơn hàng này sớm nhất.</p>
+    </div>
 
-<hr>
+    <!-- ĐÁNH GIÁ SẢN PHẨM -->
+    <div class="card" th:if="${order.status == 'HOAN_THANH'}">
+        <h3>⭐ Đánh giá sản phẩm</h3>
 
-</div>
+        <div class="review-form" th:each="i, iStat : ${items}">
 
-<br>
+            <form action="/review/save" method="post">
 
-<a href="/orders" class="btn">Quay lại</a>
+                <input type="hidden" name="productName" th:value="${i.product.name}">
+
+                <div class="review-form-head">
+                    <b th:text="${i.product.name}"></b>
+                </div>
+
+                <div class="review-form-row">
+
+                    <div class="star-rating">
+                        <input type="radio" name="rating" value="5" th:id="'star5_' + ${iStat.index}" checked>
+                        <label th:for="'star5_' + ${iStat.index}">★</label>
+
+                        <input type="radio" name="rating" value="4" th:id="'star4_' + ${iStat.index}">
+                        <label th:for="'star4_' + ${iStat.index}">★</label>
+
+                        <input type="radio" name="rating" value="3" th:id="'star3_' + ${iStat.index}">
+                        <label th:for="'star3_' + ${iStat.index}">★</label>
+
+                        <input type="radio" name="rating" value="2" th:id="'star2_' + ${iStat.index}">
+                        <label th:for="'star2_' + ${iStat.index}">★</label>
+
+                        <input type="radio" name="rating" value="1" th:id="'star1_' + ${iStat.index}">
+                        <label th:for="'star1_' + ${iStat.index}">★</label>
+                    </div>
+
+                    <input type="text" name="comment" placeholder="Viết nhận xét của bạn..." class="review-input">
+
+                    <button type="submit" class="btn">Gửi đánh giá</button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <a th:href="@{/orders}" class="btn btn-back">← Quay lại lịch sử đơn hàng</a>
 
 </div>
 

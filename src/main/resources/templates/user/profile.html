@@ -13,57 +13,70 @@
 
 <div th:replace="layout/header :: header"></div>
 
-<div class="profile-container">
+<div class="profile-page">
 
-    <!-- LEFT AVATAR -->
-    <div class="profile-left">
+    <div class="profile-container">
 
-        <img th:src="@{/imges/{img}(img=${user.avatar})}" />
+        <!-- LEFT AVATAR -->
+        <div class="profile-left">
 
-        <h3 th:text="${user.fullName}"></h3>
+            <div class="profile-cover"></div>
 
-        <p th:text="${user.email}"></p>
+            <img class="profile-avatar" th:src="@{/imges/{img}(img=${user.avatar})}" />
 
-    </div>
+            <h3 th:text="${user.fullName}"></h3>
+
+            <p class="profile-username">@<span th:text="${user.username}"></span></p>
+
+            <p class="profile-email">📧 <span th:text="${user.email}"></span></p>
+
+            <span class="profile-role" th:text="${user.role}"></span>
+
+            <a href="/change-password" class="profile-link">🔒 Đổi mật khẩu</a>
+            <a href="/orders" class="profile-link">📦 Lịch sử đặt hàng</a>
+            <a href="/reviews" class="profile-link">⭐ Lịch sử đánh giá</a>
+
+        </div>
 
 
-    <!-- RIGHT FORM -->
-    <div class="profile-right">
-		<div th:if="${message}" class="alert-success">
-		    <span th:text="${message}"></span>
-		</div>
-		
-        <h2>Thông tin cá nhân</h2>
+        <!-- RIGHT FORM -->
+        <div class="profile-right">
 
-        <form th:action="@{/profile/update}" method="post">
-
-            <input type="hidden" name="id" th:value="${user.id}"/>
-
-            <div class="profile-row">
-                <label>Username</label>
-                <input name="username" th:value="${user.username}" readonly>
+            <div th:if="${message}" class="alert-success">
+                <span th:text="${message}"></span>
             </div>
 
-            <div class="profile-row">
-                <label>Họ tên</label>
-                <input name="fullName" th:value="${user.fullName}">
-            </div>
+            <h2>✏️ Cập nhật thông tin cá nhân</h2>
 
-            <div class="profile-row">
-                <label>Email</label>
-                <input name="email" th:value="${user.email}">
-            </div>
+            <form th:action="@{/profile/update}" method="post">
 
-            <div class="profile-row">
-                <label>Avatar (tên file)</label>
-                <input name="avatar" th:value="${user.avatar}">
-            </div>
+                <input type="hidden" name="id" th:value="${user.id}"/>
 
-            <button class="btn-save">💾 Cập nhật</button>
+                <div class="profile-row">
+                    <label>Username</label>
+                    <input name="username" th:value="${user.username}" readonly>
+                </div>
 
-        </form>
+                <div class="profile-row">
+                    <label>Họ tên</label>
+                    <input name="fullName" th:value="${user.fullName}">
+                </div>
 
-        <a href="/forgot" class="forgot">Quên mật khẩu?</a>
+                <div class="profile-row">
+                    <label>Email</label>
+                    <input name="email" th:value="${user.email}">
+                </div>
+
+                <div class="profile-row">
+                    <label>Avatar (tên file ảnh trong /imges)</label>
+                    <input name="avatar" th:value="${user.avatar}">
+                </div>
+
+                <button class="btn-save">💾 Cập nhật</button>
+
+            </form>
+
+        </div>
 
     </div>
 

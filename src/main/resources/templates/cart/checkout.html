@@ -10,15 +10,66 @@
 <div th:replace="layout/header :: header"></div>
 <div class="cart-container">
 
-    <h2>🧾 Thông tin thanh toán</h2>
+    <h2>🧾 Xác nhận đơn hàng</h2>
 
-    <form th:action="@{/cart/pay}" method="post" class="checkout-form">
+    <!-- ===== 1. TỔNG TIỀN ===== -->
+    <div class="cart-total checkout-total">
+        Tổng tiền:
+        <span th:text="${#numbers.formatDecimal(cart.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></span>
+    </div>
+
+    <!-- ===== 2. SẢN PHẨM ===== -->
+    <div class="checkout-products">
+        <div class="checkout-product-item" th:each="item : ${cart.items}">
+
+            <img th:src="@{/imges/{img}(img=${item.image})}" class="product-thumb">
+
+            <div class="cpi-info">
+                <div class="cpi-name" th:text="${item.productName}"></div>
+                <div class="cpi-meta">
+                    <span th:text="${#numbers.formatDecimal(item.price,0,'COMMA',0,'POINT')} + 'đ'"></span>
+                    &nbsp;×&nbsp;
+                    <span th:text="${item.quantity}"></span>
+                </div>
+            </div>
+
+            <div class="cpi-subtotal price"
+                 th:text="${#numbers.formatDecimal(item.totalPrice,0,'COMMA',0,'POINT')} + 'đ'"></div>
+
+        </div>
+    </div>
+
+    <form th:action="@{/cart/pay}" method="post" class="checkout-form" id="checkoutForm">
+
+        <input type="hidden" name="mode" th:value="${mode}">
+
+        <!-- ===== 3. PHƯƠNG THỨC THANH TOÁN ===== -->
+        <h3 class="checkout-subtitle">💳 Phương thức thanh toán</h3>
+
+        <div class="payment-method-grid">
+
+            <label class="pm-option">
+                <input type="radio" name="paymentMethod" value="COD" checked onchange="togglePayment()">
+                <span class="pm-icon">💵</span>
+                <span class="pm-label">Thanh toán khi nhận hàng (COD)</span>
+            </label>
+
+            <label class="pm-option">
+                <input type="radio" name="paymentMethod" value="BANKING" onchange="togglePayment()">
+                <span class="pm-icon">🏦</span>
+                <span class="pm-label">Chuyển khoản ngân hàng</span>
+            </label>
+
+        </div>
+
+        <!-- ===== 4. CHI TIẾT THANH TOÁN ===== -->
+        <h3 class="checkout-subtitle">📋 Chi tiết thanh toán</h3>
 
         <label>Họ và tên</label>
-        <input type="text" name="fullname" required>
+        <input type="text" name="fullname" th:value="${savedFullname}" required>
 
         <label>Email</label>
-        <input type="email" name="email" required>
+        <input type="email" name="email" th:value="${savedEmail}" required>
 
         <label>Số điện thoại</label>
         <input type="text" name="phone" required>
@@ -26,81 +77,37 @@
         <label>Địa chỉ giao hàng</label>
         <textarea name="address" required></textarea>
 
-        <div class="cart-total">
-            Tổng tiền:
-            <b th:text="${cart.totalAmount}"></b> ₫
+        <!-- thông tin chuyển khoản, chỉ hiện khi chọn Banking -->
+        <div id="bankingFields" class="banking-fields">
+
+            <div class="bank-info">
+                <p><b>Ngân hàng:</b> MB BANK</p>
+                <p><b>Chủ tài khoản:</b> NGUYỄN HOÀNG THIÊN HẬU</p>
+                <p><b>Số tài khoản:</b> 0565032567</p>
+            </div>
+
+            <label>Ngân hàng của bạn</label>
+            <input type="text" name="customerBank" th:value="${savedBank}" placeholder="VD: MB Bank, Vietcombank...">
+
+            <label>Số tài khoản của bạn</label>
+            <input type="text" name="customerAccount" th:value="${savedAccount}" placeholder="Số tài khoản dùng để chuyển">
+
         </div>
 
-        <div class="payment-buttons">
+        <button type="submit" class="btn-checkout btn-place-order">✅ Đặt hàng</button>
 
-		    <button type="submit"
-		            name="paymentMethod"
-		            value="COD"
-		            class="btn-checkout">
-		        💵 Thanh toán tiền mặt
-		    </button>
-		
-		    <button type="button"
-		            onclick="document.getElementById('bankingModal').style.display='flex'"
-		            class="btn-checkout">
-		        🏦 Thanh toán Banking
-		    </button>
-
-		</div>
     </form>
 
 </div>
-<div id="bankingModal" class="banking-modal">
 
-    <div class="banking-box">
+<script>
+    function togglePayment() {
+        var banking = document.querySelector('input[name="paymentMethod"]:checked').value === 'BANKING';
+        document.getElementById('bankingFields').style.display = banking ? 'block' : 'none';
+    }
 
-        <h3>🏦 Thanh toán chuyển khoản</h3>
+    togglePayment();
+</script>
 
-        <div class="bank-info">
-            <p><b>Ngân hàng:</b> MB BANK</p>
-            <p><b>Chủ tài khoản:</b> NGUYỄN HOÀNG THIÊN HẬU</p>
-            <p><b>Số tài khoản:</b> 0565032567</p>
-        </div>
-
-        <form th:action="@{/cart/pay}" method="post">
-
-            <input type="hidden"
-                   name="paymentMethod"
-                   value="BANKING">
-
-            <label>Họ tên khách hàng</label>
-            <input type="text" name="fullname" required>
-
-            <label>Email</label>
-            <input type="email" name="email" required>
-
-            <label>Số điện thoại</label>
-            <input type="text" name="phone" required>
-
-            <label>Địa chỉ giao hàng</label>
-            <textarea name="address" required></textarea>
-
-            <label>Ngân hàng của bạn</label>
-            <input type="text" name="customerBank">
-
-            <label>Số tài khoản của bạn</label>
-            <input type="text" name="customerAccount">
-
-            <button type="submit" class="btn-bank-submit">
-                ✅ Tôi đã chuyển khoản
-            </button>
-
-        </form>
-
-        <button
-            class="btn-close-bank"
-            onclick="document.getElementById('bankingModal').style.display='none'">
-            Đóng
-        </button>
-
-    </div>
-
-
-</div>
 </body>
 </html>

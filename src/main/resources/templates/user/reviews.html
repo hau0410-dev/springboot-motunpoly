@@ -3,27 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <title>Lịch sử đánh giá</title>
-<link rel="stylesheet" th:href="@{/css/user-orders.css}">
-<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<link rel="stylesheet" th:href="@{/css/reviews.css}">
 </head>
 <body>
 <div th:replace="layout/header :: header"></div>
-<h2>⭐ Lịch sử đánh giá</h2>
 
-<table>
-<tr>
-    <th>Sản phẩm</th>
-    <th>Số sao</th>
-    <th>Ghi chú</th>
-</tr>
+<div class="reviews-page">
 
-<tr th:each="r : ${reviews}">
-    <td th:text="${r.productName}"></td>
-    <td th:text="${r.rating} + ' ⭐'"></td>
-    <td th:text="${r.comment}"></td>
-</tr>
+    <h2>⭐ Lịch sử đánh giá</h2>
 
-</table>
+    <div th:if="${reviews == null || reviews.isEmpty()}" class="reviews-empty">
+        Bạn chưa có đánh giá nào.
+    </div>
+
+    <div class="review-list" th:if="${reviews != null && !reviews.isEmpty()}">
+
+        <div class="review-card" th:each="r : ${reviews}">
+
+            <div class="review-head">
+                <h3 th:text="${r.productName}"></h3>
+
+                <div class="review-stars">
+                    <span th:each="i : ${#numbers.sequence(1,5)}"
+                          th:text="${i <= r.rating} ? '★' : '☆'"
+                          th:classappend="${i <= r.rating} ? 'star-on' : 'star-off'"></span>
+                </div>
+            </div>
+
+            <p class="review-comment" th:text="${r.comment}"></p>
+
+        </div>
+
+    </div>
+
+</div>
 
 </body>
 </html>

@@ -66,4 +66,52 @@ public class UserOrderController {
 
         return "user/order-detail";
     }
+
+    // ===== KHÁCH XÁC NHẬN ĐÃ NHẬN HÀNG: DA_GIAO -> HOAN_THANH =====
+    @GetMapping("/confirm-received/{id}")
+    public String confirmReceived(@PathVariable("id") Integer id, HttpSession session) {
+
+        User user = (User) session.getAttribute("user");
+
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        Order order = orderRepo.findById(id).orElse(null);
+
+        if (order != null
+                && order.getUser() != null
+                && order.getUser().getId().equals(user.getId())
+                && "DA_GIAO".equals(order.getStatus())) {
+
+            order.setStatus("HOAN_THANH");
+            orderRepo.save(order);
+        }
+
+        return "redirect:/orders/" + id;
+    }
+
+    // ===== KHÁCH BÁO CHƯA NHẬN ĐƯỢC HÀNG: DA_GIAO -> KHIEU_NAI =====
+    @GetMapping("/report-issue/{id}")
+    public String reportIssue(@PathVariable("id") Integer id, HttpSession session) {
+
+        User user = (User) session.getAttribute("user");
+
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        Order order = orderRepo.findById(id).orElse(null);
+
+        if (order != null
+                && order.getUser() != null
+                && order.getUser().getId().equals(user.getId())
+                && "DA_GIAO".equals(order.getStatus())) {
+
+            order.setStatus("KHIEU_NAI");
+            orderRepo.save(order);
+        }
+
+        return "redirect:/orders/" + id;
+    }
 }

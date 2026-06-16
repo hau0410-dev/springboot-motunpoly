@@ -25,6 +25,12 @@ public class Payment {
     @Column(name = "payment_date")
     private LocalDateTime paymentDate;
 
+    @Column(name = "customer_bank")
+    private String customerBank;
+
+    @Column(name = "customer_account")
+    private String customerAccount;
+
     // ===== Getter Setter =====
 
     public Integer getId() {
@@ -65,5 +71,21 @@ public class Payment {
 
     public void setPaymentDate(LocalDateTime paymentDate) {
         this.paymentDate = paymentDate;
+    }
+
+    public String getCustomerBank() {
+        return customerBank;
+    }
+
+    public void setCustomerBank(String customerBank) {
+        this.customerBank = customerBank;
+    }
+
+    public String getCustomerAccount() {
+        return customerAccount;
+    }
+
+    public void setCustomerAccount(String customerAccount) {
+        this.customerAccount = customerAccount;
     }
 }

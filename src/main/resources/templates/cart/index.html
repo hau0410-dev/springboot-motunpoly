@@ -23,8 +23,8 @@
         Giỏ hàng đang trống.
     </div>
 
-    <table th:if="${cart != null && !cart.empty}"
-           class="cart-table">
+    <div class="cart-table-wrap" th:if="${cart != null && !cart.empty}">
+    <table class="cart-table">
         <thead>
         <tr>
             <th>Sản phẩm</th>
@@ -38,18 +38,46 @@
 
         <tbody>
         <tr th:each="item : ${cart.items}">
-            <td>
-                <img th:src="@{/images/{img}(img=${item.image})}" width="60">
+            <td class="product-cell">
+                <img th:src="@{/imges/{img}(img=${item.image})}" class="product-thumb">
                 <div th:text="${item.productName}"></div>
             </td>
 
-            <td class="price" th:text="${item.price}"></td>
+            <td class="price"
+                th:text="${#numbers.formatDecimal(item.price,0,'COMMA',0,'POINT')} + 'đ'"></td>
 
-            <td th:text="${item.quantity}"></td>
-            
+            <td>
+                <div class="qty-control">
+
+                    <!-- GIẢM -->
+                    <form th:action="@{/cart/update/{id}(id=${item.productId})}" method="post">
+                        <input type="hidden" name="qty" th:value="${item.quantity - 1}">
+                        <button type="submit" class="btn-qty"
+                                th:disabled="${item.quantity <= 1}">−</button>
+                    </form>
+
+                    <!-- NHẬP SỐ LƯỢNG -->
+                    <form th:action="@{/cart/update/{id}(id=${item.productId})}" method="post">
+                        <input type="number" name="qty" class="qty-input"
+                               th:value="${item.quantity}"
+                               min="1" th:max="${item.stock}"
+                               onchange="this.form.submit()">
+                    </form>
+
+                    <!-- TĂNG -->
+                    <form th:action="@{/cart/update/{id}(id=${item.productId})}" method="post">
+                        <input type="hidden" name="qty" th:value="${item.quantity + 1}">
+                        <button type="submit" class="btn-qty"
+                                th:disabled="${item.quantity >= item.stock}">+</button>
+                    </form>
+
+                </div>
+            </td>
+
             <td th:text="${item.stock}"></td>
 
-            <td class="price" th:text="${item.totalPrice}"></td>
+            <td class="price"
+                th:text="${#numbers.formatDecimal(item.totalPrice,0,'COMMA',0,'POINT')} + 'đ'"></td>
 
             <td>
                 <a class="btn-remove"
@@ -60,15 +88,16 @@
         </tr>
         </tbody>
     </table>
+    </div>
 
     <div th:if="${cart != null && !cart.empty}"
          class="cart-total">
         Tổng tiền:
-        <span th:text="${cart.totalAmount}"></span> ₫
+        <span th:text="${#numbers.formatDecimal(cart.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></span>
     </div>
     <div th:if="${cart != null && !cart.empty}" class="cart-actions">
     <a class="btn-checkout" th:href="@{/cart/checkout}">
-        🧾 Thanh toán
+        🧾 Tiến hành thanh toán
     </a>
 </div>
     

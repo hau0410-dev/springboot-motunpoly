@@ -105,3 +105,56 @@ margin-left:15px;
 color:#2563eb;
 font-weight:600;
 }
+
+/* ===== ẢNH ĐẠI DIỆN HIỆN TẠI ===== */
+.current-image{
+margin-top:10px;
+}
+
+.current-image img{
+border-radius:8px;
+border:1px solid #e5e7eb;
+object-fit:cover;
+}
+
+/* ===== GALLERY PREVIEW (admin form) ===== */
+.gallery-preview{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+margin-top:10px;
+}
+
+.gallery-preview-item{
+position:relative;
+width:80px;
+height:80px;
+}
+
+.gallery-preview-item img{
+width:80px;
+height:80px;
+object-fit:cover;
+border-radius:8px;
+border:1px solid #e5e7eb;
+}
+
+.gallery-remove{
+position:absolute;
+top:-8px;
+right:-8px;
+width:20px;
+height:20px;
+line-height:20px;
+text-align:center;
+background:#ef4444;
+color:#fff;
+border-radius:50%;
+font-size:12px;
+font-weight:bold;
+text-decoration:none;
+}
+
+.gallery-remove:hover{
+background:#dc2626;
+}

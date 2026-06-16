@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý khuyến mãi</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <style>
+        .product-checklist { display:flex; flex-direction:column; gap:6px; max-height:180px; overflow-y:auto; padding:8px; border:1px solid #e0e0e0; border-radius:10px; margin-top:4px; }
+        .product-check-item { display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer; }
+        .product-check-item input { accent-color:#f59e0b; }
+    </style>
+</head>
+<body>
+<div class="admin-container">
+    <div th:replace="admin/layout/sidebar :: sidebar"></div>
+    <div class="content">
+        <div th:replace="admin/layout/header :: header"></div>
+        <div class="content-body">
+
+            <h2 class="page-title">🎁 Quản lý khuyến mãi</h2>
+
+            <div style="display:grid;grid-template-columns:360px 1fr;gap:22px;align-items:start;">
+
+                <div class="card">
+                    <h3 style="margin:0 0 16px;font-size:15px;border-left:4px solid #f59e0b;padding-left:10px;">
+                        <span th:text="${promotion.id != null} ? '✏️ Cập nhật' : '➕ Thêm khuyến mãi'">Thêm</span>
+                    </h3>
+                    <form th:action="@{/admin/promotions/save}" method="post">
+                        <input type="hidden" name="id" th:value="${promotion.id}">
+
+                        <div class="form-group">
+                            <label>Tên chương trình</label>
+                            <input type="text" name="title" th:value="${promotion.title}" placeholder="VD: Ưu đãi Vàng">
+                        </div>
+                        <div class="form-group">
+                            <label>Badge hiển thị</label>
+                            <input type="text" name="badgeText" th:value="${promotion.badgeText}" placeholder="VD: Giảm 10%">
+                        </div>
+                        <div class="form-group">
+                            <label>Icon (emoji)</label>
+                            <input type="text" name="icon" th:value="${promotion.icon}" placeholder="🔥">
+                        </div>
+                        <div class="form-group">
+                            <label>Mô tả</label>
+                            <textarea name="description" rows="2" th:text="${promotion.description}"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Loại giảm giá</label>
+                            <select name="discountType">
+                                <option value="PERCENT" th:selected="${promotion.discountType == 'PERCENT'}">Giảm %</option>
+                                <option value="AMOUNT" th:selected="${promotion.discountType == 'AMOUNT'}">Giảm tiền cố định</option>
+                                <option value="GIFT" th:selected="${promotion.discountType == 'GIFT'}">Tặng quà / Mua 1 tặng 1</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Giá trị giảm</label>
+                            <input type="number" step="any" name="discountValue" th:value="${promotion.discountValue}">
+                        </div>
+                        <div class="form-group">
+                            <label>Tổng chi tiêu tối thiểu (đ)</label>
+                            <input type="number" step="any" name="minTotalSpent" th:value="${promotion.minTotalSpent}">
+                        </div>
+                        <div class="form-group">
+                            <label>Trạng thái</label>
+                            <select name="active">
+                                <option value="true" th:selected="${promotion.active == true}">✅ Hoạt động</option>
+                                <option value="false" th:selected="${promotion.active == false}">🔒 Tắt</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Áp dụng cho sản phẩm</label>
+                            <div class="product-checklist">
+                                <label th:each="p : ${products}" class="product-check-item">
+                                    <input type="checkbox" name="productIds" th:value="${p.id}" th:checked="${selectedIds.contains(p.id)}">
+                                    <span th:text="${p.name}"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div style="display:flex;gap:10px;">
+                            <button type="submit" class="btn btn-primary" style="flex:1;">💾 Lưu</button>
+                            <a th:href="@{/admin/promotions}" class="btn btn-secondary">➕ Mới</a>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>ID</th><th>Tên chương trình</th><th>Badge</th><th>Điều kiện</th><th>Số SP</th><th>Trạng thái</th><th>Thao tác</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p : ${promotions}">
+                                <td th:text="${p.id}"></td>
+                                <td><a th:href="@{'/admin/promotions/edit/' + ${p.id}}" style="color:#d97706;font-weight:700;" th:text="${p.title}"></a></td>
+                                <td>
+                                    <span style="background:linear-gradient(135deg,#ff6b6b,#ee0033);color:#fff;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;"
+                                          th:text="${(p.icon ?: '') + ' ' + p.badgeText}"></span>
+                                </td>
+                                <td th:text="${#numbers.formatDecimal(p.minTotalSpent,0,'COMMA',0,'POINT')} + 'đ'"></td>
+                                <td th:text="${p.products != null ? #lists.size(p.products) : 0}"></td>
+                                <td>
+                                    <span th:if="${p.active}" class="badge badge-success">✅ Hoạt động</span>
+                                    <span th:unless="${p.active}" class="badge badge-muted">🔒 Tắt</span>
+                                </td>
+                                <td>
+                                    <a th:href="@{'/admin/promotions/edit/' + ${p.id}}" class="btn btn-sm btn-secondary">✏️</a>
+                                    <a th:href="@{'/admin/promotions/delete/' + ${p.id}}" onclick="return confirm('Xoá khuyến mãi?')" class="btn btn-sm btn-danger">🗑️</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

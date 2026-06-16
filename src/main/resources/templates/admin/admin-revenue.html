@@ -1,139 +1,131 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Quản lý doanh thu</title>
-
-<link rel="stylesheet" th:href="@{/css/admin-revenue.css}">
-<link rel="stylesheet" th:href="@{/css/admin.css}">
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    <meta charset="UTF-8">
+    <title>Doanh thu</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-<div th:replace="admin/layout/header :: header"></div>
-<div class="container">
+<div class="admin-container">
+    <div th:replace="admin/layout/sidebar :: sidebar"></div>
+    <div class="content">
+        <div th:replace="admin/layout/header :: header"></div>
+        <div class="content-body">
 
-<h2 class="title">QUẢN LÝ DOANH THU</h2>
+            <h2 class="page-title">💰 Quản lý doanh thu</h2>
 
-<div class="dashboard">
+            <!-- STAT ROW -->
+            <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);">
+                <div class="stat-box">
+                    <div class="stat-num" th:text="${#numbers.formatDecimal(totalRevenue,0,'COMMA',0,'POINT')} + 'đ'">0đ</div>
+                    <div class="stat-label">Tổng doanh thu</div>
+                </div>
+                <div class="stat-box" style="border-top-color:#0ea5e9">
+                    <div class="stat-num" th:text="${#numbers.formatDecimal(maxToday,0,'COMMA',0,'POINT')} + 'đ'">0đ</div>
+                    <div class="stat-label">Cao nhất hôm nay</div>
+                </div>
+                <div class="stat-box" style="border-top-color:#16a34a">
+                    <div class="stat-num" th:text="${#numbers.formatDecimal(avgToday,0,'COMMA',0,'POINT')} + 'đ'">0đ</div>
+                    <div class="stat-label">Trung bình</div>
+                </div>
+            </div>
 
-    <!-- LEFT SIDE -->
-    <div class="main-content">
+            <!-- FILTER -->
+            <div class="card">
+                <div class="filter-bar">
+                    <form action="/admin/revenue/filter" style="display:flex;gap:8px;align-items:center;">
+                        <label style="font-weight:600;font-size:13px;">Ngày</label>
+                        <input type="date" name="date">
+                        <button type="submit" class="btn btn-primary">Lọc</button>
+                    </form>
+                    <form action="/admin/revenue/search" style="display:flex;gap:8px;align-items:center;">
+                        <label style="font-weight:600;font-size:13px;">Từ số tiền</label>
+                        <input type="number" name="amount" placeholder=">= VNĐ" style="width:160px;">
+                        <button type="submit" class="btn btn-primary">Tìm</button>
+                    </form>
+                </div>
+            </div>
 
-        <div class="card">
+            <div style="display:grid;grid-template-columns:1fr 300px;gap:22px;align-items:start;">
 
-           <div class="filters">
+                <div>
+                    <!-- TABLE -->
+                    <div class="table-wrap" style="margin-bottom:22px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Khách hàng</th><th>Sản phẩm</th>
+                                    <th>Giá</th><th>SL</th><th>Thành tiền</th><th>Ngày</th><th>Xoá</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="r : ${revenues}">
+                                    <td th:text="${r.customerName}"></td>
+                                    <td th:text="${r.productName}"></td>
+                                    <td th:text="${#numbers.formatDecimal(r.price,0,'COMMA',0,'POINT')} + 'đ'"></td>
+                                    <td th:text="${r.quantity}"></td>
+                                    <td style="color:#16a34a;font-weight:700;" th:text="${#numbers.formatDecimal(r.subtotal,0,'COMMA',0,'POINT')} + 'đ'"></td>
+                                    <td th:text="${r.createdDate}"></td>
+                                    <td>
+                                        <a th:href="@{'/admin/revenue/delete/' + ${r.id}}" class="btn btn-sm btn-danger">🗑️</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-		    <form action="/admin/revenue/filter" class="filter-group">
-		        <label>Ngày</label>
-		        <input type="date" name="date">
-		        <button class="btn">Lọc</button>
-		    </form>
-		
-		    <form action="/admin/revenue/search" class="filter-group">
-		        <label>Doanh thu</label>
-		        <input type="number" name="amount" placeholder=">= VNĐ">
-		        <button class="btn">Tìm</button>
-		    </form>
-		
-		</div>
+                    <!-- CHART -->
+                    <div class="card">
+                        <h3 style="margin:0 0 14px;font-size:15px;border-left:4px solid #f59e0b;padding-left:10px;">📊 Biểu đồ doanh thu</h3>
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
 
-            <table>
-                <tr>
-                    <th>Khách hàng</th>
-                    <th>Sản phẩm</th>
-                    <th>Giá</th>
-                    <th>Số lượng</th>
-                    <th>Thành tiền</th>
-                    <th>Ngày</th>
-                    <th>Xóa</th>
-                </tr>
-
-                <tr th:each="r : ${revenues}">
-                    <td th:text="${r.customerName}"></td>
-                    <td th:text="${r.productName}"></td>
-                    <td th:text="${r.price}"></td>
-                    <td th:text="${r.quantity}"></td>
-                    <td th:text="${r.subtotal}"></td>
-                    <td th:text="${r.createdDate}"></td>
-                    <td>
-                        <a th:href="@{'/admin/revenue/delete/' + ${r.id}}">
-                            <button class="btn btn-danger">Xóa</button>
-                        </a>
-                    </td>
-                </tr>
-
-            </table>
+                <!-- TOP PRODUCTS -->
+                <div class="card">
+                    <h3 style="margin:0 0 14px;font-size:15px;border-left:4px solid #f59e0b;padding-left:10px;">🏆 Top sản phẩm</h3>
+                    <table>
+                        <thead><tr><th>Sản phẩm</th><th>SL</th></tr></thead>
+                        <tbody>
+                            <tr th:each="p : ${topProducts}">
+                                <td style="text-align:left;" th:text="${p[0]}"></td>
+                                <td><b th:text="${p[1]}"></b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
         </div>
-
-
-        <div class="card">
-            <h3>Biểu đồ doanh thu</h3>
-            <canvas id="revenueChart"></canvas>
-        </div>
-
     </div>
+</div>
 
 <script th:inline="javascript">
 /*<![CDATA[*/
     let labels = /*[[${chartLabels}]]*/ [];
-    let data = /*[[${chartData}]]*/ [];
+    let data   = /*[[${chartData}]]*/  [];
 
     new Chart(document.getElementById('revenueChart'), {
         type: 'bar',
         data: {
             labels: labels,
             datasets: [{
-                label: 'Doanh thu',
-                data: data
+                label: 'Doanh thu (đ)',
+                data: data,
+                backgroundColor: 'rgba(245,158,11,.7)',
+                borderColor: '#d97706',
+                borderWidth: 1,
+                borderRadius: 6
             }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
         }
     });
 /*]]>*/
 </script>
-
-<!-- RIGHT SIDE -->
-    <div class="sidebar">
-
-        <div class="card stat">
-            <p>Tổng doanh thu</p>
-            <h3 th:text="${#numbers.formatDecimal(totalRevenue,0,'POINT',0,'COMMA')}"></h3>
-        </div>
-
-        <div class="card stat">
-            <p>Giá cao nhất hôm nay</p>
-            <h3 th:text="${#numbers.formatDecimal(maxToday,0,'POINT',0,'COMMA')} + ' đ'"></h3>
-        </div>
-
-        <div class="card stat">
-            <p>Giá trung bình</p>
-            <h3 th:text="${#numbers.formatDecimal(avgToday,0,'POINT',0,'COMMA')} + ' đ'"></h3>
-        </div>
-
-        <div class="card">
-            <h3>Top sản phẩm</h3>
-
-            <table>
-                <tr>
-                    <th>Sản phẩm</th>
-                    <th>Số lượng</th>
-                </tr>
-
-                <tr th:each="p : ${topProducts}">
-                    <td th:text="${p[0]}"></td>
-                    <td th:text="${p[1]}"></td>
-                </tr>
-
-            </table>
-        </div>
-
-    </div>
-
-</div>
-
-</div>
-
 </body>
 </html>

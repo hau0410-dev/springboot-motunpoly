@@ -9,4 +9,7 @@ public interface PaymentRepository
 
 	Payment findByOrder_Id(Integer orderId);
 
+	// Lấy lần chuyển khoản gần nhất của user (để gợi ý điền sẵn lần sau)
+	Payment findTopByOrder_User_IdAndCustomerBankIsNotNullOrderByIdDesc(Integer userId);
+
 }

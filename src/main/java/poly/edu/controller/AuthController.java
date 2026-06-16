@@ -88,8 +88,8 @@ public class AuthController {
     }
     @GetMapping("/logout")
     public String logout(HttpSession session) {
-        session.removeAttribute("user");
-        return "redirect:/";
+        session.invalidate(); // xoá toàn bộ session, không chỉ "user"
+        return "redirect:/login";
     }
     @GetMapping("/forgot")
     public String forgotForm() {

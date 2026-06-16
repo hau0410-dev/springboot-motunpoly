@@ -2,76 +2,81 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>Shipper Dashboard</title>
-<link rel="stylesheet" th:href="@{/css/style.css}">
-<link rel="stylesheet"
-      th:href="@{/css/shipper.css}">
+<title>Shipper Dashboard - MotunPoly</title>
+<link rel="stylesheet" th:href="@{/css/shipper.css}">
 </head>
-
 <body>
-<div th:replace="layout/header :: header"></div>
-<div class="container">
 
-    <h1>Danh sách đơn hàng cần giao</h1>
+<div class="sh-topbar">
+    <div class="sh-brand">🛵 MotunPoly <span>Shipper</span></div>
+    <div class="sh-user">
+        <span th:text="'Xin chào, ' + ${shipper.fullName}"></span>
+        <a th:href="@{/shipper/history}" class="sh-logout">📋 Lịch sử</a>
+        <a th:href="@{/logout}" class="sh-logout">Đăng xuất</a>
+    </div>
+</div>
 
-    <table>
+<div class="sh-container">
 
-        <thead>
-            <tr>
-                <th>Mã đơn</th>
-                <th>Khách hàng</th>
-                <th>SĐT</th>
-                <th>Địa chỉ</th>
-                <th>Tổng tiền</th>
-                <th>Trạng thái</th>
-                <th>Thao tác</th>
-            </tr>
-        </thead>
+    <!-- ===== ĐƠN CHỜ LẤY HÀNG ===== -->
+    <div class="sh-section">
+        <h2>📦 Đơn chờ lấy hàng</h2>
 
-        <tbody>
+        <div th:if="${waitingOrders == null || waitingOrders.isEmpty()}" class="sh-empty">
+            Hiện không có đơn nào cần lấy.
+        </div>
 
-            <tr th:each="o : ${orders}">
+        <div class="sh-card" th:each="o : ${waitingOrders}">
 
-                <td th:text="${o.id}"></td>
+            <div class="sh-card-head">
+                <span class="sh-order-id">#<span th:text="${o.id}"></span></span>
+                <span class="sh-badge sh-badge-wait">Chờ lấy hàng</span>
+            </div>
 
-                <td th:text="${o.fullname}"></td>
+            <div class="sh-card-body">
+                <p><b th:text="${o.fullname}"></b> &nbsp;|&nbsp; <span th:text="${o.phone}"></span></p>
+                <p class="sh-address" th:text="${o.address}"></p>
+                <p class="sh-amount" th:text="${#numbers.formatDecimal(o.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></p>
+            </div>
 
-                <td th:text="${o.phone}"></td>
+            <div class="sh-card-actions">
+                <a th:href="@{/shipper/detail/{id}(id=${o.id})}" class="sh-btn sh-btn-outline">Chi tiết</a>
+                <a th:href="@{/shipper/pickup/{id}(id=${o.id})}" class="sh-btn sh-btn-primary">🛵 Lấy hàng</a>
+            </div>
 
-                <td th:text="${o.address}"></td>
+        </div>
 
-                <td th:text="${o.totalAmount}"></td>
+    </div>
 
-                <td>
+    <!-- ===== ĐƠN ĐANG GIAO CỦA TÔI ===== -->
+    <div class="sh-section">
+        <h2>🚚 Đơn đang giao của tôi</h2>
 
-                    <span th:if="${o.status == 'DANG_GIAO'}">
-                        Đang giao
-                    </span>
+        <div th:if="${myOrders == null || myOrders.isEmpty()}" class="sh-empty">
+            Bạn chưa nhận đơn nào để giao.
+        </div>
 
-                    <span th:if="${o.status == 'DA_GIAO'}">
-                        Đã giao
-                    </span>
+        <div class="sh-card" th:each="o : ${myOrders}">
 
-                </td>
+            <div class="sh-card-head">
+                <span class="sh-order-id">#<span th:text="${o.id}"></span></span>
+                <span class="sh-badge sh-badge-going">Đang giao</span>
+            </div>
 
-                <td>
+            <div class="sh-card-body">
+                <p><b th:text="${o.fullname}"></b> &nbsp;|&nbsp; <span th:text="${o.phone}"></span></p>
+                <p class="sh-address" th:text="${o.address}"></p>
+                <p class="sh-amount" th:text="${#numbers.formatDecimal(o.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></p>
+            </div>
 
-                    <a th:href="@{'/shipper/detail/' + ${o.id}}">
-                        Chi tiết
-                    </a>
+            <div class="sh-card-actions">
+                <a th:href="@{/shipper/detail/{id}(id=${o.id})}" class="sh-btn sh-btn-outline">Chi tiết</a>
+                <a th:href="@{/shipper/delivered/{id}(id=${o.id})}" class="sh-btn sh-btn-success">✅ Giao thành công</a>
+            </div>
 
-                    <a th:if="${o.status == 'DANG_GIAO'}"
-                       th:href="@{'/shipper/delivered/' + ${o.id}}">
-                        Đã giao
-                    </a>
+        </div>
 
-                </td>
-
-            </tr>
-
-        </tbody>
-
-    </table>
+    </div>
 
 </div>
 

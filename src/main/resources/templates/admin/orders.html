@@ -1,128 +1,88 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title>Lịch sử đặt hàng</title>
-
-<link rel="stylesheet" th:href="@{/css/historyorder.css}">
-<link rel="stylesheet" th:href="@{/css/admin.css}">
+    <meta charset="UTF-8">
+    <title>Đơn hàng</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
-
 <body>
-<div th:replace="admin/layout/header :: header"></div>
-<h2>📦 Lịch sử đặt hàng</h2>
+<div class="admin-container">
+    <div th:replace="admin/layout/sidebar :: sidebar"></div>
+    <div class="content">
+        <div th:replace="admin/layout/header :: header"></div>
+        <div class="content-body">
 
-<div class="container">
+            <h2 class="page-title">📦 Lịch sử đặt hàng</h2>
 
-    <div class="layout">
+            <div class="card">
+                <form method="get" action="/admin/orders" class="filter-bar">
+                    <input type="text" name="name" placeholder="🔍 Tìm khách hàng" th:value="${name}">
+                    <select name="status">
+                        <option value="" th:selected="${status == null or status == ''}">Tất cả trạng thái</option>
+                        <option value="CHO_XAC_NHAN" th:selected="${status == 'CHO_XAC_NHAN'}">⏳ Chờ xác nhận</option>
+                        <option value="CHO_LAY_HANG" th:selected="${status == 'CHO_LAY_HANG'}">📦 Chờ lấy hàng</option>
+                        <option value="DANG_GIAO" th:selected="${status == 'DANG_GIAO'}">🚚 Đang giao</option>
+                        <option value="DA_GIAO" th:selected="${status == 'DA_GIAO'}">📬 Chờ khách xác nhận</option>
+                        <option value="HOAN_THANH" th:selected="${status == 'HOAN_THANH'}">✅ Hoàn thành</option>
+                        <option value="KHIEU_NAI" th:selected="${status == 'KHIEU_NAI'}">🚨 Đơn rủi ro</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Lọc</button>
+                </form>
+            </div>
 
-        <!-- FILTER CARD -->
-        <div class="card filter-card">
-
-            <h3>Bộ lọc</h3>
-
-           <form method="get" action="/admin/orders">
-
-				<label>Tìm khách hàng</label>
-				<input type="text" name="name" th:value="${name}">
-				
-				<label>Trạng thái</label>
-				<select name="status">
-				
-				<option value="">Tất cả</option>
-				
-				 <option value="CHO_XAC_NHAN"
-			        th:selected="${status == 'CHO_XAC_NHAN'}">
-			        Chờ xác nhận
-			    </option>
-			
-			    <option value="DANG_GIAO"
-			        th:selected="${status == 'DANG_GIAO'}">
-			        Đang giao
-			    </option>
-			
-			    <option value="DA_GIAO"
-			        th:selected="${status == 'DA_GIAO'}">
-			        Đã giao
-			    </option>
-				
-				</select>
-				
-				<button type="submit">Tìm</button>
-				
-			</form>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Khách hàng</th>
+                            <th>SĐT</th>
+                            <th>Tổng tiền</th>
+                            <th>TT Thanh toán</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="o : ${orders}">
+                            <td><b th:text="'#' + ${o.id}"></b></td>
+                            <td style="text-align:left;">
+                                <div style="font-weight:600;" th:text="${o.fullname}"></div>
+                                <div style="font-size:12px;color:#888;" th:text="${o.email}"></div>
+                            </td>
+                            <td th:text="${o.phone}"></td>
+                            <td style="color:#d97706;font-weight:700;"
+                                th:text="${#numbers.formatDecimal(o.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></td>
+                            <td>
+                                <span th:if="${o.payment != null and o.payment.paymentStatus == 'DA_THANH_TOAN'}" class="badge badge-success">✅ Đã TT</span>
+                                <span th:if="${o.payment != null and o.payment.paymentStatus == 'CHO_THANH_TOAN'}" class="badge badge-pending">⏳ Chờ TT</span>
+                                <span th:if="${o.payment != null and o.payment.paymentStatus == 'CHO_XAC_NHAN'}" class="badge badge-info">🏦 Chờ XN CK</span>
+                                <span th:if="${o.payment == null}" class="badge badge-muted">—</span>
+                            </td>
+                            <td>
+                                <span th:if="${o.status == 'CHO_XAC_NHAN'}" class="badge badge-pending">⏳ Chờ xác nhận</span>
+                                <span th:if="${o.status == 'CHO_LAY_HANG'}" class="badge badge-wait">📦 Chờ lấy hàng</span>
+                                <span th:if="${o.status == 'DANG_GIAO'}" class="badge badge-info">🚚 Đang giao</span>
+                                <span th:if="${o.status == 'DA_GIAO'}" class="badge badge-wait-xn">📬 Chờ KH xác nhận</span>
+                                <span th:if="${o.status == 'HOAN_THANH'}" class="badge badge-success">✅ Hoàn thành</span>
+                                <span th:if="${o.status == 'KHIEU_NAI'}" class="badge badge-danger">🚨 Đơn rủi ro</span>
+                            </td>
+                            <td>
+                                <a th:if="${o.status == 'CHO_XAC_NHAN'}"
+                                   th:href="@{/admin/orders/update/{id}(id=${o.id})}"
+                                   class="btn btn-sm btn-primary">✅ Xác nhận</a>
+                                <a th:if="${o.status == 'KHIEU_NAI'}"
+                                   th:href="@{/admin/orders/resolve/{id}(id=${o.id})}"
+                                   class="btn btn-sm btn-primary">🔁 Xử lý</a>
+                                <a th:href="@{/admin/orders/{id}(id=${o.id})}" class="btn btn-sm btn-secondary">👁 Xem</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
         </div>
-
-
-        <!-- TABLE CARD -->
-        <div class="card">
-
-            <table>
-			    <tr>
-			       <th>ID</th>
-					<th>Khách hàng</th>
-					<th>Email</th>
-					<th>SĐT</th>
-					<th>Tổng tiền</th>
-					
-					<th>Thanh toán</th>
-					<th>TT Thanh toán</th>
-					
-					<th>Trạng thái</th>
-					<th>Thao tác</th>
-			    </tr>
-			
-			    <tr th:each="o : ${orders}">
-			        <td th:text="${o.id}"></td>
-			        <td th:text="${o.fullname}"></td>
-			        <td th:text="${o.email}"></td>
-			        <td th:text="${o.phone}"></td>
-			        <td th:text="${o.totalAmount}"></td>
-			        <td th:text="${o.payment.paymentMethod}"></td>
-
-
-					<td><span th:text="${o.payment.paymentStatus}"></span></td>
-			
-			        <td class="status-column">
-			
-			            <span th:if="${o.status == 'CHO_XAC_NHAN'}"
-			                  class="status status-cho">
-			                Chờ xác nhận
-			            </span>
-			
-			            <span th:if="${o.status == 'DANG_GIAO'}"
-			                  class="status status-dang">
-			                Đang giao
-			            </span>
-			             <span th:if="${o.payment.paymentStatus == 'CHO_XAC_NHAN'}">
-						        🏦 Chờ xác nhận
-						  </span>
-			
-			            <span th:if="${o.status == 'DA_GIAO'}"
-			                  class="status status-da">
-			                Đã giao
-			            </span>
-			
-			        </td>
-			
-			        <td>
-			            <a th:href="@{/admin/orders/update/{id}(id=${o.id})}">
-			                🔄 Đổi trạng thái
-			            </a>
-			
-			            <a th:href="@{/admin/orders/{id}(id=${o.id})}">
-			                👁 Xem
-			            </a>
-			            
-			        </td>
-			    </tr>
-			
-			</table>
-        </div>
-
     </div>
-
 </div>
-
 </body>
 </html>

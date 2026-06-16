@@ -14,9 +14,8 @@ public class AdminUserController {
 
     @Autowired
     UserRepository userRepo;
-    
-    
-    // Hiển thị danh sách user
+
+    // Danh sách user
     @GetMapping("")
     public String index(Model model) {
         model.addAttribute("users", userRepo.findAll());
@@ -24,30 +23,22 @@ public class AdminUserController {
         return "admin/users";
     }
 
-    // Thêm user
-    @RestController
-    @RequestMapping("/api/admin/users")
-    public class UserAPIController {
-
-        @Autowired
-        UserRepository userRepo;
-
-        @PostMapping("/save")
-        public User save(@RequestBody User user) {
-            return userRepo.save(user);
-        }
-    }
-
-    // Edit user
+    // Form thêm/sửa user (load sẵn dữ liệu)
     @GetMapping("/edit/{id}")
     public String edit(@PathVariable("id") Integer id, Model model) {
-    	 User user = userRepo.findById(id).orElse(new User());
-        model.addAttribute("user", userRepo.findById(id).orElse(null));
+        model.addAttribute("user", userRepo.findById(id).orElse(new User()));
         model.addAttribute("users", userRepo.findAll());
         return "admin/users";
     }
 
-    // Delete user
+    // Lưu user (thêm mới hoặc cập nhật)
+    @PostMapping("/save")
+    public String save(@ModelAttribute User user) {
+        userRepo.save(user);
+        return "redirect:/admin/users";
+    }
+
+    // Xoá user
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable("id") Integer id) {
         userRepo.deleteById(id);

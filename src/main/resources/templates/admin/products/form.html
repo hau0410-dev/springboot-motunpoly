@@ -1,81 +1,89 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Product Form</title>
-<link rel="stylesheet" th:href="@{/css/admin-product-form.css}">
-<link rel="stylesheet" th:href="@{/css/admin.css}">
+    <meta charset="UTF-8">
+    <title>Form sản phẩm</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <style>
+        .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:0 24px; }
+        .form-grid .full { grid-column: 1 / -1; }
+        .gallery-preview { display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; }
+        .gallery-preview-item { position:relative; }
+        .gallery-preview-item img { width:80px;height:80px;object-fit:cover;border-radius:10px;border:1px solid #e0e0e0; }
+        .gallery-remove { position:absolute;top:-6px;right:-6px;background:#c40000;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;text-decoration:none; }
+        .current-image img { width:100px;height:100px;object-fit:contain;border-radius:10px;border:1px solid #e0e0e0;margin-top:8px;background:#fff; }
+    </style>
 </head>
-
 <body>
-<div th:replace="admin/layout/header :: header"></div>
-<h2>FORM SẢN PHẨM</h2>
+<div class="admin-container">
+    <div th:replace="admin/layout/sidebar :: sidebar"></div>
+    <div class="content">
+        <div th:replace="admin/layout/header :: header"></div>
+        <div class="content-body">
 
-<form th:action="@{/admin/products/save}"
-      th:object="${product}"
-      method="post"
-      enctype="multipart/form-data">
+            <h2 class="page-title" th:text="${product.id != null} ? '✏️ Sửa sản phẩm' : '➕ Thêm sản phẩm'">Sản phẩm</h2>
 
-<input type="hidden" th:field="*{id}"/>
+            <div class="card" style="max-width:900px;">
+                <form th:action="@{/admin/products/save}" th:object="${product}" method="post" enctype="multipart/form-data">
+                    <input type="hidden" th:field="*{id}">
 
-<div class="form-group">
-    <label>Name</label>
-    <input type="text" th:field="*{name}">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Tên sản phẩm</label>
+                            <input type="text" th:field="*{name}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Giá (đ)</label>
+                            <input type="text" th:field="*{price}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tồn kho</label>
+                            <input type="number" min="0" th:field="*{stock}">
+                        </div>
+                        <div class="form-group">
+                            <label>Danh mục</label>
+                            <select th:field="*{category.id}">
+                                <option value="">-- Chọn danh mục --</option>
+                                <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Ảnh đại diện</label>
+                            <input type="file" name="imageFile" accept="image/*">
+                            <div th:if="${product.image != null}" class="current-image">
+                                <img th:src="@{'/imges/' + ${product.image}}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Ảnh gallery (chọn nhiều)</label>
+                            <input type="file" name="galleryFiles" multiple accept="image/*">
+                            <div th:if="${images != null && !images.isEmpty()}" class="gallery-preview">
+                                <div th:each="img : ${images}" class="gallery-preview-item">
+                                    <img th:src="@{'/imges/' + ${img.imageUrl}}">
+                                    <a th:href="@{'/admin/products/image/delete/' + ${img.id}}"
+                                       onclick="return confirm('Xoá ảnh này?')" class="gallery-remove">✕</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group full">
+                            <label>Mô tả sản phẩm</label>
+                            <textarea th:field="*{description}" style="min-height:100px;resize:vertical;"></textarea>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;gap:12px;margin-top:8px;">
+                        <button type="submit" class="btn btn-primary">💾 Lưu sản phẩm</button>
+                        <a th:if="${product.id != null}"
+                           th:href="@{/admin/products/delete/{id}(id=${product.id})}"
+                           onclick="return confirm('Xoá sản phẩm này?')"
+                           class="btn btn-danger">🗑️ Xoá</a>
+                        <a th:href="@{/admin/products}" class="btn btn-secondary">← Quay lại</a>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
 </div>
-
-<div class="form-group">
-    <label>Price</label>
-    <input type="text" th:field="*{price}">
-</div>
-
-<div class="form-group">
-    <label>Tồn kho</label>
-    <input type="number"
-           min="0"
-           th:field="*{stock}">
-</div>
-
-<div class="form-group">
-    <label>Image</label>
-    <input type="file" name="imageFile">
-</div>
-
-<div class="form-group">
-    <label>Category</label>
-    <select th:field="*{category.id}">
-        <option value="">-- Chọn danh mục --</option>
-        <option th:each="c : ${categories}"
-                th:value="${c.id}"
-                th:text="${c.name}">
-        </option>
-    </select>
-</div>
-
-<div class="form-group description">
-    <label>Description</label>
-    <textarea th:field="*{description}"></textarea>
-</div>
-
-<hr>
-
-<div class="actions">
-
-    <button type="submit">💾 Lưu</button>
-
-    <a th:if="${product.id != null}"
-       th:href="@{|/admin/products/delete/${product.id}|}"
-       onclick="return confirm('Xoá sản phẩm này khỏi database?')"
-       class="delete">
-        ❌ Xoá
-    </a>
-
-    <a th:href="@{/admin/products}" class="back">
-        ⬅ Quay lại
-    </a>
-
-</div>
-
-</form>
-
 </body>
 </html>

@@ -3,112 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <title>Chi tiết đơn hàng</title>
-    <link rel="stylesheet" th:href="@{/css/admin-order-detail.css}">
     <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
 <body>
-<div th:replace="admin/layout/header :: header"></div>
-<div class="order-detail-container">
+<div class="admin-container">
+    <div th:replace="admin/layout/sidebar :: sidebar"></div>
+    <div class="content">
+        <div th:replace="admin/layout/header :: header"></div>
+        <div class="content-body">
 
-    <h1>CHI TIẾT ĐƠN HÀNG #<span th:text="${order.id}"></span></h1>
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px;flex-wrap:wrap;">
+                <h2 class="page-title" style="margin:0;">🧾 Đơn hàng #<span th:text="${order.id}"></span></h2>
+                <span th:if="${order.status == 'CHO_XAC_NHAN'}" class="badge badge-pending">⏳ Chờ xác nhận</span>
+                <span th:if="${order.status == 'CHO_LAY_HANG'}" class="badge badge-wait">📦 Chờ lấy hàng</span>
+                <span th:if="${order.status == 'DANG_GIAO'}" class="badge badge-info">🚚 Đang giao</span>
+                <span th:if="${order.status == 'DA_GIAO'}" class="badge badge-wait-xn">📬 Chờ KH xác nhận</span>
+                <span th:if="${order.status == 'HOAN_THANH'}" class="badge badge-success">✅ Hoàn thành</span>
+                <span th:if="${order.status == 'KHIEU_NAI'}" class="badge badge-danger">🚨 Đơn rủi ro</span>
+            </div>
 
-    <!-- Thông tin khách hàng -->
-    <div class="order-info">
-        <div class="info-box">
-            <p><strong>Khách hàng:</strong> <span th:text="${order.fullname}"></span></p>
-            <p><strong>Email:</strong> <span th:text="${order.email}"></span></p>
-            <p><strong>SĐT:</strong> <span th:text="${order.phone}"></span></p>
-            <p><strong>Địa chỉ:</strong> <span th:text="${order.address}"></span></p>
-        </div>
+            <!-- INFO GRID -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:22px;">
 
-        <div class="info-box">
-            <p><strong>Ngày đặt:</strong>
-                <span th:text="${#temporals.format(order.createdDate, 'dd/MM/yyyy HH:mm')}"></span>
+                <div class="card">
+                    <h3 style="margin:0 0 14px;font-size:14px;font-weight:700;border-left:4px solid #f59e0b;padding-left:10px;">👤 Thông tin nhận hàng</h3>
+                    <table style="min-width:0;">
+                        <tbody>
+                            <tr><td style="color:#888;width:120px;">Khách hàng</td><td><b th:text="${order.fullname}"></b></td></tr>
+                            <tr><td style="color:#888;">Email</td><td th:text="${order.email}"></td></tr>
+                            <tr><td style="color:#888;">SĐT</td><td th:text="${order.phone}"></td></tr>
+                            <tr><td style="color:#888;">Địa chỉ</td><td th:text="${order.address}"></td></tr>
+                            <tr><td style="color:#888;">Ngày đặt</td><td th:text="${#temporals.format(order.createdDate,'dd/MM/yyyy HH:mm')}"></td></tr>
+                            <tr th:if="${order.shipper != null}"><td style="color:#888;">Shipper</td><td><b th:text="${order.shipper.fullName}"></b></td></tr>
+                        </tbody>
+                    </table>
+                </div>
 
-            </p>
-            <p><strong>Trạng thái:</strong>
-                <span class="status" th:text="${order.status}"></span>
-            </p>
-            <p>
-			    <strong>Phương thức thanh toán:</strong>
-			
-			    <span th:if="${payment != null}"
-			          th:text="${order.payment.paymentMethod}">
-			    </span>
-			
-			    <span th:if="${payment == null}">
-			        Chưa có thông tin
-			    </span>
-			</p>
-			
-			<p>
-			    <strong>TT thanh toán:</strong>
-			
-			    <span th:if="${payment != null and payment.paymentStatus == 'CHO_THANH_TOAN'}">
-			        ⏳ Chờ thanh toán
-			    </span>
-			
-			    <span th:if="${payment != null and payment.paymentStatus == 'DA_THANH_TOAN'}">
-			        ✅ Đã thanh toán
-			    </span>
-			   <div th:if="${payment != null and payment.paymentStatus == 'CHO_XAC_NHAN'}">
+                <div class="card">
+                    <h3 style="margin:0 0 14px;font-size:14px;font-weight:700;border-left:4px solid #f59e0b;padding-left:10px;">💳 Thanh toán</h3>
+                    <table style="min-width:0;">
+                        <tbody>
+                            <tr>
+                                <td style="color:#888;width:140px;">Phương thức</td>
+                                <td th:text="${payment != null ? payment.paymentMethod : '—'}"></td>
+                            </tr>
+                            <tr>
+                                <td style="color:#888;">TT Thanh toán</td>
+                                <td>
+                                    <span th:if="${payment != null and payment.paymentStatus == 'DA_THANH_TOAN'}" class="badge badge-success">✅ Đã thanh toán</span>
+                                    <span th:if="${payment != null and payment.paymentStatus == 'CHO_THANH_TOAN'}" class="badge badge-pending">⏳ Chờ thanh toán</span>
+                                    <span th:if="${payment != null and payment.paymentStatus == 'CHO_XAC_NHAN'}" class="badge badge-info">🏦 Chờ xác nhận CK</span>
+                                    <span th:if="${payment == null}" class="badge badge-muted">—</span>
+                                </td>
+                            </tr>
+                            <tr th:if="${payment != null}">
+                                <td style="color:#888;">Ngày TT</td>
+                                <td th:text="${payment.paymentDate != null ? #temporals.format(payment.paymentDate,'dd/MM/yyyy HH:mm') : '—'}"></td>
+                            </tr>
+                            <tr>
+                                <td style="color:#888;">Tổng tiền</td>
+                                <td style="color:#d97706;font-weight:700;font-size:18px;"
+                                    th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-				    <a th:href="@{/admin/orders/confirm-payment/{id}(id=${order.id})}"
-				       class="btn-confirm">
-				
-				        ✅ Xác nhận đã nhận tiền
-				
-				    </a>
+                    <!-- Thông tin chuyển khoản của khách -->
+                    <div th:if="${payment != null and payment.paymentMethod == 'BANKING' and payment.customerBank != null}"
+                         style="margin-top:14px;padding:12px;background:#fff8f5;border:1px solid #ffe0d6;border-radius:10px;">
+                        <p style="margin:4px 0;font-size:13px;"><b style="color:#d97706;">🏦 Ngân hàng khách:</b> <span th:text="${payment.customerBank}"></span></p>
+                        <p style="margin:4px 0;font-size:13px;"><b style="color:#d97706;">STK khách:</b> <span th:text="${payment.customerAccount}"></span></p>
+                    </div>
+                </div>
+            </div>
 
-				</div>
-			</p>
-			
-			<p>
-			    <strong>Ngày thanh toán:</strong>
-			
-			    <span th:if="${payment != null}"
-			          th:text="${#temporals.format(payment.paymentDate,'dd/MM/yyyy HH:mm')}">
-			    </span>
-			</p>
-            <p><strong>Tổng tiền:</strong>
-                <span class="total-price"
-                      th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')} + ' đ'">
-                </span>
-            </p>
+            <!-- ACTIONS -->
+            <div class="card" style="margin-bottom:22px;" th:if="${order.status == 'CHO_XAC_NHAN' or order.status == 'KHIEU_NAI' or (payment != null and payment.paymentStatus == 'CHO_XAC_NHAN')}">
+                <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                    <a th:if="${order.status == 'CHO_XAC_NHAN'}"
+                       th:href="@{/admin/orders/update/{id}(id=${order.id})}"
+                       class="btn btn-primary">✅ Xác nhận đơn (chuyển cho shipper)</a>
+                    <a th:if="${order.status == 'KHIEU_NAI'}"
+                       th:href="@{/admin/orders/resolve/{id}(id=${order.id})}"
+                       class="btn btn-primary">🔁 Xử lý đơn rủi ro (giao lại)</a>
+                    <a th:if="${payment != null and payment.paymentStatus == 'CHO_XAC_NHAN'}"
+                       th:href="@{/admin/orders/confirm-payment/{id}(id=${order.id})}"
+                       class="btn btn-primary">✅ Xác nhận đã nhận tiền CK</a>
+                </div>
+            </div>
+
+            <!-- PRODUCTS TABLE -->
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Tên sản phẩm</th><th>Đơn giá</th><th>Số lượng</th><th>Thành tiền</th></tr></thead>
+                    <tbody>
+                        <tr th:each="item : ${items}">
+                            <td style="text-align:left;font-weight:600;" th:text="${item.product.name}"></td>
+                            <td th:text="${#numbers.formatDecimal(item.price,0,'COMMA',0,'POINT')} + 'đ'"></td>
+                            <td th:text="${item.quantity}"></td>
+                            <td style="color:#d97706;font-weight:700;"
+                                th:text="${#numbers.formatDecimal(item.subtotal,0,'COMMA',0,'POINT')} + 'đ'"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top:20px;">
+                <a th:href="@{/admin/orders}" class="btn btn-secondary">← Quay lại danh sách</a>
+            </div>
+
         </div>
     </div>
-
-    <!-- Danh sách sản phẩm -->
-    <h2>Sản phẩm đã đặt</h2>
-
-    <table class="order-table">
-        <thead>
-        <tr>
-            <th>Tên sản phẩm</th>
-            <th>Giá</th>
-            <th>Số lượng</th>
-            <th>Thành tiền</th>
-        </tr>
-        </thead>
-
-        <tbody>
-        <tr th:each="item : ${items}">
-            <td th:text="${item.product.name}"></td>
-
-            <td th:text="${#numbers.formatDecimal(item.price,0,'COMMA',0,'POINT')} + ' đ'"></td>
-
-            <td th:text="${item.quantity}"></td>
-
-            <td th:text="${#numbers.formatDecimal(item.subtotal,0,'COMMA',0,'POINT')} + ' đ'"></td>
-        </tr>
-        </tbody>
-    </table>
-
-    <div class="back-btn">
-        <a th:href="@{/admin/orders}">← Quay lại danh sách</a>
-    </div>
-
 </div>
-
 </body>
 </html>

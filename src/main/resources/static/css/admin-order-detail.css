@@ -55,6 +55,43 @@ h2 {
     color: #1976d2;
 }
 
+.status-cho{ color:#d97706; background:#fff7ed; }
+.status-lay{ color:#7c3aed; background:#f5f3ff; }
+.status-dang{ color:#2563eb; background:#eff6ff; }
+.status-cho-xn{ color:#d97706; background:#fff7ed; }
+.status-hoan{ color:#16a34a; background:#ecfdf5; }
+.status-khieu{ color:#dc2626; background:#fef2f2; }
+
+.btn-confirm{
+    display: inline-block;
+    margin-top: 8px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #ff5050, #c40000);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+/* ===== Thông tin chuyển khoản của khách ===== */
+.bank-transfer-info {
+    margin-top: 10px;
+    padding: 12px 14px;
+    background: #fff8f5;
+    border: 1px solid #ffe0d6;
+    border-radius: 8px;
+}
+
+.bank-transfer-info p {
+    margin: 4px 0;
+    font-size: 14px;
+}
+
+.bank-transfer-info strong {
+    color: #c40000;
+}
+
 /* ===== Tổng tiền ===== */
 .total-price {
     color: #e53935;

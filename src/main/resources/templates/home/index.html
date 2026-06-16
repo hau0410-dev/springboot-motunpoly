@@ -1,139 +1,119 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-
-    <meta charset="UTF-8">
-    <title>MotunPoLy</title>
-</head>
-<body>
-
-
-<h1>Chào mừng đến với MotunPoLy</h1>
-<p>Website bán phụ tùng xe máy</p>
-
-<!-- ===== DANH MỤC ===== -->
-<div class="section">
-    <h2>Danh mục nổi bật</h2>
-
-    <div class="category-grid">
-        <div class="category-item"
-             th:each="c : ${categories}"
-             th:text="${c.name}">
-            Tên danh mục
+<!-- ===== HERO BANNER ===== -->
+<div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+        <div class="hero-eyebrow">MotunPoLy · Phụ tùng xe máy</div>
+        <h1>Chính hãng.<br>Đúng giá.<br>Giao nhanh.</h1>
+        <p>Hàng ngàn phụ tùng xe máy chính hãng — từ lọc nhớt, lốp, phanh đến phụ kiện độ xe. Giá cạnh tranh, giao hàng toàn quốc.</p>
+        <div class="hero-actions">
+            <a href="#products" class="hero-btn">🛍️ Mua sắm ngay</a>
+            <a th:href="@{/promotions}" class="hero-btn-outline">🎁 Ưu đãi của tôi</a>
         </div>
     </div>
 </div>
 
-	
-
-
-<!-- ===== GỢI Ý CHO BẠN ===== -->
+<!-- ===== DANH MỤC ===== -->
 <div class="section">
-    <h2>Gợi ý cho bạn</h2>
-
-    <div class="product-grid">
-		 <div class="product-card"
-		     th:each="p : ${products}">
-		
-		    <!-- CLICK VÀO ẢNH -->
-		    <a th:href="@{/product/detail(id=${p.id})}">
-		        <img th:src="@{'/imges/' + ${p.image}}">
-		    </a>
-		
-		    <!-- CLICK VÀO TÊN -->
-		    <a th:href="@{/product/detail(id=${p.id})}">
-		        <h3 th:text="${p.name}">Tên sản phẩm</h3>
-		    </a>
-		
-		    <p class="price"
-		       th:text="${#numbers.formatDecimal(p.price,0,'COMMA',0,'POINT')} + 'đ'">
-		        Giá
-		    </p>
-		
-		    <!-- THÊM VÀO GIỎ -->
-		    <form th:action="@{/cart/add/{id}(id=${p.id})}"
-		          method="post">
-		        <input type="hidden" name="qty" value="1">
-		        <button type="submit">Thêm vào giỏ</button>
-		    </form>
-		   
-		
-		</div>
+    <div class="section-header">
+        <span class="section-title">Danh mục nổi bật</span>
+    </div>
+    <div class="category-grid">
+        <a class="category-item"
+           th:each="c, catStat : ${categories}"
+           th:if="${catStat.index < 12}"
+           th:href="@{/(category=${c.id})}">
+            <span class="category-icon" th:text="${c.icon ?: '🔧'}"></span>
+            <span class="category-name" th:text="${c.name}">Danh mục</span>
+        </a>
     </div>
 </div>
-<style>/* ===== PHÂN TRANG STYLE SHOPPER ===== */
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    margin: 30px 0;
-    flex-wrap: wrap;
-}
 
-/* link trang */
-.pagination a {
-    display: inline-block;
-    padding: 8px 14px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    text-decoration: none;
-    color: #333;
-    background-color: #fff;
-    transition: all 0.2s ease;
-    font-size: 14px;
-}
+<!-- ===== ƯU ĐÃI NỔI BẬT ===== -->
+<div class="section" th:if="${allPromotions != null && !allPromotions.isEmpty()}">
+    <div class="section-header">
+        <span class="section-title">🔥 Ưu đãi nổi bật</span>
+        <a th:href="@{/promotions}" class="section-subtitle">Xem tất cả →</a>
+    </div>
+    <div class="promo-showcase">
+        <div class="promo-showcase-card" th:each="promo : ${allPromotions}">
+            <div class="promo-showcase-head">
+                <span class="promo-showcase-icon" th:text="${promo.icon ?: '🎁'}"></span>
+                <div>
+                    <div class="promo-showcase-title" th:text="${promo.title}"></div>
+                    <div class="promo-showcase-badge" th:text="${promo.badgeText}"></div>
+                </div>
+            </div>
+            <p class="promo-showcase-desc" th:text="${promo.description}"></p>
+            <div class="promo-showcase-products" th:if="${promo.products != null && !promo.products.isEmpty()}">
+                <a th:each="prod : ${promo.products}"
+                   th:href="@{/product/detail(id=${prod.id})}"
+                   class="promo-showcase-product">
+                    <img th:src="@{'/imges/' + ${prod.image}}" th:alt="${prod.name}">
+                    <span th:text="${prod.name}"></span>
+                </a>
+            </div>
+            <div class="promo-showcase-condition" th:if="${(promo.minTotalSpent ?: 0) > 0}">
+                🔒 Từ <b th:text="${#numbers.formatDecimal(promo.minTotalSpent,0,'COMMA',0,'POINT')} + 'đ'"></b>
+            </div>
+            <div class="promo-showcase-condition free" th:if="${(promo.minTotalSpent ?: 0) <= 0}">
+                ✅ Dành cho tất cả khách hàng
+            </div>
+        </div>
+    </div>
+</div>
 
-/* hover */
-.pagination a:hover {
-    background-color: #222;
-    color: #fff;
-    border-color: #222;
-}
+<!-- ===== SẢN PHẨM ===== -->
+<div class="section" id="products">
+    <div class="section-header">
+        <span class="section-title" th:text="${isSearch} ? '🔎 Kết quả tìm kiếm' : 'Gợi ý cho bạn'">Sản phẩm</span>
+    </div>
 
-/* trang đang active */
-.pagination a.active {
-    background-color: #222;
-    color: #fff;
-    border-color: #222;
-    font-weight: 600;
-}
+    <div class="product-grid">
+        <div class="product-card" th:each="p : ${products}">
 
-/* Prev / Next nổi bật nhẹ */
-.pagination a:first-child,
-.pagination a:last-child {
-    font-weight: 500;
-}
+            <div th:if="${promoMap.containsKey(p.id)}" class="promo-badge">
+                <span th:text="(${promoMap.get(p.id).icon} ?: '') + ' ' + ${promoMap.get(p.id).badgeText}"></span>
+            </div>
 
-/* disable nếu muốn (optional) */
-.pagination a[disabled] {
-    pointer-events: none;
-    opacity: 0.4;
-}</style>
- <!-- ===== PHÂN TRANG ===== -->
-			<div class="pagination">
-			    
-			    <!-- PREV -->
-			    <a th:if="${currentPage > 0}"
-			       th:href="@{/(page=${currentPage - 1})}">
-			        Prev
-			    </a>
-			
-			    <!-- PAGE NUMBER -->
-			    <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-			        <a th:href="@{/(page=${i})}"
-			           th:text="${i + 1}"
-			           th:classappend="${i == currentPage} ? 'active'">
-			        </a>
-			    </span>
-			
-			    <!-- NEXT -->
-			    <a th:if="${currentPage < totalPages - 1}"
-			       th:href="@{/(page=${currentPage + 1})}">
-			        Next
-			    </a>
-			
-			</div>
+            <a th:href="@{/product/detail(id=${p.id})}">
+                <img th:src="@{'/imges/' + ${p.image}}">
+            </a>
 
-</body>
-</html>
+            <a th:href="@{/product/detail(id=${p.id})}">
+                <h3 th:text="${p.name}">Tên sản phẩm</h3>
+            </a>
+
+            <div class="price-wrap"
+                 th:if="${promoMap.containsKey(p.id) && (promoMap.get(p.id).discountType == 'PERCENT' || promoMap.get(p.id).discountType == 'AMOUNT')}">
+                <span class="price-old" th:text="${#numbers.formatDecimal(p.price,0,'COMMA',0,'POINT')} + 'đ'"></span>
+                <span class="price"
+                      th:if="${promoMap.get(p.id).discountType == 'PERCENT'}"
+                      th:text="${#numbers.formatDecimal(p.price - (p.price * promoMap.get(p.id).discountValue / 100),0,'COMMA',0,'POINT')} + 'đ'"></span>
+                <span class="price"
+                      th:if="${promoMap.get(p.id).discountType == 'AMOUNT'}"
+                      th:text="${#numbers.formatDecimal(p.price - promoMap.get(p.id).discountValue,0,'COMMA',0,'POINT')} + 'đ'"></span>
+            </div>
+
+            <p class="price"
+               th:unless="${promoMap.containsKey(p.id) && (promoMap.get(p.id).discountType == 'PERCENT' || promoMap.get(p.id).discountType == 'AMOUNT')}"
+               th:text="${#numbers.formatDecimal(p.price,0,'COMMA',0,'POINT')} + 'đ'"></p>
+
+            <form th:action="@{/cart/add/{id}(id=${p.id})}" method="post">
+                <input type="hidden" name="qty" value="1">
+                <button type="submit">Thêm vào giỏ</button>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- PHÂN TRANG -->
+    <div class="pagination">
+        <a th:if="${currentPage > 0}" th:href="@{/(page=${currentPage - 1})}">← Trước</a>
+        <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+           th:href="@{/(page=${i})}"
+           th:text="${i + 1}"
+           th:classappend="${i == currentPage} ? 'active'"></a>
+        <a th:if="${currentPage < totalPages - 1}" th:href="@{/(page=${currentPage + 1})}">Sau →</a>
+    </div>
+
+</div>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Lịch sử giao hàng - Shipper</title>
+<link rel="stylesheet" th:href="@{/css/shipper.css}">
+</head>
+<body>
+
+<div class="sh-topbar">
+    <div class="sh-brand">🛵 MotunPoly <span>Shipper</span></div>
+    <div class="sh-user">
+        <span th:text="'Xin chào, ' + ${shipper.fullName}"></span>
+        <a th:href="@{/logout}" class="sh-logout">Đăng xuất</a>
+    </div>
+</div>
+
+<div class="sh-container">
+
+    <a th:href="@{/shipper/index}" class="sh-back">← Quay lại dashboard</a>
+
+    <div class="sh-section">
+        <h2>📋 Lịch sử giao hàng</h2>
+
+        <!-- LỌC -->
+        <div class="sh-filter-bar">
+            <a th:href="@{/shipper/history(filter='day')}"
+               th:classappend="${filter == 'day'} ? 'active' : ''">Hôm nay</a>
+            <a th:href="@{/shipper/history(filter='week')}"
+               th:classappend="${filter == 'week'} ? 'active' : ''">Tuần này</a>
+            <a th:href="@{/shipper/history(filter='month')}"
+               th:classappend="${filter == 'month'} ? 'active' : ''">Tháng này</a>
+        </div>
+
+        <!-- THỐNG KÊ NHANH -->
+        <div class="sh-stats">
+            <div class="sh-stat-card">
+                <div class="sh-stat-num" th:text="${totalDelivered}">0</div>
+                <div class="sh-stat-label">Đơn thành công</div>
+            </div>
+            <div class="sh-stat-card sh-stat-risk">
+                <div class="sh-stat-num" th:text="${totalRisk}">0</div>
+                <div class="sh-stat-label">Đơn rủi ro</div>
+            </div>
+            <div class="sh-stat-card sh-stat-revenue">
+                <div class="sh-stat-num"
+                     th:text="${#numbers.formatDecimal(totalRevenue,0,'COMMA',0,'POINT')} + 'đ'">0đ</div>
+                <div class="sh-stat-label">Tổng giá trị giao</div>
+            </div>
+        </div>
+
+        <!-- DANH SÁCH ĐƠN -->
+        <div th:if="${history == null || history.isEmpty()}" class="sh-empty">
+            Chưa có đơn nào trong khoảng thời gian này.
+        </div>
+
+        <div class="sh-card" th:each="o : ${history}">
+
+            <div class="sh-card-head">
+                <span class="sh-order-id">#<span th:text="${o.id}"></span></span>
+
+                <span th:if="${o.status == 'HOAN_THANH'}" class="sh-badge sh-badge-done">✅ Hoàn thành</span>
+                <span th:if="${o.status == 'DA_GIAO'}" class="sh-badge sh-badge-going">📬 Chờ xác nhận</span>
+                <span th:if="${o.status == 'KHIEU_NAI'}" class="sh-badge sh-badge-risk">🚨 Đơn rủi ro</span>
+            </div>
+
+            <div class="sh-card-body">
+                <p><b th:text="${o.fullname}"></b> &nbsp;|&nbsp; <span th:text="${o.phone}"></span></p>
+                <p class="sh-address" th:text="${o.address}"></p>
+                <p class="sh-amount" th:text="${#numbers.formatDecimal(o.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></p>
+            </div>
+
+            <div class="sh-card-actions">
+                <a th:href="@{/shipper/detail/{id}(id=${o.id})}" class="sh-btn sh-btn-outline">Xem chi tiết</a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

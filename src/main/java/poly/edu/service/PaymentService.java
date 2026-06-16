@@ -19,4 +19,10 @@ public class PaymentService {
     public Payment findByOrderId(Integer orderId) {
         return paymentRepo.findByOrder_Id(orderId);
     }
+
+    // Lấy thông tin chuyển khoản gần nhất của user (để gợi ý điền sẵn)
+    public Payment findLastBankingInfo(Integer userId) {
+        if (userId == null) return null;
+        return paymentRepo.findTopByOrder_User_IdAndCustomerBankIsNotNullOrderByIdDesc(userId);
+    }
 }

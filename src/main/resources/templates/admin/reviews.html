@@ -1,73 +1,64 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Quản lý đánh giá</title>
-<link rel="stylesheet" th:href="@{/css/admin-reviews.css}">
-<link rel="stylesheet" th:href="@{/css/admin.css}">
+    <meta charset="UTF-8">
+    <title>Quản lý đánh giá</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
 <body>
-<div th:replace="admin/layout/header :: header"></div>
-<h2>Quản lý đánh giá</h2>
+<div class="admin-container">
+    <div th:replace="admin/layout/sidebar :: sidebar"></div>
+    <div class="content">
+        <div th:replace="admin/layout/header :: header"></div>
+        <div class="content-body">
 
-<div class="layout">
+            <h2 class="page-title">⭐ Quản lý đánh giá</h2>
 
-   <div class="left-card">
-
-    <h3>Bộ lọc</h3>
-
-    <form action="/admin/reviews" method="get">
-
-        <input type="text" name="user" placeholder="Tìm user">
-
-        <input type="text" name="product" placeholder="Tìm sản phẩm">
-
-        <button type="submit" class="btn-save">Tìm</button>
-
-    </form>
-
-</div>
-
-
-    <!-- KHUNG PHẢI -->
-    <div class="right-card">
-
-        <table>
-
-        <tr>
-            <th>ID</th>
-            <th>User</th>
-            <th>Email</th>
-            <th>Sản phẩm</th>
-            <th>Sao</th>
-            <th>Nhận xét</th>
-            <th>Xóa</th>
-        </tr>
-
-        <tr th:each="r : ${reviews}">
-            <td th:text="${r.id}"></td>
-            <td th:text="${r.fullname}"></td>
-            <td th:text="${r.email}"></td>
-            <td th:text="${r.productName}"></td>
-
-            <td class="stars">
-                <span th:each="i : ${#numbers.sequence(1,r.rating)}">⭐</span>
-            </td>
-
-            <td th:text="${r.comment}"></td>
-
-            <td>
-                <form th:action="@{/admin/reviews/delete/{id}(id=${r.id})}" method="post">
-                    <button type="submit" class="btn-delete">Xóa</button>
+            <div class="card">
+                <form action="/admin/reviews" method="get" class="filter-bar">
+                    <input type="text" name="user" placeholder="🔍 Tìm user" th:value="${param.user}">
+                    <input type="text" name="product" placeholder="🔍 Tìm sản phẩm" th:value="${param.product}">
+                    <button type="submit" class="btn btn-primary">Tìm kiếm</button>
                 </form>
-            </td>
-        </tr>
+            </div>
 
-        </table>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Khách hàng</th>
+                            <th>Email</th>
+                            <th>Sản phẩm</th>
+                            <th>Đánh giá</th>
+                            <th>Nhận xét</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="r : ${reviews}">
+                            <td th:text="${r.id}"></td>
+                            <td><b th:text="${r.fullname}"></b></td>
+                            <td th:text="${r.email}"></td>
+                            <td th:text="${r.productName}"></td>
+                            <td style="color:#f59e0b;font-size:16px;letter-spacing:2px;">
+                                <span th:each="i : ${#numbers.sequence(1,r.rating)}">★</span>
+                                <span th:each="i : ${#numbers.sequence(r.rating+1,5)}" style="color:#ddd;">★</span>
+                            </td>
+                            <td th:text="${r.comment}" style="max-width:200px;text-align:left;"></td>
+                            <td>
+                                <form th:action="@{/admin/reviews/delete/{id}(id=${r.id})}" method="post">
+                                    <button type="submit" class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Xoá đánh giá này?')">🗑️ Xoá</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
+        </div>
     </div>
-
 </div>
-
 </body>
 </html>

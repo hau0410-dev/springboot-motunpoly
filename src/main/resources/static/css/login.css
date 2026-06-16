@@ -1,74 +1,173 @@
+*{
+    box-sizing: border-box;
+}
+
 .login-page {
-    background: linear-gradient(135deg, #fff5f5, #ffeaea);
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    background: linear-gradient(135deg, #ffe5e5, #fff5f5);
+    padding: 20px;
 }
 
+/* GLASS FORM */
 .login-box {
-    background: #ffffff;
-    padding: 30px 40px;
-    border-radius: 10px;
-    box-shadow: 0 10px 25px rgba(255, 0, 0, 0.08);
-    border: 1px solid #ffd6d6;
-    width: 350px;
+    width: 100%;
+    max-width: 400px;
+    padding: 40px;
+    border-radius: 16px;
+
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(10px);
+
+    border: 1px solid rgba(255, 0, 0, 0.2);
+    box-shadow: 0 20px 45px rgba(204, 0, 0, 0.2);
+}
+
+/* BRAND / LOGO */
+.auth-brand{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-decoration: none;
+    margin-bottom: 18px;
+}
+
+.auth-brand img{
+    height: 38px;
+    border-radius: 8px;
+    background: #fff;
+    padding: 2px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.08);
+}
+
+.auth-brand span{
+    font-size: 20px;
+    font-weight: 800;
+    color: #c40000;
 }
 
 .login-box h2 {
     text-align: center;
-    margin-bottom: 20px;
-    color: #cc0000;
+    color: #d60000;
+    margin: 0 0 4px;
+    letter-spacing: 1px;
+    font-size: 22px;
 }
 
-.login-box .error {
-    color: #e00000;
-    font-size: 14px;
+.auth-subtitle{
     text-align: center;
-    margin-bottom: 10px;
+    color: #999;
+    font-size: 13px;
+    margin: 0 0 20px;
 }
 
-.login-box input {
-    width: 100%;
-    padding: 10px 12px;
+/* ALERT MESSAGES */
+.alert{
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+}
+
+.alert.success {
+    color: #1a7f37;
+    background: #e6ffed;
+    border: 1px solid #b7ebc6;
+}
+.alert.error {
+    color: #d70018;
+    background: #fff0f0;
+    border: 1px solid #ffd2d2;
+}
+
+/* INPUT BOX */
+.input-box {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ffc2c2;
+    border-radius: 10px;
+    padding: 10px 14px;
     margin-bottom: 15px;
-    border: 1px solid #ffcccc;
-    border-radius: 6px;
-    outline: none;
-    transition: 0.2s;
+    background: white;
+    transition: 0.3s;
 }
 
-.login-box input:focus {
-    border-color: #ff4d4d;
-    box-shadow: 0 0 5px rgba(255, 0, 0, 0.2);
+.input-box span {
+    margin-right: 8px;
+    font-size: 16px;
 }
 
-.login-box button {
-    width: 100%;
-    padding: 10px;
-    background: #e60000;
-    color: white;
+.input-box input {
     border: none;
-    border-radius: 6px;
-    font-weight: bold;
+    outline: none;
+    width: 100%;
+    font-size: 14px;
+    background: transparent;
+}
+
+.input-box:focus-within {
+    border-color: #ff2d2d;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.15);
+}
+
+.toggle-eye{
+    margin-left: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    opacity: .6;
+    transition: opacity .15s;
+    user-select: none;
+}
+
+.toggle-eye:hover{
+    opacity: 1;
+}
+
+/* BUTTON */
+button {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 24px;
+    margin-top: 6px;
+
+    background: linear-gradient(135deg, #ff5050, #c40000);
+    color: white;
+    font-weight: 700;
+    font-size: 15px;
     cursor: pointer;
     transition: 0.2s;
 }
 
-.login-box button:hover {
-    background: #cc0000;
+button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(196,0,0,.25);
 }
 
-.login-box .register-link {
-    display: block;
-    text-align: center;
-    margin-top: 12px;
-    color: #cc0000;
+/* LINKS */
+.auth-links{
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.register-link,
+.forgot-link {
+    color: #d60000;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 13px;
+    font-weight: 600;
 }
 
-.login-box .register-link:hover {
+.register-link:hover,
+.forgot-link:hover {
     text-decoration: underline;
 }

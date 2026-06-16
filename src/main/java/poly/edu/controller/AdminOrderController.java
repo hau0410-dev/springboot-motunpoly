@@ -71,56 +71,33 @@ public class AdminOrderController {
         
     }
 
+    // ===== ADMIN XÁC NHẬN ĐƠN: CHO_XAC_NHAN -> CHO_LAY_HANG =====
     @GetMapping("/update/{id}")
     public String updateStatus(@PathVariable("id") Integer id) {
 
         Order order = orderService.findById(id);
-        
-        Payment payment =
-                paymentService.findByOrderId(id);
 
-        if(payment != null){
-
-            if("CHO_THANH_TOAN".equals(payment.getPaymentStatus())){
-
-                payment.setPaymentStatus("DA_THANH_TOAN");
-
-            }else{
-
-                payment.setPaymentStatus("CHO_THANH_TOAN");
-
-            }
-
-            paymentService.save(payment);
-        }
-        
-        if (order != null) {
-
-            // CHỜ XÁC NHẬN -> ĐANG GIAO
-            if ("CHO_XAC_NHAN".equals(order.getStatus())) {
-
-                order.setStatus("DANG_GIAO");
-
-            }
-
-            // ĐANG GIAO -> ĐÃ GIAO
-            else if ("DANG_GIAO".equals(order.getStatus())) {
-
-                order.setStatus("DA_GIAO");
-
-            }
-
-            // ĐÃ GIAO -> CHỜ XÁC NHẬN
-            else if ("DA_GIAO".equals(order.getStatus())) {
-
-                order.setStatus("CHO_XAC_NHAN");
-
-            }
-
+        if (order != null && "CHO_XAC_NHAN".equals(order.getStatus())) {
+            order.setStatus("CHO_LAY_HANG");
             orderService.save(order);
         }
 
         return "redirect:/admin/orders";
+    }
+
+    // ===== ADMIN XỬ LÝ KHIẾU NẠI: KHIEU_NAI -> CHO_LAY_HANG (giao lại) =====
+    @GetMapping("/resolve/{id}")
+    public String resolve(@PathVariable("id") Integer id) {
+
+        Order order = orderService.findById(id);
+
+        if (order != null && "KHIEU_NAI".equals(order.getStatus())) {
+            order.setStatus("CHO_LAY_HANG");
+            order.setShipper(null);
+            orderService.save(order);
+        }
+
+        return "redirect:/admin/orders/" + id;
     }
     @GetMapping("/confirm-payment/{id}")
     public String confirmPayment(

@@ -1,88 +1,49 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
 <head>
-<meta charset="UTF-8">
-<title>Quản lý tồn kho</title>
-
-<link rel="stylesheet"
-      th:href="@{/css/admin-inventory.css}">
-      <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <meta charset="UTF-8">
+    <title>Tồn kho</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
-
 <body>
-
-<div th:replace="admin/layout/header :: header"></div>
-
 <div class="admin-container">
-
     <div th:replace="admin/layout/sidebar :: sidebar"></div>
+    <div class="content">
+        <div th:replace="admin/layout/header :: header"></div>
+        <div class="content-body">
 
-    <main class="content">
+            <h2 class="page-title">📊 Quản lý tồn kho</h2>
 
-        <h2>📦 Quản lý tồn kho phụ tùng</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Tên sản phẩm</th><th>Giá</th><th>Tồn kho</th><th>Cập nhật</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="p : ${products}">
+                            <td th:text="${p.id}"></td>
+                            <td style="text-align:left;font-weight:600;" th:text="${p.name}"></td>
+                            <td th:text="${#numbers.formatDecimal(p.price,0,'COMMA',0,'POINT')} + 'đ'"></td>
+                            <td>
+                                <span th:if="${p.stock > 10}" class="badge badge-success" th:text="${p.stock}"></span>
+                                <span th:if="${p.stock > 0 and p.stock <= 10}" class="badge badge-wait-xn" th:text="${p.stock}"></span>
+                                <span th:if="${p.stock <= 0}" class="badge badge-danger">Hết hàng</span>
+                            </td>
+                            <td>
+                                <form th:action="@{/admin/inventory/update}" method="post" style="display:flex;gap:8px;justify-content:center;">
+                                    <input type="hidden" name="id" th:value="${p.id}">
+                                    <input type="number" name="stock" th:value="${p.stock}" min="0"
+                                           style="width:80px;padding:6px 10px;border:1px solid #e0e0e0;border-radius:8px;text-align:center;">
+                                    <button type="submit" class="btn btn-sm btn-primary">💾</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <table>
-
-            <thead>
-
-            <tr>
-                <th>ID</th>
-                <th>Tên phụ tùng</th>
-                <th>Giá</th>
-                <th>Tồn kho</th>
-                <th>Lưu</th>
-            </tr>
-
-            </thead>
-
-            <tbody>
-
-            <tr th:each="p : ${products}">
-
-                <td th:text="${p.id}"></td>
-
-                <td th:text="${p.name}"></td>
-
-                <td>
-                    <span th:text="${#numbers.formatDecimal(p.price,0,'COMMA',0,'POINT')}"></span>
-                    đ
-                </td>
-
-                <td>
-
-                    <form th:action="@{/admin/inventory/update}"
-                          method="post">
-
-                        <input type="hidden"
-                               name="id"
-                               th:value="${p.id}">
-
-                        <input type="number"
-                               min="0"
-                               name="stock"
-                               th:value="${p.stock}">
-                </td>
-
-                <td>
-
-                        <button type="submit">
-                            💾 Cập nhật
-                        </button>
-
-                    </form>
-
-                </td>
-
-            </tr>
-
-            </tbody>
-
-        </table>
-
-    </main>
-
+        </div>
+    </div>
 </div>
-
 </body>
 </html>

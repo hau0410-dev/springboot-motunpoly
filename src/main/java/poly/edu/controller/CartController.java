@@ -101,6 +101,55 @@ public class CartController {
 
         return "redirect:/cart";
     }
+    // ===== MUA NGAY (tách riêng khỏi giỏ hàng) =====
+    @PostMapping("/buynow/{id}")
+    public String buyNow(
+            @PathVariable("id") Integer id,
+            @RequestParam(value = "qty", defaultValue = "1") int qty,
+            HttpSession session) {
+
+        Product p = productService.findById(id);
+
+        if (p == null) {
+            return "redirect:/";
+        }
+
+        if (p.getStock() == null) {
+            p.setStock(0);
+        }
+
+        if (qty < 1) {
+            qty = 1;
+        }
+
+        if (p.getStock() <= 0) {
+            session.setAttribute(
+                "stockMessage",
+                p.getName() + " hiện đã hết hàng!"
+            );
+            return "redirect:/product/detail?id=" + id;
+        }
+
+        if (qty > p.getStock()) {
+            qty = p.getStock();
+        }
+
+        CartItem item = new CartItem();
+        item.setProductId(p.getId());
+        item.setProductName(p.getName());
+        item.setPrice(p.getPrice());
+        item.setImage(p.getImage());
+        item.setQuantity(qty);
+        item.setStock(p.getStock());
+
+        Cart buyNowCart = new Cart();
+        buyNowCart.add(item);
+
+        session.setAttribute("buyNowCart", buyNowCart);
+
+        return "redirect:/cart/checkout?mode=buynow";
+    }
+
     @GetMapping("/remove/{id}")
     public String remove(@PathVariable("id") Integer id, HttpSession session) {
         Cart cart = (Cart) session.getAttribute("cart");
@@ -110,15 +159,88 @@ public class CartController {
         return "redirect:/cart";
         
     }
-    @GetMapping("/checkout")
-    public String checkout(HttpSession session, Model model) {
+
+    // ===== TĂNG / GIẢM SỐ LƯỢNG SẢN PHẨM TRONG GIỎ =====
+    @PostMapping("/update/{id}")
+    public String updateQuantity(
+            @PathVariable("id") Integer id,
+            @RequestParam("qty") int qty,
+            HttpSession session) {
+
         Cart cart = (Cart) session.getAttribute("cart");
 
-        if (cart == null || cart.isEmpty()) {
+        if (cart == null) {
             return "redirect:/cart";
         }
 
+        if (qty < 1) {
+            qty = 1;
+        }
+
+        // ===== KIỂM TRA TỒN KHO =====
+        Product p = productService.findById(id);
+
+        if (p != null) {
+            int stock = (p.getStock() == null) ? 0 : p.getStock();
+
+            if (qty > stock) {
+                qty = stock;
+
+                session.setAttribute(
+                    "stockMessage",
+                    p.getName() + " chỉ còn " + stock + " sản phẩm trong kho!"
+                );
+            }
+
+            if (qty < 1) {
+                cart.remove(id);
+                return "redirect:/cart";
+            }
+        }
+
+        cart.update(id, qty);
+
+        return "redirect:/cart";
+    }
+    @GetMapping("/checkout")
+    public String checkout(
+            @RequestParam(value = "mode", required = false) String mode,
+            HttpSession session, Model model) {
+
+        Cart cart;
+
+        if ("buynow".equals(mode)) {
+            cart = (Cart) session.getAttribute("buyNowCart");
+
+            if (cart == null || cart.isEmpty()) {
+                return "redirect:/";
+            }
+
+        } else {
+            cart = (Cart) session.getAttribute("cart");
+
+            if (cart == null || cart.isEmpty()) {
+                return "redirect:/cart";
+            }
+
+            mode = "cart";
+        }
+
         model.addAttribute("cart", cart);
+        model.addAttribute("mode", mode);
+
+        // ===== GỢI Ý ĐIỀN SẴN THÔNG TIN CHUYỂN KHOẢN (theo user đăng nhập) =====
+        User user = (User) session.getAttribute("user");
+        if (user != null) {
+            Payment lastBanking = paymentService.findLastBankingInfo(user.getId());
+            if (lastBanking != null) {
+                model.addAttribute("savedBank", lastBanking.getCustomerBank());
+                model.addAttribute("savedAccount", lastBanking.getCustomerAccount());
+            }
+            model.addAttribute("savedFullname", user.getFullName());
+            model.addAttribute("savedEmail", user.getEmail());
+        }
+
         return "cart/checkout";
     }
     @PostMapping("/pay")
@@ -128,11 +250,17 @@ public class CartController {
             @RequestParam("email") String email,
             @RequestParam("phone") String phone,
             @RequestParam("address") String address,
+            @RequestParam(value = "customerBank", required = false) String customerBank,
+            @RequestParam(value = "customerAccount", required = false) String customerAccount,
+            @RequestParam(value = "mode", required = false) String mode,
             HttpSession session) {
 
-        Cart cart = (Cart) session.getAttribute("cart");
+        boolean isBuyNow = "buynow".equals(mode);
+
+        Cart cart = (Cart) session.getAttribute(isBuyNow ? "buyNowCart" : "cart");
+
         if (cart == null || cart.isEmpty()) {
-            return "redirect:/cart";
+            return isBuyNow ? "redirect:/" : "redirect:/cart";
         }
      // ===== KIỂM TRA TOÀN BỘ TỒN KHO TRƯỚC =====
 
@@ -148,7 +276,7 @@ public class CartController {
                         "Sản phẩm không tồn tại!"
                 );
 
-                return "redirect:/cart";
+                return isBuyNow ? "redirect:/" : "redirect:/cart";
             }
 
             if (product.getStock() == null) {
@@ -165,7 +293,7 @@ public class CartController {
                         + " sản phẩm trong kho!"
                 );
 
-                return "redirect:/cart";
+                return isBuyNow ? "redirect:/" : "redirect:/cart";
             }
         }
         
@@ -201,6 +329,8 @@ public class CartController {
 
         if("BANKING".equals(paymentMethod)){
             payment.setPaymentStatus("CHO_XAC_NHAN");
+            payment.setCustomerBank(customerBank);
+            payment.setCustomerAccount(customerAccount);
         }
 
         payment.setPaymentDate(LocalDateTime.now());
@@ -232,7 +362,11 @@ public class CartController {
             orderItemRepo.save(item);
         }
 
-        session.removeAttribute("cart"); // clear giỏ hàng
+        if (isBuyNow) {
+            session.removeAttribute("buyNowCart");
+        } else {
+            session.removeAttribute("cart");
+        }
 
         return "cart/success";
     }

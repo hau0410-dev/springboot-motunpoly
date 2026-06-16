@@ -1,68 +1,70 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
 <head>
 <meta charset="UTF-8">
-
-<title>Chi tiết đơn hàng</title>
-<link rel="stylesheet" th:href="@{/css/style.css}">
-<link rel="stylesheet"
-      th:href="@{/css/shipper.css}">
+<title>Chi tiết đơn hàng - Shipper</title>
+<link rel="stylesheet" th:href="@{/css/shipper.css}">
 </head>
-
 <body>
-<div th:replace="layout/header :: header"></div>
-<div class="container">
 
-    <h1>Chi tiết đơn hàng</h1>
+<div class="sh-topbar">
+    <div class="sh-brand">🛵 MotunPoly <span>Shipper</span></div>
+    <div class="sh-user">
+        <span th:text="'Xin chào, ' + ${shipper.fullName}"></span>
+        <a th:href="@{/shipper/history}" class="sh-logout">📋 Lịch sử</a>
+        <a th:href="@{/logout}" class="sh-logout">Đăng xuất</a>
+    </div>
+</div>
 
-    <p>Mã đơn:
-        <span th:text="${order.id}"></span>
-    </p>
+<div class="sh-container">
 
-    <p>Khách hàng:
-        <span th:text="${order.fullname}"></span>
-    </p>
+    <a th:href="@{/shipper/index}" class="sh-back">← Quay lại danh sách</a>
 
-    <p>SĐT:
-        <span th:text="${order.phone}"></span>
-    </p>
+    <div class="sh-section">
 
-    <p>Địa chỉ:
-        <span th:text="${order.address}"></span>
-    </p>
+        <div class="sh-card-head" style="margin-bottom:14px;">
+            <h2 style="margin:0;">🧾 Đơn hàng #<span th:text="${order.id}"></span></h2>
 
-    <p>Trạng thái:
-        <span th:text="${order.status}"></span>
-    </p>
+            <span th:if="${order.status == 'CHO_LAY_HANG'}" class="sh-badge sh-badge-wait">Chờ lấy hàng</span>
+            <span th:if="${order.status == 'DANG_GIAO'}" class="sh-badge sh-badge-going">Đang giao</span>
+            <span th:if="${order.status == 'DA_GIAO'}" class="sh-badge sh-badge-done">Đã giao</span>
+        </div>
 
-    <hr>
+        <div class="sh-info-grid">
+            <div class="sh-info-box">
+                <p><span>Khách hàng</span><b th:text="${order.fullname}"></b></p>
+                <p><span>SĐT</span><b th:text="${order.phone}"></b></p>
+                <p><span>Địa chỉ</span><b th:text="${order.address}"></b></p>
+            </div>
+            <div class="sh-info-box">
+                <p><span>Phương thức TT</span><b th:text="${order.payment != null ? order.payment.paymentMethod : '—'}"></b></p>
+                <p><span>Tổng tiền</span><b class="sh-amount" th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></b></p>
+            </div>
+        </div>
 
-    <table>
+        <h3>Sản phẩm</h3>
 
-        <thead>
-            <tr>
-                <th>Sản phẩm</th>
-                <th>Số lượng</th>
-                <th>Giá</th>
-            </tr>
-        </thead>
+        <div class="sh-products">
+            <div class="sh-product-item" th:each="i : ${items}">
+                <span th:text="${i.product.name}"></span>
+                <span th:text="'x' + ${i.quantity}"></span>
+                <span class="sh-amount" th:text="${#numbers.formatDecimal(i.subtotal,0,'COMMA',0,'POINT')} + 'đ'"></span>
+            </div>
+        </div>
 
-        <tbody>
+        <div class="sh-card-actions" style="margin-top:20px;">
+            <a th:if="${order.status == 'CHO_LAY_HANG'}"
+               th:href="@{/shipper/pickup/{id}(id=${order.id})}" class="sh-btn sh-btn-primary">
+                🛵 Lấy hàng
+            </a>
 
-            <tr th:each="i : ${items}">
+            <a th:if="${order.status == 'DANG_GIAO'}"
+               th:href="@{/shipper/delivered/{id}(id=${order.id})}" class="sh-btn sh-btn-success">
+                ✅ Giao thành công
+            </a>
+        </div>
 
-                <td th:text="${i.product.name}"></td>
-
-                <td th:text="${i.quantity}"></td>
-
-                <td th:text="${i.price}"></td>
-
-            </tr>
-
-        </tbody>
-
-    </table>
+    </div>
 
 </div>
 

@@ -18,14 +18,60 @@
         <span th:text="${product.name}"></span>
     </div>
 
+    <!-- thông báo tồn kho (nếu có) -->
+    <div th:if="${stockMessage}" class="alert-stock">
+        <span th:text="${stockMessage}"></span>
+    </div>
 
     <div class="product-detail">
 
-        <!-- LEFT IMAGE -->
-        <div class="product-image">
+        <!-- LEFT: GALLERY -->
+        <div class="product-gallery">
 
-            <img class="main-img"
-                 th:src="@{'/imges/' + ${product.image}}">
+            <div class="main-image-wrap">
+
+                <img id="mainImage" class="main-img"
+                     th:src="@{'/imges/' + ${product.image}}"
+                     th:alt="${product.name}">
+
+                <!-- BADGE GIẢM GIÁ TRÊN ẢNH -->
+                <div class="discount-tag" th:if="${promo != null and promo.discountType == 'PERCENT'}">
+                    -<span th:text="${#numbers.formatDecimal(promo.discountValue,0,0)}"></span>%
+                </div>
+
+                <!-- LƯỢT THÍCH (ẢO) -->
+                <button type="button" id="likeBtn" class="like-btn" onclick="toggleLike()">
+                    <span id="likeIcon">🤍</span>
+                    <span id="likeCount" th:text="${likeCount}">0</span>
+                </button>
+
+            </div>
+
+            <!-- THUMBNAIL GALLERY -->
+            <div class="thumbnail-list">
+
+                <!-- ảnh đại diện cũng hiển thị như 1 thumbnail -->
+                <img class="thumb-img active"
+                     th:src="@{'/imges/' + ${product.image}}"
+                     th:data-full="@{'/imges/' + ${product.image}}"
+                     onclick="changeImage(this)">
+
+                <!-- các ảnh phụ trong gallery -->
+                <img th:each="img : ${images}"
+                     class="thumb-img"
+                     th:src="@{'/imges/' + ${img.imageUrl}}"
+                     th:data-full="@{'/imges/' + ${img.imageUrl}}"
+                     onclick="changeImage(this)">
+
+            </div>
+
+            <!-- CHIA SẺ -->
+            <div class="share-row">
+                <span>Chia sẻ:</span>
+                <a href="#" title="Facebook">📘</a>
+                <a href="#" title="Zalo">💬</a>
+                <a href="#" title="Sao chép liên kết" onclick="copyLink(event)">🔗</a>
+            </div>
 
         </div>
 
@@ -36,83 +82,249 @@
             <h1 th:text="${product.name}"></h1>
 
             <div class="rating">
-                ⭐ 4.9 | 297 đánh giá
+                <span class="stars">⭐⭐⭐⭐⭐</span>
+                <span class="rating-text">4.9 &nbsp;|&nbsp; 297 đánh giá</span>
+                <span class="sold-text">&nbsp;|&nbsp; Đã bán <b th:text="${likeCount * 2}">0</b></span>
             </div>
-			<div class="stock-info">
 
-			    <span th:if="${product.stock > 0}">
-			        Còn lại:
-			        <b th:text="${product.stock}"></b>
-			        sản phẩm
-			    </span>
-			
-			    <span th:if="${product.stock <= 0}"
-			          style="color:red;font-weight:bold;">
-			        Hết hàng
-			    </span>
-			
-			</div>
+            <!-- ===== KHUNG GIÁ (kiểu Flash Sale khi có khuyến mãi) ===== -->
+            <div class="price-box" th:classappend="${promo != null} ? 'has-promo' : ''">
 
-            <div class="price-box">
-            	<div class="stock-info">
+                <div class="promo-flash" th:if="${promo != null}">
+                    <span class="promo-flash-icon" th:text="${promo.icon ?: '🔥'}"></span>
+                    <span class="promo-flash-text" th:text="${promo.badgeText}"></span>
+                </div>
 
-				    <span th:if="${product.stock > 0}">
-				        Còn lại:
-				        <b th:text="${product.stock}"></b>
-				        sản phẩm
-				    </span>
-				
-				    <span th:if="${product.stock <= 0}"
-				          style="color:red;font-weight:bold;">
-				        Hết hàng
-				    </span>
-				
-				</div>
+                <div class="price-row">
 
-                <div class="price"
-                     th:text="${#numbers.formatDecimal(product.price,0,'COMMA',0,'POINT')} + 'đ'">
+                    <div class="price"
+                         th:if="${finalPrice != null}"
+                         th:text="${#numbers.formatDecimal(finalPrice,0,'COMMA',0,'POINT')} + 'đ'">
+                    </div>
+
+                    <div class="price"
+                         th:if="${finalPrice == null}"
+                         th:text="${#numbers.formatDecimal(product.price,0,'COMMA',0,'POINT')} + 'đ'">
+                    </div>
+
+                    <div class="price-old" th:if="${finalPrice != null and finalPrice < product.price}"
+                         th:text="${#numbers.formatDecimal(product.price,0,'COMMA',0,'POINT')} + 'đ'">
+                    </div>
+
+                    <div class="discount-percent" th:if="${promo != null and promo.discountType == 'PERCENT'}">
+                        -<span th:text="${#numbers.formatDecimal(promo.discountValue,0,0)}"></span>%
+                    </div>
+
+                </div>
+
+                <p class="promo-desc" th:if="${promo != null}" th:text="${promo.description}"></p>
+
+                <div class="stock-info">
+
+                    <span th:if="${product.stock > 0}" class="in-stock">
+                        ✅ Còn lại <b th:text="${product.stock}"></b> sản phẩm
+                    </span>
+
+                    <span th:if="${product.stock <= 0}" class="out-stock">
+                        ❌ Hết hàng
+                    </span>
+
                 </div>
 
             </div>
 
 
-            <div class="description">
-                <h3>Mô tả sản phẩm</h3>
-
-                <p th:text="${product.description}">
-                </p>
-            </div>
-
-
             <!-- add to cart -->
             <form th:action="@{/cart/add/{id}(id=${product.id})}"
-			      method="post">
-			
-			    <input type="hidden" name="qty" value="1">
-			
-			    <button
-			        class="btn-cart"
-			        type="submit"
-			        th:disabled="${product.stock <= 0}">
-			
-			        <span th:if="${product.stock > 0}">
-			            🛒 Thêm vào giỏ hàng
-			        </span>
-			
-			        <span th:if="${product.stock <= 0}">
-			            ❌ Hết hàng
-			        </span>
-			
-			    </button>
-			
-			</form>
+                  method="post" class="add-cart-form">
 
+                <div class="qty-row" th:if="${product.stock > 0}">
+                    <span class="qty-label">Số lượng</span>
+
+                    <div class="qty-control">
+                        <button type="button" class="btn-qty" onclick="changeQty(-1)">−</button>
+                        <input type="number" id="qtyInput" name="qty" class="qty-input"
+                               value="1" min="1" th:max="${product.stock}">
+                        <button type="button" class="btn-qty" onclick="changeQty(1)">+</button>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+
+                    <button
+                        class="btn-cart"
+                        type="submit"
+                        th:disabled="${product.stock <= 0}">
+
+                        <span th:if="${product.stock > 0}">
+                            🛒 Thêm vào giỏ hàng
+                        </span>
+
+                        <span th:if="${product.stock <= 0}">
+                            ❌ Hết hàng
+                        </span>
+
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn-buynow"
+                        th:disabled="${product.stock <= 0}"
+                        onclick="openBuyNow()">
+                        ⚡ Mua ngay
+                    </button>
+
+                </div>
+
+            </form>
+
+            <!-- mô tả sản phẩm -->
+            <div class="description">
+                <h3>📝 Mô tả sản phẩm</h3>
+                <p th:text="${product.description}"></p>
+            </div>
 
         </div>
 
     </div>
 
 </div>
+
+<!-- ===== BOTTOM SHEET: MUA NGAY ===== -->
+<div id="buyNowOverlay" class="bn-overlay" onclick="closeBuyNow()"></div>
+
+<div id="buyNowSheet" class="bn-sheet">
+
+    <div class="bn-handle"></div>
+
+    <div class="bn-product">
+        <img th:src="@{'/imges/' + ${product.image}}" th:alt="${product.name}">
+
+        <div class="bn-product-info">
+            <div class="bn-product-name" th:text="${product.name}"></div>
+
+            <div class="bn-product-price"
+                 th:if="${finalPrice != null}"
+                 th:text="${#numbers.formatDecimal(finalPrice,0,'COMMA',0,'POINT')} + 'đ'">
+            </div>
+
+            <div class="bn-product-price"
+                 th:if="${finalPrice == null}"
+                 th:text="${#numbers.formatDecimal(product.price,0,'COMMA',0,'POINT')} + 'đ'">
+            </div>
+        </div>
+    </div>
+
+    <form th:action="@{/cart/buynow/{id}(id=${product.id})}" method="post" id="buyNowForm">
+
+        <div class="bn-qty-row">
+            <span class="qty-label">Số lượng</span>
+
+            <div class="qty-control">
+                <button type="button" class="btn-qty" onclick="changeBnQty(-1)">−</button>
+                <input type="number" id="bnQtyInput" name="qty" class="qty-input"
+                       value="1" min="1" th:max="${product.stock}">
+                <button type="button" class="btn-qty" onclick="changeBnQty(1)">+</button>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-buynow-confirm">⚡ Mua ngay</button>
+
+    </form>
+
+</div>
+
+<script th:inline="javascript">
+
+    function changeImage(el) {
+        document.getElementById('mainImage').src = el.getAttribute('data-full');
+
+        document.querySelectorAll('.thumb-img').forEach(function(t){
+            t.classList.remove('active');
+        });
+
+        el.classList.add('active');
+    }
+
+    // ===== SỐ LƯỢNG =====
+    function changeQty(delta) {
+        var input = document.getElementById('qtyInput');
+        var max = parseInt(input.getAttribute('max'), 10) || 9999;
+        var val = parseInt(input.value, 10) || 1;
+
+        val += delta;
+
+        if (val < 1) val = 1;
+        if (val > max) val = max;
+
+        input.value = val;
+    }
+
+    // ===== BOTTOM SHEET: MUA NGAY =====
+    function openBuyNow() {
+        // đồng bộ số lượng từ ô chính sang bottom sheet
+        var mainQty = document.getElementById('qtyInput');
+        var bnQty = document.getElementById('bnQtyInput');
+
+        if (mainQty && bnQty) {
+            bnQty.value = mainQty.value;
+        }
+
+        document.getElementById('buyNowOverlay').classList.add('show');
+        document.getElementById('buyNowSheet').classList.add('show');
+    }
+
+    function closeBuyNow() {
+        document.getElementById('buyNowOverlay').classList.remove('show');
+        document.getElementById('buyNowSheet').classList.remove('show');
+    }
+
+    function changeBnQty(delta) {
+        var input = document.getElementById('bnQtyInput');
+        var max = parseInt(input.getAttribute('max'), 10) || 9999;
+        var val = parseInt(input.value, 10) || 1;
+
+        val += delta;
+
+        if (val < 1) val = 1;
+        if (val > max) val = max;
+
+        input.value = val;
+    }
+
+    // ===== LƯỢT THÍCH (ẢO) - lưu trạng thái thích trên trình duyệt =====
+    var productId = /*[[${product.id}]]*/ 0;
+    var likeKey = 'liked_product_' + productId;
+
+    function toggleLike() {
+        var icon = document.getElementById('likeIcon');
+        var countEl = document.getElementById('likeCount');
+        var count = parseInt(countEl.textContent, 10);
+
+        if (localStorage.getItem(likeKey)) {
+            localStorage.removeItem(likeKey);
+            icon.textContent = '🤍';
+            countEl.textContent = count - 1;
+        } else {
+            localStorage.setItem(likeKey, '1');
+            icon.textContent = '❤️';
+            countEl.textContent = count + 1;
+        }
+    }
+
+    function copyLink(e) {
+        e.preventDefault();
+        navigator.clipboard.writeText(window.location.href);
+        alert('Đã sao chép liên kết sản phẩm!');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        if (localStorage.getItem(likeKey)) {
+            document.getElementById('likeIcon').textContent = '❤️';
+        }
+    });
+
+</script>
 
 </body>
 </html>

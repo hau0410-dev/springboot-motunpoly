@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Ưu đãi của tôi</title>
+<link rel="stylesheet" th:href="@{/css/promotions.css}">
+</head>
+<body>
+
+<div class="promo-container">
+
+    <h2 class="promo-title">🎁 Ưu đãi của bạn</h2>
+
+    <!-- TỔNG TIỀN ĐÃ MUA -->
+    <div class="promo-summary">
+        <div class="summary-label">Tổng giá trị đơn hàng đã hoàn thành</div>
+        <div class="summary-value"
+             th:text="${#numbers.formatDecimal(totalSpent,0,'COMMA',0,'POINT')} + 'đ'">
+            0đ
+        </div>
+        <div class="summary-note">
+            Mua sắm nhiều hơn để mở khoá thêm các ưu đãi hấp dẫn dành riêng cho bạn!
+        </div>
+    </div>
+
+    <!-- DANH SÁCH CÁC MỨC ƯU ĐÃI -->
+    <div class="promo-list">
+
+        <div th:if="${promotions == null || promotions.isEmpty()}" class="promo-empty">
+            Hiện chưa có chương trình khuyến mãi nào.
+        </div>
+
+        <div class="promo-card"
+             th:each="p : ${promotions}"
+             th:classappend="${(p.minTotalSpent == null ? 0 : p.minTotalSpent) <= totalSpent} ? 'unlocked' : 'locked'">
+
+            <div class="promo-card-icon" th:text="${p.icon ?: '🎁'}"></div>
+
+            <div class="promo-card-body">
+
+                <h3 th:text="${p.title}"></h3>
+
+                <div class="promo-card-badge" th:text="${p.badgeText}"></div>
+
+                <p class="promo-card-desc" th:text="${p.description}"></p>
+
+                <div class="promo-card-condition">
+                    Điều kiện: tổng đơn hàng từ
+                    <b th:text="${#numbers.formatDecimal(p.minTotalSpent,0,'COMMA',0,'POINT')} + 'đ'"></b>
+                </div>
+
+                <!-- TRẠNG THÁI -->
+                <div class="promo-status unlocked-status"
+                     th:if="${(p.minTotalSpent == null ? 0 : p.minTotalSpent) <= totalSpent}">
+                    ✅ Bạn đã mở khoá ưu đãi này!
+                </div>
+
+                <div class="promo-status locked-status"
+                     th:if="${(p.minTotalSpent == null ? 0 : p.minTotalSpent) > totalSpent}">
+                    🔒 Mua thêm
+                    <b th:text="${#numbers.formatDecimal(p.minTotalSpent - totalSpent,0,'COMMA',0,'POINT')} + 'đ'"></b>
+                    nữa để mở khoá
+                </div>
+
+                <!-- SẢN PHẨM ÁP DỤNG -->
+                <div class="promo-products" th:if="${p.products != null && !p.products.isEmpty()}">
+                    <span class="promo-products-label">Áp dụng cho:</span>
+                    <a th:each="prod : ${p.products}"
+                       th:href="@{/product/detail(id=${prod.id})}"
+                       class="promo-product-chip"
+                       th:text="${prod.name}">
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

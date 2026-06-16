@@ -1,98 +1,53 @@
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<html xmlns:th="http://www.thymeleaf.org">
 <header class="mp-header" th:fragment="header">
     <div class="mp-header-top">
 
-       <a th:href="@{/}" class="logo">
-    		<img th:src="@{/imges/logo.png}" alt="ChittyDetailing">
-    		<span>MotunPoly</span>
-		</a>
-
-
-        <button class="btn-category" onclick="toggleFilter()">
-		    ☰ Danh mục
-		</button>
-        <div class="category-popup" id="filterBox">
-
-				<form action="/" method="get">
-			
-			    <label>Tên sản phẩm</label>
-			    <input type="text" name="keyword">
-			
-			    <label>Danh mục</label>
-			    <select name="category">
-			        <option value="">Tất cả</option>
-			        <option th:each="c : ${categories}"
-			                th:value="${c.id}"
-			                th:text="${c.name}">
-			        </option>
-			    </select>
-			
-			    <label>Giá từ</label>
-			    <input type="number" name="min">
-			
-			    <label>Đến</label>
-			    <input type="number" name="max">
-			
-			    <button type="submit">Lọc</button>
-			
-			</form>
-		
-		</div>
+        <a th:href="@{/}" class="logo">
+            <img th:src="@{/imges/logomotunpoly.png}" alt="MotunPoly">
+            <span>MotunPoly</span>
+        </a>
 
         <!-- SEARCH -->
         <div class="search-wrapper">
             <form class="search-box" th:action="@{/}" method="get">
-                <input type="text"
-                       name="keyword"
-                       placeholder="Tìm phụ tùng xe máy, nhớt, lốp, phanh..."
+                <input type="text" name="keyword"
+                       placeholder="Tìm phụ tùng xe máy..."
                        th:value="${keyword}">
                 <button type="submit">🔍</button>
             </form>
-
-            
-            
         </div>
 
         <!-- CART -->
-        <div class="cart">
-            <a th:href="@{/cart}" style="color:white; text-decoration:none;">
-                🛒 Giỏ hàng
-                <span th:if="${session.cart != null}">
-                    (<b th:text="${#lists.size(session.cart.items)}"></b>)
-                </span>
-            </a>
-        </div>
+        <a th:href="@{/cart}" class="cart">
+            🛒 <span class="cart-text">Giỏ hàng</span>
+            <span th:if="${session.cart != null && !#lists.isEmpty(session.cart.items)}"
+                  class="cart-badge"
+                  th:text="${#lists.size(session.cart.items)}"></span>
+        </a>
 
         <!-- AUTH -->
         <div class="auth-buttons">
 
-            <div th:if="${session.user == null}">
+            <div th:if="${session.user == null}" style="display:flex;gap:10px;">
                 <a th:href="@{/login}" class="btn-auth">Đăng nhập</a>
                 <a th:href="@{/register}" class="btn-auth btn-register">Đăng ký</a>
             </div>
 
             <div th:if="${session.user != null}" class="user-menu">
-                <div class="user-trigger">
-                    <img src="/imges/avatar.png" class="user-avatar" alt="avatar">
-                    <span class="username">
-                        Xin chào, <b th:text="${session.user.username}"></b>
-                    </span>
+                <div class="user-menu-toggle">
+                    <span>👤</span>
+                    <span th:text="${session.user.fullName ?: session.user.username}">User</span>
+                    <span style="opacity:.5;font-size:12px;">▾</span>
                 </div>
-
                 <div class="user-dropdown">
                     <a th:href="@{/profile}">👤 Thông tin cá nhân</a>
                     <a th:href="@{/orders}">📦 Lịch sử đặt hàng</a>
                     <a th:href="@{/reviews}">⭐ Lịch sử đánh giá</a>
-                    <a href="/change-password">🔒 Đổi mật khẩu</a>
-                    
-					<a th:if="${session.user != null and session.user.role == 'ADMIN'}"
-					   th:href="@{/admin}">
-					    👤 Quản trị
-					</a>
-					
-					<hr th:if="${session.user != null and session.user.role == 'ADMIN'}">
-                    <a th:href="@{/logout}" class="logout">🚪 Đăng xuất</a>
+                    <a th:href="@{/promotions}">🎁 Ưu đãi của tôi</a>
+                    <a th:href="@{/change-password}">🔒 Đổi mật khẩu</a>
+                    <a th:if="${session.user.role == 'ADMIN'}" th:href="@{/admin}"
+                       style="color:#d97706;font-weight:700;">⚙️ Quản trị</a>
+                    <a th:href="@{/logout}" style="color:#e11d48;font-weight:700;">🚪 Đăng xuất</a>
                 </div>
             </div>
 
@@ -100,14 +55,3 @@
 
     </div>
 </header>
-<script>
-function toggleFilter() {
-    var box = document.getElementById("filterBox");
-
-    if(box.style.display === "block"){
-        box.style.display = "none";
-    }else{
-        box.style.display = "block";
-    }
-}
-</script>

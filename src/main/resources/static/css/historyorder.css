@@ -42,6 +42,34 @@ border:1px solid #93c5fd;
 color:#16a34a;
 background:#ecfdf5;
 border:1px solid #86efac;
+}
+
+/* CHỜ LẤY HÀNG */
+.status-lay{
+color:#7c3aed;
+background:#f5f3ff;
+border:1px solid #c4b5fd;
+}
+
+/* CHỜ KHÁCH XÁC NHẬN */
+.status-cho-xn{
+color:#d97706;
+background:#fff7ed;
+border:1px solid #fdba74;
+}
+
+/* HOÀN THÀNH */
+.status-hoan{
+color:#16a34a;
+background:#ecfdf5;
+border:1px solid #86efac;
+}
+
+/* KHIẾU NẠI */
+.status-khieu{
+color:#dc2626;
+background:#fef2f2;
+border:1px solid #fca5a5;
 }*{
 box-sizing:border-box;
 font-family:"Segoe UI",Tahoma,sans-serif;

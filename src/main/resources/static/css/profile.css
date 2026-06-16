@@ -1,70 +1,176 @@
+.profile-page{
+    padding: 30px 24px;
+    max-width: 1320px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
 .profile-container{
-    display:flex;
-    max-width:1000px;
-    margin:40px auto;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    flex-wrap: wrap;
 }
 
+/* ===== LEFT CARD ===== */
 .profile-left{
-    width:260px;
-    background:white;
-    padding:25px;
-    border-radius:10px;
-    text-align:center;
-    box-shadow:0 0 10px rgba(0,0,0,0.1);
+    width: 280px;
+    flex-shrink: 0;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.05);
+    text-align: center;
+    overflow: hidden;
+    padding-bottom: 24px;
 }
 
-.profile-left img{
-    width:130px;
-    height:130px;
-    border-radius:50%;
-    object-fit:cover;
-    margin-bottom:10px;
+.profile-cover{
+    height: 90px;
+    background: linear-gradient(135deg, #ff5050, #c40000 65%, #a30000);
 }
 
+.profile-avatar{
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #fff;
+    margin-top: -55px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.12);
+    background: #fff;
+}
+
+.profile-left h3{
+    margin: 12px 0 2px;
+    color: #222;
+}
+
+.profile-username{
+    margin: 0;
+    color: #999;
+    font-size: 13px;
+}
+
+.profile-email{
+    margin: 8px 0;
+    font-size: 13px;
+    color: #666;
+}
+
+.profile-role{
+    display: inline-block;
+    margin-top: 4px;
+    padding: 4px 14px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #ff6b6b, #ee0033);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .5px;
+}
+
+.profile-link{
+    display: block;
+    margin: 14px 24px 0;
+    padding: 10px 0;
+    border-top: 1px solid #f1f1f1;
+    text-decoration: none;
+    color: #555;
+    font-size: 14px;
+    font-weight: 600;
+    transition: color .15s;
+}
+
+.profile-link:hover{
+    color: #c40000;
+}
+
+/* ===== RIGHT CARD ===== */
 .profile-right{
-    flex:1;
-    margin-left:20px;
-    background:white;
-    padding:30px;
-    border-radius:10px;
+    flex: 1;
+    min-width: 320px;
+    background: #fff;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.05);
+}
+
+.profile-right h2{
+    margin: 0 0 22px;
+    font-size: 19px;
+    font-weight: 700;
+    color: #222;
+    padding-left: 12px;
+    border-left: 5px solid #ee0033;
 }
 
 .profile-row{
-    margin-bottom:15px;
+    margin-bottom: 18px;
+}
+
+.profile-row label{
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    color: #555;
 }
 
 .profile-row input{
-    width:100%;
-    padding:10px;
-    border-radius:8px;
-    border:1px solid #ccc;
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color .15s, box-shadow .15s;
+}
+
+.profile-row input:focus{
+    outline: none;
+    border-color: #ff5050;
+    box-shadow: 0 0 0 3px rgba(255,80,80,.15);
+}
+
+.profile-row input[readonly]{
+    background: #f7f7f7;
+    color: #888;
+    cursor: not-allowed;
 }
 
 .btn-save{
-    background:#c40000;
-    color:white;
-    border:none;
-    padding:10px 20px;
-    border-radius:20px;
-    cursor:pointer;
+    background: linear-gradient(135deg, #ff5050, #c40000);
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 24px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform .1s, box-shadow .15s;
 }
 
-.forgot{
-    margin-top:15px;
-    display:block;
-    color:#555;
-    text-decoration:none;
+.btn-save:hover{
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(196,0,0,.25);
 }
 
-.forgot:hover{
-    text-decoration:underline;
-}
 .alert-success{
-    background:#e6ffed;
-    color:#1a7f37;
-    border:1px solid #b7ebc6;
-    padding:12px;
-    border-radius:8px;
-    margin-bottom:15px;
-    font-weight:500;
+    background: #e6ffed;
+    color: #1a7f37;
+    border: 1px solid #b7ebc6;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+    font-weight: 600;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 750px){
+    .profile-container{
+        flex-direction: column;
+    }
+    .profile-left{
+        width: 100%;
+    }
 }

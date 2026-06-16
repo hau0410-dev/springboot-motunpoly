@@ -1,0 +1,37 @@
+/* ===== DANH SÁCH SẢN PHẨM (checkbox) ===== */
+.product-checklist{
+    max-height: 220px;
+    overflow-y: auto;
+    border: 1px solid #e0e6ed;
+    border-radius: 8px;
+    padding: 10px;
+    background: #fafbfc;
+    margin-bottom: 4px;
+}
+
+.product-check-item{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 2px;
+    font-weight: 400;
+    color: #333;
+    cursor: pointer;
+}
+
+.product-check-item input{
+    width: auto;
+    margin: 0;
+}
+
+/* ===== BADGE PREVIEW TRONG BẢNG ===== */
+.promo-badge-preview{
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #ff6b6b, #ee0033);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}

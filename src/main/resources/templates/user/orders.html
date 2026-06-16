@@ -3,63 +3,78 @@
 <head>
 <meta charset="UTF-8">
 <title>Lịch sử đơn hàng</title>
+<link rel="stylesheet" th:href="@{/css/style.css}">
 <link rel="stylesheet" th:href="@{/css/user-orders.css}">
-<link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 <div th:replace="layout/header :: header"></div>
-<h2 style="text-align:center">📦 Lịch sử đặt hàng</h2>
 
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Khách hàng</th>
-        <th>Email</th>
-        <th>SDT</th>
-       <th>Tổng tiền</th>
-		<th>Thanh toán</th>
-		<th>TT Thanh toán</th>
-		<th>Trạng thái</th>
-		<th>Thao tác</th>
-    </tr>
+<div class="orders-page">
 
-    <tr th:each="o : ${orders}">
-        <td th:text="${o.id}"></td>
-        <td th:text="${o.fullname}"></td>
-        <td th:text="${o.email}"></td>
-        <td th:text="${o.phone}"></td>
-        <td th:text="${o.totalAmount}"></td>
+    <h2>📦 Lịch sử đặt hàng</h2>
 
-		<td th:text="${o.payment.paymentMethod}"></td>
-		
-		<td>
+    <div th:if="${orders == null || orders.isEmpty()}" class="orders-empty">
+        Bạn chưa có đơn hàng nào. <a th:href="@{/}">Tiếp tục mua sắm →</a>
+    </div>
 
-		    <span th:if="${o.payment != null and o.payment.paymentStatus == 'CHO_THANH_TOAN'}">
-		        ⏳ Chờ thanh toán
-		    </span>
-		
-		    <span th:if="${o.payment != null and o.payment.paymentStatus == 'DA_THANH_TOAN'}">
-		        ✅ Đã thanh toán
-		    </span>
-		     <span th:if="${o.payment.paymentStatus == 'CHO_XAC_NHAN'}">
-		        🏦 Chờ xác nhận
-		    </span>
-		
-		    <span th:if="${o.payment == null}">
-		        Chưa có
-		    </span>
-		
-		</td>
-		
-		<td th:text="${o.status}"></td>
-		        <td>
-		            <a th:href="@{/orders/{id}(id=${o.id})}" class="btn">
-		                Xem
-		            </a>
-		        </td>
-		    </tr>
+    <div class="orders-table-wrap" th:if="${orders != null && !orders.isEmpty()}">
+        <table>
+            <tr>
+                <th>Mã ĐH</th>
+                <th>Khách hàng</th>
+                <th>Email</th>
+                <th>SĐT</th>
+                <th>Tổng tiền</th>
+                <th>Thanh toán</th>
+                <th>TT Thanh toán</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
 
-</table>
+            <tr th:each="o : ${orders}">
+                <td><b th:text="'#' + ${o.id}"></b></td>
+                <td th:text="${o.fullname}"></td>
+                <td th:text="${o.email}"></td>
+                <td th:text="${o.phone}"></td>
+                <td class="price" th:text="${#numbers.formatDecimal(o.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></td>
+
+                <td th:text="${o.payment != null ? o.payment.paymentMethod : '—'}"></td>
+
+                <td>
+                    <span th:if="${o.payment != null and o.payment.paymentStatus == 'CHO_THANH_TOAN'}"
+                          class="badge badge-pending">⏳ Chờ thanh toán</span>
+
+                    <span th:if="${o.payment != null and o.payment.paymentStatus == 'DA_THANH_TOAN'}"
+                          class="badge badge-success">✅ Đã thanh toán</span>
+
+                    <span th:if="${o.payment != null and o.payment.paymentStatus == 'CHO_XAC_NHAN'}"
+                          class="badge badge-info">🏦 Chờ xác nhận</span>
+
+                    <span th:if="${o.payment == null}" class="badge badge-muted">Chưa có</span>
+                </td>
+
+                <td>
+                    <span th:if="${o.status == 'CHO_XAC_NHAN'}" class="badge badge-pending">⏳ Chờ xác nhận</span>
+                    <span th:if="${o.status == 'CHO_LAY_HANG'}" class="badge badge-info">📦 Chờ lấy hàng</span>
+                    <span th:if="${o.status == 'DANG_GIAO'}" class="badge badge-info">🚚 Đang giao</span>
+                    <span th:if="${o.status == 'DA_GIAO'}" class="badge badge-pending">📬 Chờ bạn xác nhận</span>
+                    <span th:if="${o.status == 'HOAN_THANH'}" class="badge badge-success">✅ Hoàn thành</span>
+                    <span th:if="${o.status == 'KHIEU_NAI'}" class="badge badge-danger">🚨 Đơn rủi ro</span>
+                    <span th:unless="${o.status == 'CHO_XAC_NHAN' or o.status == 'CHO_LAY_HANG' or o.status == 'DANG_GIAO' or o.status == 'DA_GIAO' or o.status == 'HOAN_THANH' or o.status == 'KHIEU_NAI'}"
+                          class="badge badge-muted" th:text="${o.status}"></span>
+                </td>
+
+                <td>
+                    <a th:href="@{/orders/{id}(id=${o.id})}" class="btn">
+                        Xem
+                    </a>
+                </td>
+            </tr>
+
+        </table>
+    </div>
+
+</div>
 
 </body>
 </html>
