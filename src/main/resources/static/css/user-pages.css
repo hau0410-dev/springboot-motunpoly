@@ -93,6 +93,34 @@
 }
 .u-badge-muted   { background: #f9fafb; color: #9ca3af; border: 1px solid #e5e7eb; }
 
+.u-refund-note {
+    margin-top: 6px;
+    font-size: 11px;
+    color: #c2410c;
+    font-weight: 700;
+}
+
+/* BUTTON */
+.u-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #111;
+    color: #fff;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    transition: background .15s;
+}
+.u-btn:hover { background: #333; }
+
+.u-btn-danger {
+    background: #fff;
+    color: #be123c;
+    border: 1.5px solid #fecdd3;
+    margin-left: 6px;
+}
+.u-btn-danger:hover { background: #fff1f2; }
 /* BUTTON */
 .u-btn {
     display: inline-block;

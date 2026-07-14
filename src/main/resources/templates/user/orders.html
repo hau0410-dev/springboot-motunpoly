@@ -51,12 +51,22 @@
                         <span th:if="${o.status == 'DA_GIAO'}" class="u-badge u-badge-wait">📬 Chờ xác nhận</span>
                         <span th:if="${o.status == 'HOAN_THANH'}" class="u-badge u-badge-ok">✅ Hoàn thành</span>
                         <span th:if="${o.status == 'KHIEU_NAI'}" class="u-badge u-badge-danger">🚨 Rủi ro</span>
+                        <span th:if="${o.status == 'DA_HUY'}" class="u-badge u-badge-muted">🛑 Đã huỷ</span>
+                        <span th:if="${o.status == 'DA_HOAN_HANG'}" class="u-badge u-badge-info">↩️ Đã hoàn hàng</span>
                         <div th:if="${o.status == 'DANG_GIAO' and o.shipper != null}" class="u-shipper-mini">
                             🚚 <span th:text="${o.shipper.fullName}"></span>
+                        </div>
+                        <div th:if="${o.status == 'DA_HUY' and o.payment != null and o.payment.paymentMethod == 'BANKING' and (o.payment.paymentStatus == 'THANH_CONG' or o.payment.paymentStatus == 'DA_THANH_TOAN')}"
+                             class="u-refund-note">
+                            💰 Tiền sẽ về TK của bạn trong 24h
                         </div>
                     </td>
                     <td>
                         <a th:href="@{/orders/{id}(id=${o.id})}" class="u-btn">Xem →</a>
+                        <a th:if="${o.status == 'CHO_XAC_NHAN'}"
+                           th:href="@{/orders/cancel/{id}(id=${o.id})}"
+                           onclick="return confirm('Huỷ đơn hàng này?')"
+                           class="u-btn u-btn-danger">Huỷ đơn</a>
                     </td>
                 </tr>
             </tbody>

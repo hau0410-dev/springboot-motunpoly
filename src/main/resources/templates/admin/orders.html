@@ -25,6 +25,8 @@
                         <option value="DA_GIAO" th:selected="${status == 'DA_GIAO'}">📬 Chờ khách xác nhận</option>
                         <option value="HOAN_THANH" th:selected="${status == 'HOAN_THANH'}">✅ Hoàn thành</option>
                         <option value="KHIEU_NAI" th:selected="${status == 'KHIEU_NAI'}">🚨 Đơn rủi ro</option>
+                        <option value="DA_HUY" th:selected="${status == 'DA_HUY'}">🛑 Đã huỷ</option>
+                        <option value="DA_HOAN_HANG" th:selected="${status == 'DA_HOAN_HANG'}">↩️ Đã hoàn hàng</option>
                     </select>
                     <button type="submit" class="btn btn-primary">Lọc</button>
                 </form>
@@ -67,11 +69,17 @@
                                 <span th:if="${o.status == 'DA_GIAO'}" class="badge badge-wait-xn">📬 Chờ KH xác nhận</span>
                                 <span th:if="${o.status == 'HOAN_THANH'}" class="badge badge-success">✅ Hoàn thành</span>
                                 <span th:if="${o.status == 'KHIEU_NAI'}" class="badge badge-danger">🚨 Đơn rủi ro</span>
+                                <span th:if="${o.status == 'DA_HUY'}" class="badge badge-muted">🛑 Đã huỷ</span>
+                                <span th:if="${o.status == 'DA_HOAN_HANG'}" class="badge badge-info">↩️ Đã hoàn hàng</span>
                             </td>
                             <td>
                                 <a th:if="${o.status == 'CHO_XAC_NHAN'}"
                                    th:href="@{/admin/orders/update/{id}(id=${o.id})}"
                                    class="btn btn-sm btn-primary">✅ Xác nhận</a>
+                                <a th:if="${o.status == 'CHO_XAC_NHAN'}"
+                                   th:href="@{/admin/orders/cancel/{id}(id=${o.id})}"
+                                   onclick="return confirm('Huỷ đơn hàng này?')"
+                                   class="btn btn-sm btn-danger">🛑 Huỷ đơn</a>
                                 <a th:if="${o.status == 'KHIEU_NAI'}"
                                    th:href="@{/admin/orders/resolve/{id}(id=${o.id})}"
                                    class="btn btn-sm btn-primary">🔁 Xử lý</a>

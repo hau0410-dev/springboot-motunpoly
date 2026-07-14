@@ -37,7 +37,9 @@ public class Order {
     private String status; // ĐANG_GIAO / DA_GIAO
 
     private LocalDateTime createdDate;
-    
+
+    @Column(name = "completed_date")
+    private LocalDateTime completedDate; // Ngày khách xác nhận "Đã nhận hàng" (HOAN_THANH) - dùng tính hạn 3 ngày hoàn trả
     
 
     // ===== Getter & Setter =====
@@ -104,6 +106,14 @@ public class Order {
 
     public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public LocalDateTime getCompletedDate() {
+        return completedDate;
+    }
+
+    public void setCompletedDate(LocalDateTime completedDate) {
+        this.completedDate = completedDate;
     }
     public List<OrderItem> getOrderItems() {
         return orderItems;

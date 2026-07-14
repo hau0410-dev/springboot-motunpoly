@@ -9,11 +9,16 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpSession;
 import poly.edu.entity.Order;
+import poly.edu.entity.OrderItem;
 import poly.edu.entity.Payment;
+import poly.edu.entity.Product;
+import poly.edu.entity.ReturnOrder;
 import poly.edu.entity.User;
 import poly.edu.repository.OrderItemRespository;
 import poly.edu.repository.OrderRepository;
+import poly.edu.repository.ReturnOrderRepository;
 import poly.edu.service.PaymentService;
+import poly.edu.service.ProductService;
 
 @Controller
 @RequestMapping("/shipper")
@@ -27,6 +32,12 @@ public class ShipperController {
 
     @Autowired
     private PaymentService paymentService;
+
+    @Autowired
+    private ReturnOrderRepository returnOrderRepo;
+
+    @Autowired
+    private ProductService productService;
 
     // ===== KIỂM TRA QUYỀN SHIPPER =====
     private User requireShipper(HttpSession session) {
@@ -175,11 +186,126 @@ public class ShipperController {
             Payment payment = paymentService.findByOrderId(order.getId());
 
             if (payment != null && "COD".equals(payment.getPaymentMethod())) {
-                payment.setPaymentStatus("DA_THANH_TOAN");
+                payment.setPaymentStatus("THANH_CONG");
                 paymentService.save(payment);
             }
         }
 
         return "redirect:/shipper/index";
+    }
+
+    // =====================================================
+    // ================ ĐƠN HOÀN HÀNG =====================
+    // =====================================================
+
+    // ===== DANH SÁCH ĐƠN HOÀN (chờ nhận + đang xử lý của tôi) =====
+    @GetMapping("/returns")
+    public String returnsIndex(Model model, HttpSession session) {
+
+        User shipper = requireShipper(session);
+        if (shipper == null) {
+            return "redirect:/login";
+        }
+
+        // Đơn hoàn đã được admin duyệt, chưa ai nhận
+        List<ReturnOrder> waitingReturns = returnOrderRepo.findByStatusAndShipperIsNullOrderByIdDesc("DA_XAC_NHAN");
+
+        // Đơn hoàn mà chính shipper này đang đi lấy
+        List<ReturnOrder> myReturns = returnOrderRepo.findByStatusAndShipper_IdOrderByIdDesc("DANG_LAY_HANG", shipper.getId());
+
+        // Đơn hoàn đã lấy được hàng, đang chờ xác nhận trả về kho
+        List<ReturnOrder> pickedReturns = returnOrderRepo.findByStatusAndShipper_IdOrderByIdDesc("DA_LAY_HANG", shipper.getId());
+
+        model.addAttribute("shipper", shipper);
+        model.addAttribute("waitingReturns", waitingReturns);
+        model.addAttribute("myReturns", myReturns);
+        model.addAttribute("pickedReturns", pickedReturns);
+
+        return "shipper/returns";
+    }
+
+    // ===== SHIPPER NHẬN VIỆC LẤY HÀNG HOÀN: DA_XAC_NHAN -> DANG_LAY_HANG =====
+    @GetMapping("/returns/accept/{id}")
+    public String acceptReturn(@PathVariable("id") Integer id, HttpSession session) {
+
+        User shipper = requireShipper(session);
+        if (shipper == null) {
+            return "redirect:/login";
+        }
+
+        ReturnOrder ro = returnOrderRepo.findById(id).orElse(null);
+
+        if (ro != null && "DA_XAC_NHAN".equals(ro.getStatus()) && ro.getShipper() == null) {
+            ro.setStatus("DANG_LAY_HANG");
+            ro.setShipper(shipper);
+            returnOrderRepo.save(ro);
+        }
+
+        return "redirect:/shipper/returns";
+    }
+
+    // ===== SHIPPER LẤY HÀNG HOÀN THÀNH CÔNG: DANG_LAY_HANG -> DA_LAY_HANG =====
+    @GetMapping("/returns/picked/{id}")
+    public String pickedReturn(@PathVariable("id") Integer id, HttpSession session) {
+
+        User shipper = requireShipper(session);
+        if (shipper == null) {
+            return "redirect:/login";
+        }
+
+        ReturnOrder ro = returnOrderRepo.findById(id).orElse(null);
+
+        if (ro != null
+                && "DANG_LAY_HANG".equals(ro.getStatus())
+                && ro.getShipper() != null
+                && ro.getShipper().getId().equals(shipper.getId())) {
+
+            ro.setStatus("DA_LAY_HANG");
+            ro.setPickedDate(java.time.LocalDateTime.now());
+            returnOrderRepo.save(ro);
+        }
+
+        return "redirect:/shipper/returns";
+    }
+
+    // ===== SHIPPER HOÀN VỀ KHO THÀNH CÔNG: DA_LAY_HANG -> HOAN_KHO (cộng lại tồn kho) =====
+    @GetMapping("/returns/restocked/{id}")
+    public String restockedReturn(@PathVariable("id") Integer id, HttpSession session) {
+
+        User shipper = requireShipper(session);
+        if (shipper == null) {
+            return "redirect:/login";
+        }
+
+        ReturnOrder ro = returnOrderRepo.findById(id).orElse(null);
+
+        if (ro != null
+                && "DA_LAY_HANG".equals(ro.getStatus())
+                && ro.getShipper() != null
+                && ro.getShipper().getId().equals(shipper.getId())) {
+
+            ro.setStatus("HOAN_KHO");
+            ro.setRestockedDate(java.time.LocalDateTime.now());
+            returnOrderRepo.save(ro);
+
+            // Cộng lại tồn kho cho từng sản phẩm trong đơn hàng gốc
+            List<OrderItem> items = orderItemRepo.findByOrderId(ro.getOrder().getId());
+
+            for (OrderItem item : items) {
+                Product product = item.getProduct();
+                if (product != null) {
+                    int currentStock = (product.getStock() == null) ? 0 : product.getStock();
+                    product.setStock(currentStock + item.getQuantity());
+                    productService.save(product);
+                }
+            }
+
+            // Đơn hàng gốc coi như đã hoàn tất quy trình hoàn hàng
+            Order order = ro.getOrder();
+            order.setStatus("DA_HOAN_HANG");
+            orderRepo.save(order);
+        }
+
+        return "redirect:/shipper/returns";
     }
 }

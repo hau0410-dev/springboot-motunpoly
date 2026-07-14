@@ -20,6 +20,8 @@
                 <span th:if="${order.status == 'DA_GIAO'}" class="badge badge-wait-xn">📬 Chờ KH xác nhận</span>
                 <span th:if="${order.status == 'HOAN_THANH'}" class="badge badge-success">✅ Hoàn thành</span>
                 <span th:if="${order.status == 'KHIEU_NAI'}" class="badge badge-danger">🚨 Đơn rủi ro</span>
+                <span th:if="${order.status == 'DA_HUY'}" class="badge badge-muted">🛑 Đã huỷ</span>
+                <span th:if="${order.status == 'DA_HOAN_HANG'}" class="badge badge-info">↩️ Đã hoàn hàng</span>
             </div>
 
             <!-- INFO GRID -->
@@ -86,6 +88,10 @@
                     <a th:if="${order.status == 'CHO_XAC_NHAN'}"
                        th:href="@{/admin/orders/update/{id}(id=${order.id})}"
                        class="btn btn-primary">✅ Xác nhận đơn (chuyển cho shipper)</a>
+                    <a th:if="${order.status == 'CHO_XAC_NHAN'}"
+                       th:href="@{/admin/orders/cancel/{id}(id=${order.id})}"
+                       onclick="return confirm('Huỷ đơn hàng này? Hành động không thể hoàn tác.')"
+                       class="btn btn-danger">🛑 Huỷ đơn</a>
                     <a th:if="${order.status == 'KHIEU_NAI'}"
                        th:href="@{/admin/orders/resolve/{id}(id=${order.id})}"
                        class="btn btn-primary">🔁 Xử lý đơn rủi ro (giao lại)</a>
@@ -95,6 +101,24 @@
                     <a th:if="${payment != null and payment.paymentMethod == 'COD' and payment.paymentStatus == 'CHO_THANH_TOAN'}"
                        th:href="@{/admin/orders/confirm-payment/{id}(id=${order.id})}"
                        class="btn btn-primary">💵 Xác nhận đã thu tiền COD</a>
+                </div>
+            </div>
+
+            <!-- CẢNH BÁO ĐƠN ĐÃ HUỶ NHƯNG ĐÃ CHUYỂN KHOẢN -->
+            <div class="card" style="margin-bottom:22px;background:#fff7ed;border:1px solid #fed7aa;"
+                 th:if="${order.status == 'DA_HUY' and payment != null and payment.paymentMethod == 'BANKING' and (payment.paymentStatus == 'THANH_CONG' or payment.paymentStatus == 'DA_THANH_TOAN')}">
+                <h3 style="margin:0 0 8px;color:#c2410c;font-size:15px;">⚠️ Cần hoàn tiền thủ công cho khách</h3>
+                <p style="margin:0 0 10px;font-size:13px;color:#9a3412;">
+                    Đơn này khách đã chuyển khoản thành công nhưng huỷ trước khi xác nhận. Vui lòng chuyển khoản hoàn lại
+                    <b th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></b> cho khách trong vòng 24h.
+                </p>
+                <div th:if="${order.user != null and order.user.bankAccount != null}" style="font-size:13px;">
+                    <p style="margin:4px 0;"><b>Ngân hàng:</b> <span th:text="${order.user.bankName}"></span></p>
+                    <p style="margin:4px 0;"><b>Số TK:</b> <span th:text="${order.user.bankAccount}"></span></p>
+                    <p style="margin:4px 0;"><b>Chủ TK:</b> <span th:text="${order.user.bankHolder}"></span></p>
+                </div>
+                <div th:if="${order.user == null or order.user.bankAccount == null}" style="font-size:13px;color:#c2410c;">
+                    Khách chưa cập nhật thông tin ngân hàng trong hồ sơ cá nhân — vui lòng liên hệ khách qua SĐT <b th:text="${order.phone}"></b> để lấy thông tin nhận hoàn tiền.
                 </div>
             </div>
 

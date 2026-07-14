@@ -28,6 +28,15 @@ public class User {
 
     private Boolean enabled;
 
+    @Column(name = "bank_name")
+    private String bankName;       // Ngân hàng nhận hoàn tiền
+
+    @Column(name = "bank_account")
+    private String bankAccount;    // Số tài khoản nhận hoàn tiền
+
+    @Column(name = "bank_holder")
+    private String bankHolder;     // Tên chủ tài khoản
+
     // ===== CONSTRUCTOR =====
     public User() {
     }
@@ -95,5 +104,29 @@ public class User {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public String getBankName() {
+        return bankName;
+    }
+
+    public void setBankName(String bankName) {
+        this.bankName = bankName;
+    }
+
+    public String getBankAccount() {
+        return bankAccount;
+    }
+
+    public void setBankAccount(String bankAccount) {
+        this.bankAccount = bankAccount;
+    }
+
+    public String getBankHolder() {
+        return bankHolder;
+    }
+
+    public void setBankHolder(String bankHolder) {
+        this.bankHolder = bankHolder;
     }
 }

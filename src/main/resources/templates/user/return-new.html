@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Yêu cầu hoàn hàng — MotunPoly</title>
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<link rel="stylesheet" th:href="@{/css/user-order-detail.css}">
+<link rel="stylesheet" th:href="@{/css/return-flow.css}">
+</head>
+<body>
+<div th:replace="layout/header :: header"></div>
+
+<div class="order-detail-page">
+
+    <div class="order-detail-header">
+        <h2>↩️ Yêu cầu hoàn hàng</h2>
+    </div>
+
+    <!-- LỖI: không đủ điều kiện -->
+    <div class="card" style="border:1px solid #fecaca;background:#fef2f2;" th:if="${errorMsg != null}">
+        <h3 style="color:#c62828;margin:0 0 8px;">Không thể tạo yêu cầu hoàn hàng</h3>
+        <p style="margin:0;color:#666;" th:text="${errorMsg}"></p>
+        <a th:href="@{/orders}" class="btn btn-back" style="margin-top:14px;display:inline-block;">← Quay lại lịch sử đơn hàng</a>
+    </div>
+
+    <div th:if="${errorMsg == null}">
+
+        <!-- TÓM TẮT ĐƠN HÀNG -->
+        <div class="card">
+            <h3>🧾 Đơn hàng #<span th:text="${order.id}"></span></h3>
+
+            <table>
+                <tr>
+                    <th>Tên sản phẩm</th>
+                    <th>Giá</th>
+                    <th>Số lượng</th>
+                    <th>Thành tiền</th>
+                </tr>
+                <tr th:each="i : ${items}">
+                    <td class="product-name" th:text="${i.product.name}"></td>
+                    <td th:text="${#numbers.formatDecimal(i.price,0,'COMMA',0,'POINT')} + 'đ'"></td>
+                    <td th:text="${i.quantity}"></td>
+                    <td class="price" th:text="${#numbers.formatDecimal(i.subtotal,0,'COMMA',0,'POINT')} + 'đ'"></td>
+                </tr>
+            </table>
+
+            <div class="order-total">
+                <span>Số tiền sẽ được hoàn</span>
+                <b th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></b>
+            </div>
+        </div>
+
+        <!-- FORM CHỌN LÝ DO -->
+        <div class="card">
+            <h3>📝 Lý do hoàn hàng</h3>
+
+            <form th:action="@{/returns/create/{id}(id=${order.id})}" method="post">
+
+                <div class="rf-reason-group">
+                    <label class="rf-reason-option">
+                        <input type="radio" name="reason" value="Sản phẩm bị lỗi / hư hỏng" checked>
+                        <span>🔧 Sản phẩm bị lỗi / hư hỏng</span>
+                    </label>
+                    <label class="rf-reason-option">
+                        <input type="radio" name="reason" value="Sản phẩm không đúng mô tả">
+                        <span>📋 Sản phẩm không đúng mô tả</span>
+                    </label>
+                    <label class="rf-reason-option">
+                        <input type="radio" name="reason" value="Giao sai sản phẩm">
+                        <span>📦 Giao sai sản phẩm</span>
+                    </label>
+                    <label class="rf-reason-option">
+                        <input type="radio" name="reason" value="Thiếu phụ kiện / quà tặng">
+                        <span>🎁 Thiếu phụ kiện / quà tặng</span>
+                    </label>
+                    <label class="rf-reason-option">
+                        <input type="radio" name="reason" value="Không còn nhu cầu sử dụng">
+                        <span>🙅 Không còn nhu cầu sử dụng</span>
+                    </label>
+                    <label class="rf-reason-option">
+                        <input type="radio" name="reason" value="Hàng giả / không chính hãng">
+                        <span>⚠️ Hàng giả / không chính hãng</span>
+                    </label>
+                    <label class="rf-reason-option">
+                        <input type="radio" name="reason" value="Lý do khác">
+                        <span>💬 Lý do khác</span>
+                    </label>
+                </div>
+
+                <div style="margin-top:16px;">
+                    <label style="display:block;font-size:13px;color:#666;margin-bottom:6px;">Mô tả thêm (không bắt buộc)</label>
+                    <textarea name="reasonNote" class="rf-textarea" placeholder="Mô tả chi tiết vấn đề bạn gặp phải..."></textarea>
+                </div>
+
+                <div style="margin-top:18px;display:flex;gap:12px;">
+                    <button type="submit" class="btn btn-return-request">↩️ Gửi yêu cầu hoàn hàng</button>
+                    <a th:href="@{/orders/{id}(id=${order.id})}" class="btn btn-back">Huỷ</a>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

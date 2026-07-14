@@ -34,6 +34,7 @@
 
             <a href="/change-password" class="profile-link">🔒 Đổi mật khẩu</a>
             <a href="/orders" class="profile-link">📦 Lịch sử đặt hàng</a>
+            <a href="/returns" class="profile-link">↩️ Đơn hoàn trả</a>
             <a href="/reviews" class="profile-link">⭐ Lịch sử đánh giá</a>
 
         </div>
@@ -70,6 +71,24 @@
                 <div class="profile-row">
                     <label>Avatar (tên file ảnh trong /imges)</label>
                     <input name="avatar" th:value="${user.avatar}">
+                </div>
+
+                <h3 style="margin:24px 0 4px;font-size:15px;color:#222;">🏦 Ngân hàng nhận hoàn tiền</h3>
+                <p style="margin:0 0 14px;font-size:12px;color:#888;">Dùng khi bạn huỷ đơn/hoàn hàng đã thanh toán chuyển khoản.</p>
+
+                <div class="profile-row">
+                    <label>Ngân hàng</label>
+                    <input name="bankName" th:value="${user.bankName}" placeholder="VD: MB Bank, Vietcombank...">
+                </div>
+
+                <div class="profile-row">
+                    <label>Số tài khoản</label>
+                    <input name="bankAccount" th:value="${user.bankAccount}" placeholder="Số tài khoản của bạn">
+                </div>
+
+                <div class="profile-row">
+                    <label>Tên chủ tài khoản</label>
+                    <input name="bankHolder" th:value="${user.bankHolder}" placeholder="Không dấu, viết hoa - VD: NGUYEN VAN A">
                 </div>
 
                 <button class="btn-save">💾 Cập nhật</button>

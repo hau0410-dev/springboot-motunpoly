@@ -11,6 +11,7 @@
     <div class="sh-brand">🛵 MotunPoly <span>Shipper</span></div>
     <div class="sh-user">
         <span th:text="'Xin chào, ' + ${shipper.fullName}"></span>
+        <a th:href="@{/shipper/returns}" class="sh-logout">↩️ Đơn hoàn hàng</a>
         <a th:href="@{/logout}" class="sh-logout">Đăng xuất</a>
     </div>
 </div>

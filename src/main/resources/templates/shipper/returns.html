@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Đơn hoàn hàng - Shipper - MotunPoly</title>
+<link rel="stylesheet" th:href="@{/css/shipper.css}">
+</head>
+<body>
+
+<div class="sh-topbar">
+    <div class="sh-brand">🛵 MotunPoly <span>Shipper</span></div>
+    <div class="sh-user">
+        <span th:text="'Xin chào, ' + ${shipper.fullName}"></span>
+        <a th:href="@{/shipper/index}" class="sh-logout">📦 Đơn giao hàng</a>
+        <a th:href="@{/shipper/history}" class="sh-logout">📋 Lịch sử</a>
+        <a th:href="@{/logout}" class="sh-logout">Đăng xuất</a>
+    </div>
+</div>
+
+<div class="sh-container">
+
+    <!-- ===== ĐƠN HOÀN CHỜ NHẬN ===== -->
+    <div class="sh-section">
+        <h2>↩️ Đơn hoàn chờ lấy hàng</h2>
+
+        <div th:if="${waitingReturns == null || waitingReturns.isEmpty()}" class="sh-empty">
+            Hiện không có đơn hoàn nào cần lấy.
+        </div>
+
+        <div class="sh-card" th:each="r : ${waitingReturns}">
+
+            <div class="sh-card-head">
+                <span class="sh-order-id">#RH<span th:text="${r.id}"></span></span>
+                <span class="sh-badge sh-badge-wait">Chờ lấy hàng hoàn</span>
+            </div>
+
+            <div class="sh-card-body">
+                <p><b th:text="${r.user.fullName}"></b> &nbsp;|&nbsp; <span th:text="${r.order.phone}"></span></p>
+                <p class="sh-address" th:text="${r.order.address}"></p>
+                <p style="font-size:13px;color:#888;margin:4px 0;">Lý do: <b th:text="${r.reason}"></b></p>
+                <p class="sh-amount" th:text="${#numbers.formatDecimal(r.refundAmount,0,'COMMA',0,'POINT')} + 'đ'"></p>
+            </div>
+
+            <div class="sh-card-actions">
+                <a th:href="@{/shipper/returns/accept/{id}(id=${r.id})}" class="sh-btn sh-btn-primary">↩️ Nhận lấy hàng hoàn</a>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ===== ĐƠN HOÀN TÔI ĐANG XỬ LÝ ===== -->
+    <div class="sh-section">
+        <h2>🛵 Đơn hoàn đang xử lý của tôi</h2>
+
+        <div th:if="${myReturns == null || myReturns.isEmpty()}" class="sh-empty">
+            Bạn chưa nhận đơn hoàn nào.
+        </div>
+
+        <div class="sh-card" th:each="r : ${myReturns}">
+
+            <div class="sh-card-head">
+                <span class="sh-order-id">#RH<span th:text="${r.id}"></span></span>
+                <span class="sh-badge sh-badge-going">Đang đi lấy hàng</span>
+            </div>
+
+            <div class="sh-card-body">
+                <p><b th:text="${r.user.fullName}"></b> &nbsp;|&nbsp; <span th:text="${r.order.phone}"></span></p>
+                <p class="sh-address" th:text="${r.order.address}"></p>
+                <p style="font-size:13px;color:#888;margin:4px 0;">Lý do: <b th:text="${r.reason}"></b></p>
+                <p class="sh-amount" th:text="${#numbers.formatDecimal(r.refundAmount,0,'COMMA',0,'POINT')} + 'đ'"></p>
+            </div>
+
+            <div class="sh-card-actions">
+                <a th:href="@{/shipper/returns/picked/{id}(id=${r.id})}" class="sh-btn sh-btn-success">📦 Lấy hàng hoàn thành công</a>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ===== ĐƠN HOÀN ĐÃ LẤY - CHỜ TRẢ KHO ===== -->
+    <div class="sh-section">
+        <h2>🏬 Đã lấy hàng — chờ trả kho</h2>
+
+        <div th:if="${pickedReturns == null || pickedReturns.isEmpty()}" class="sh-empty">
+            Không có đơn hoàn nào đang chờ trả kho.
+        </div>
+
+        <div class="sh-card" th:each="r : ${pickedReturns}">
+
+            <div class="sh-card-head">
+                <span class="sh-order-id">#RH<span th:text="${r.id}"></span></span>
+                <span class="sh-badge sh-badge-going">Đã lấy hàng</span>
+            </div>
+
+            <div class="sh-card-body">
+                <p><b th:text="${r.user.fullName}"></b></p>
+                <p style="font-size:13px;color:#888;margin:4px 0;">Lý do: <b th:text="${r.reason}"></b></p>
+                <p class="sh-amount" th:text="${#numbers.formatDecimal(r.refundAmount,0,'COMMA',0,'POINT')} + 'đ'"></p>
+            </div>
+
+            <div class="sh-card-actions">
+                <a th:href="@{/shipper/returns/restocked/{id}(id=${r.id})}" class="sh-btn sh-btn-success">🏬 Trả kho thành công</a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

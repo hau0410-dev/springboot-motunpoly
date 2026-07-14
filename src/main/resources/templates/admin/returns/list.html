@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Xử lý đơn hoàn</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="admin-container">
+    <div th:replace="admin/layout/sidebar :: sidebar"></div>
+    <div class="content">
+        <div th:replace="admin/layout/header :: header"></div>
+        <div class="content-body">
+
+            <h2 class="page-title">↩️ Xử lý đơn hoàn</h2>
+
+            <div class="card">
+                <div class="filter-bar">
+                    <a th:href="@{/admin/returns}" class="btn btn-sm" th:classappend="${status == null or status == ''} ? 'btn-primary' : 'btn-secondary'">Tất cả</a>
+                    <a th:href="@{/admin/returns(status='CHO_XAC_NHAN')}" class="btn btn-sm" th:classappend="${status == 'CHO_XAC_NHAN'} ? 'btn-primary' : 'btn-secondary'">⏳ Chờ xác nhận</a>
+                    <a th:href="@{/admin/returns(status='DA_XAC_NHAN')}" class="btn btn-sm" th:classappend="${status == 'DA_XAC_NHAN'} ? 'btn-primary' : 'btn-secondary'">✅ Đã xác nhận</a>
+                    <a th:href="@{/admin/returns(status='DANG_LAY_HANG')}" class="btn btn-sm" th:classappend="${status == 'DANG_LAY_HANG'} ? 'btn-primary' : 'btn-secondary'">🛵 Đang lấy hàng</a>
+                    <a th:href="@{/admin/returns(status='HOAN_KHO')}" class="btn btn-sm" th:classappend="${status == 'HOAN_KHO'} ? 'btn-primary' : 'btn-secondary'">✅ Hoàn tất</a>
+                    <a th:href="@{/admin/returns(status='DA_TU_CHOI')}" class="btn btn-sm" th:classappend="${status == 'DA_TU_CHOI'} ? 'btn-primary' : 'btn-secondary'">❌ Đã từ chối</a>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mã hoàn</th>
+                            <th>Đơn gốc</th>
+                            <th>Khách hàng</th>
+                            <th>Lý do</th>
+                            <th>Số tiền hoàn</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="r : ${returns}">
+                            <td><b th:text="'#RH' + ${r.id}"></b></td>
+                            <td>#<span th:text="${r.order.id}"></span></td>
+                            <td style="text-align:left;" th:text="${r.user.fullName}"></td>
+                            <td style="text-align:left;font-size:13px;" th:text="${r.reason}"></td>
+                            <td style="color:#d97706;font-weight:700;" th:text="${#numbers.formatDecimal(r.refundAmount,0,'COMMA',0,'POINT')} + 'đ'"></td>
+                            <td>
+                                <span th:if="${r.status == 'CHO_XAC_NHAN'}" class="badge badge-pending">⏳ Chờ xác nhận</span>
+                                <span th:if="${r.status == 'DA_TU_CHOI'}" class="badge badge-danger">❌ Đã từ chối</span>
+                                <span th:if="${r.status == 'DA_XAC_NHAN'}" class="badge badge-info">✅ Đã xác nhận</span>
+                                <span th:if="${r.status == 'DANG_LAY_HANG'}" class="badge badge-info">🛵 Đang lấy hàng</span>
+                                <span th:if="${r.status == 'DA_LAY_HANG'}" class="badge badge-info">📦 Đã lấy hàng</span>
+                                <span th:if="${r.status == 'HOAN_KHO'}" class="badge badge-success">✅ Hoàn tất</span>
+                            </td>
+                            <td>
+                                <a th:href="@{/admin/returns/{id}(id=${r.id})}" class="btn btn-sm btn-secondary">👁 Xem</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${returns == null or returns.isEmpty()}">
+                            <td colspan="7" style="color:#aaa;padding:30px 0;">Chưa có đơn hoàn nào.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

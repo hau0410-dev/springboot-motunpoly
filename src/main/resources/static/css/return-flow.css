@@ -1,0 +1,128 @@
+/* =========================================
+   RETURN FLOW - dùng chung cho các trang hoàn hàng
+========================================= */
+
+/* ===== CHỌN LÝ DO HOÀN HÀNG ===== */
+.rf-reason-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.rf-reason-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all .15s;
+}
+.rf-reason-option:hover {
+    border-color: #c7d2fe;
+    background: #f5f3ff;
+}
+.rf-reason-option input[type="radio"] {
+    accent-color: #4f46e5;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+.rf-reason-option:has(input:checked) {
+    border-color: #4f46e5;
+    background: #eef2ff;
+}
+.rf-reason-option span {
+    font-size: 14px;
+    color: #222;
+    font-weight: 600;
+}
+
+.rf-textarea {
+    width: 100%;
+    min-height: 90px;
+    padding: 12px 14px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+}
+.rf-textarea:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79,70,229,.12);
+}
+
+/* ===== TIMELINE TRẠNG THÁI ĐƠN HOÀN ===== */
+.rf-timeline {
+    display: flex;
+    flex-direction: column;
+    padding-left: 6px;
+}
+
+.rf-timeline-step {
+    position: relative;
+    display: flex;
+    gap: 16px;
+    padding-bottom: 26px;
+}
+.rf-timeline-step:last-child { padding-bottom: 0; }
+
+/* đường nối dọc giữa các mốc */
+.rf-timeline-step:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    left: 15px;
+    top: 32px;
+    bottom: 0;
+    width: 2px;
+    background: #e5e7eb;
+}
+.rf-timeline-step.done:not(:last-child)::before {
+    background: #4f46e5;
+}
+
+.rf-timeline-dot {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 13px;
+    border: 2px solid #e5e7eb;
+    z-index: 1;
+}
+
+.rf-timeline-step.done .rf-timeline-dot {
+    background: #4f46e5;
+    color: #fff;
+    border-color: #4f46e5;
+}
+
+.rf-timeline-step.rejected .rf-timeline-dot {
+    background: #dc2626;
+    color: #fff;
+    border-color: #dc2626;
+}
+
+.rf-timeline-content {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding-top: 4px;
+}
+.rf-timeline-content b {
+    font-size: 14px;
+    color: #222;
+}
+.rf-timeline-content span {
+    font-size: 12px;
+    color: #999;
+}

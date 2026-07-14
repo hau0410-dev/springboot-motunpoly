@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Chi tiết đơn hoàn — MotunPoly</title>
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<link rel="stylesheet" th:href="@{/css/user-order-detail.css}">
+<link rel="stylesheet" th:href="@{/css/return-flow.css}">
+</head>
+<body>
+<div th:replace="layout/header :: header"></div>
+
+<div class="order-detail-page">
+
+    <div class="order-detail-header">
+        <h2>↩️ Đơn hoàn <span th:text="'#RH' + ${ro.id}"></span> <span style="font-size:13px;color:#888;font-weight:400;">(đơn gốc #<span th:text="${ro.order.id}"></span>)</span></h2>
+
+        <span th:if="${ro.status == 'CHO_XAC_NHAN'}" class="badge badge-pending">⏳ Chờ xác nhận</span>
+        <span th:if="${ro.status == 'DA_TU_CHOI'}" class="badge badge-danger">❌ Bị từ chối</span>
+        <span th:if="${ro.status == 'DA_XAC_NHAN'}" class="badge badge-info">✅ Đã xác nhận</span>
+        <span th:if="${ro.status == 'DANG_LAY_HANG'}" class="badge badge-info">🛵 Đang lấy hàng</span>
+        <span th:if="${ro.status == 'DA_LAY_HANG'}" class="badge badge-info">📦 Đã lấy hàng</span>
+        <span th:if="${ro.status == 'HOAN_KHO'}" class="badge badge-success">✅ Hoàn tất</span>
+    </div>
+
+    <!-- TỪ CHỐI -->
+    <div class="card" style="border:1px solid #fecaca;background:#fef2f2;" th:if="${ro.status == 'DA_TU_CHOI'}">
+        <h3 style="color:#c62828;margin:0 0 8px;">Yêu cầu hoàn hàng đã bị từ chối</h3>
+        <p style="margin:0;color:#666;" th:text="${ro.adminNote}"></p>
+    </div>
+
+    <!-- TIMELINE TRẠNG THÁI -->
+    <div class="card">
+        <h3>📍 Trạng thái xử lý</h3>
+
+        <div class="rf-timeline">
+
+            <div class="rf-timeline-step done">
+                <div class="rf-timeline-dot">1</div>
+                <div class="rf-timeline-content">
+                    <b>Đã gửi yêu cầu hoàn hàng</b>
+                    <span th:text="${#temporals.format(ro.requestedDate,'dd/MM/yyyy HH:mm')}"></span>
+                </div>
+            </div>
+
+            <div class="rf-timeline-step" th:classappend="${ro.confirmedDate != null} ? 'done' : (${ro.status == 'DA_TU_CHOI'} ? 'rejected' : '')">
+                <div class="rf-timeline-dot">2</div>
+                <div class="rf-timeline-content">
+                    <b th:if="${ro.status != 'DA_TU_CHOI'}">Đơn hoàn đã xác nhận bởi người bán</b>
+                    <b th:if="${ro.status == 'DA_TU_CHOI'}" style="color:#c62828;">Người bán đã từ chối yêu cầu</b>
+                    <span th:if="${ro.confirmedDate != null}" th:text="${#temporals.format(ro.confirmedDate,'dd/MM/yyyy HH:mm')}"></span>
+                    <span th:if="${ro.rejectedDate != null}" th:text="${#temporals.format(ro.rejectedDate,'dd/MM/yyyy HH:mm')}"></span>
+                    <span th:if="${ro.confirmedDate == null and ro.rejectedDate == null}" style="color:#aaa;">Đang chờ người bán xử lý</span>
+                    <div th:if="${ro.status == 'DA_XAC_NHAN'}" style="margin-top:4px;color:#0d6efd;font-weight:600;">🛵 Shipper sẽ sớm tới lấy hàng</div>
+                </div>
+            </div>
+
+            <div class="rf-timeline-step" th:classappend="${ro.shipper != null} ? 'done' : ''" th:if="${ro.status != 'DA_TU_CHOI'}">
+                <div class="rf-timeline-dot">3</div>
+                <div class="rf-timeline-content">
+                    <b>Shipper nhận việc lấy hàng hoàn</b>
+                    <span th:if="${ro.shipper != null}" th:text="'Shipper: ' + ${ro.shipper.fullName}"></span>
+                    <span th:if="${ro.shipper == null}" style="color:#aaa;">Đang chờ shipper nhận</span>
+                </div>
+            </div>
+
+            <div class="rf-timeline-step" th:classappend="${ro.pickedDate != null} ? 'done' : ''" th:if="${ro.status != 'DA_TU_CHOI'}">
+                <div class="rf-timeline-dot">4</div>
+                <div class="rf-timeline-content">
+                    <b>Shipper đã lấy hàng hoàn thành công</b>
+                    <span th:if="${ro.pickedDate != null}" th:text="${#temporals.format(ro.pickedDate,'dd/MM/yyyy HH:mm')}"></span>
+                    <span th:if="${ro.pickedDate == null}" style="color:#aaa;">Chưa lấy hàng</span>
+                </div>
+            </div>
+
+            <div class="rf-timeline-step" th:classappend="${ro.restockedDate != null} ? 'done' : ''" th:if="${ro.status != 'DA_TU_CHOI'}">
+                <div class="rf-timeline-dot">5</div>
+                <div class="rf-timeline-content">
+                    <b>Hoàn về kho thành công — hoàn tất</b>
+                    <span th:if="${ro.restockedDate != null}" th:text="${#temporals.format(ro.restockedDate,'dd/MM/yyyy HH:mm')}"></span>
+                    <span th:if="${ro.restockedDate == null}" style="color:#aaa;">Chưa hoàn tất</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- THÔNG BÁO HOÀN TIỀN KHI ĐÃ HOÀN KHO -->
+    <div class="card refund-notice-box" th:if="${ro.status == 'HOAN_KHO'}">
+        <h3>💰 Hoàn tất — Chờ hoàn tiền</h3>
+        <p>
+            Kho đã nhận lại hàng thành công. Số tiền
+            <b th:text="${#numbers.formatDecimal(ro.refundAmount,0,'COMMA',0,'POINT')} + 'đ'"></b>
+            sẽ được hoàn về tài khoản ngân hàng bạn đã đăng ký trong vòng 24h.
+        </p>
+    </div>
+
+    <!-- LÝ DO HOÀN -->
+    <div class="card">
+        <h3>📝 Lý do hoàn hàng</h3>
+        <div class="info-row"><span>Lý do</span><b th:text="${ro.reason}"></b></div>
+        <div class="info-row" th:if="${ro.reasonNote != null and !ro.reasonNote.isEmpty()}"><span>Mô tả thêm</span><b th:text="${ro.reasonNote}"></b></div>
+        <div class="info-row"><span>Số tiền hoàn</span><b th:text="${#numbers.formatDecimal(ro.refundAmount,0,'COMMA',0,'POINT')} + 'đ'"></b></div>
+    </div>
+
+    <!-- SẢN PHẨM -->
+    <div class="card">
+        <h3>🛒 Sản phẩm trong đơn</h3>
+        <table>
+            <tr>
+                <th>Tên sản phẩm</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+                <th>Thành tiền</th>
+            </tr>
+            <tr th:each="i : ${items}">
+                <td class="product-name" th:text="${i.product.name}"></td>
+                <td th:text="${#numbers.formatDecimal(i.price,0,'COMMA',0,'POINT')} + 'đ'"></td>
+                <td th:text="${i.quantity}"></td>
+                <td class="price" th:text="${#numbers.formatDecimal(i.subtotal,0,'COMMA',0,'POINT')} + 'đ'"></td>
+            </tr>
+        </table>
+    </div>
+
+    <a th:href="@{/returns}" class="btn btn-back">← Quay lại danh sách đơn hoàn</a>
+
+</div>
+
+</body>
+</html>

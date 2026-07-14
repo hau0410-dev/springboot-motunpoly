@@ -49,6 +49,9 @@ public class ProfileController {
             user.setFullName(formUser.getFullName());
             user.setEmail(formUser.getEmail());
             user.setAvatar(formUser.getAvatar());
+            user.setBankName(formUser.getBankName());
+            user.setBankAccount(formUser.getBankAccount());
+            user.setBankHolder(formUser.getBankHolder());
 
             repo.save(user);
             redirect.addFlashAttribute("message", "Cập nhật thông tin thành công!");

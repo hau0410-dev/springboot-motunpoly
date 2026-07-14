@@ -319,3 +319,63 @@ tr:hover td{
         overflow-x: auto;
     }
 }
+
+/* ===== HUỶ ĐƠN ===== */
+.cancel-order-box{
+    border: 1px solid #fecdd3;
+    background: #fff1f2;
+}
+.cancel-order-box h3{
+    margin: 0 0 6px;
+    color: #be123c;
+    font-size: 16px;
+}
+.cancel-order-box p{
+    margin: 0 0 14px;
+    color: #9f1239;
+    font-size: 14px;
+}
+.btn-cancel-order{
+    background: #fff;
+    color: #be123c;
+    border: 2px solid #fecdd3;
+}
+.btn-cancel-order:hover{
+    background: #be123c;
+    color: #fff;
+    box-shadow: 0 6px 14px rgba(190,18,60,.25);
+}
+
+/* ===== BANNER HOÀN TIỀN ===== */
+.refund-notice-box{
+    border: 1px solid #fed7aa;
+    background: #fff7ed;
+}
+.refund-notice-box h3{
+    margin: 0 0 6px;
+    color: #c2410c;
+    font-size: 16px;
+}
+.refund-notice-box p{
+    margin: 0;
+    color: #9a3412;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* ===== YÊU CẦU HOÀN HÀNG ===== */
+.return-request-box h3{
+    margin: 0 0 6px;
+    color: #222;
+}
+.return-request-box p{
+    margin: 0 0 14px;
+    color: #666;
+    font-size: 14px;
+}
+.btn-return-request{
+    background: linear-gradient(135deg, #818cf8, #4f46e5);
+}
+.btn-return-request:hover{
+    box-shadow: 0 6px 14px rgba(79,70,229,.25);
+}

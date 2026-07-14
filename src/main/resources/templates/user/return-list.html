@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Đơn hoàn trả — MotunPoly</title>
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<link rel="stylesheet" th:href="@{/css/user-pages.css}">
+<link rel="stylesheet" th:href="@{/css/return-flow.css}">
+</head>
+<body>
+<div th:replace="layout/header :: header"></div>
+
+<div class="user-page-wrap">
+
+    <h2 class="user-page-title">↩️ Đơn hoàn trả của tôi</h2>
+
+    <div class="user-empty" th:if="${returns == null || returns.isEmpty()}">
+        Bạn chưa có yêu cầu hoàn hàng nào.
+        <a th:href="@{/orders}" class="user-empty-link">Xem lịch sử đơn hàng →</a>
+    </div>
+
+    <div class="user-table-wrap" th:if="${returns != null && !returns.isEmpty()}">
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>Mã hoàn</th>
+                    <th>Đơn gốc</th>
+                    <th>Lý do</th>
+                    <th>Số tiền hoàn</th>
+                    <th>Trạng thái</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="r : ${returns}">
+                    <td><b th:text="'#RH' + ${r.id}"></b></td>
+                    <td>#<span th:text="${r.order.id}"></span></td>
+                    <td style="font-size:13px;" th:text="${r.reason}"></td>
+                    <td class="u-price" th:text="${#numbers.formatDecimal(r.refundAmount,0,'COMMA',0,'POINT')} + 'đ'"></td>
+                    <td>
+                        <span th:if="${r.status == 'CHO_XAC_NHAN'}" class="u-badge u-badge-wait">⏳ Chờ xác nhận</span>
+                        <span th:if="${r.status == 'DA_TU_CHOI'}" class="u-badge u-badge-danger">❌ Bị từ chối</span>
+                        <span th:if="${r.status == 'DA_XAC_NHAN'}" class="u-badge u-badge-info">✅ Đã xác nhận</span>
+                        <span th:if="${r.status == 'DANG_LAY_HANG'}" class="u-badge u-badge-info">🛵 Đang lấy hàng</span>
+                        <span th:if="${r.status == 'DA_LAY_HANG'}" class="u-badge u-badge-info">📦 Đã lấy hàng</span>
+                        <span th:if="${r.status == 'HOAN_KHO'}" class="u-badge u-badge-ok">✅ Hoàn tất</span>
+                    </td>
+                    <td>
+                        <a th:href="@{/returns/{id}(id=${r.id})}" class="u-btn">Xem →</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<div th:replace="layout/footer"></div>
+</body>
+</html>

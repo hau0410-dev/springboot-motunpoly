@@ -21,8 +21,33 @@
         <span th:if="${order.status == 'DA_GIAO'}" class="badge badge-pending">📬 Chờ bạn xác nhận</span>
         <span th:if="${order.status == 'HOAN_THANH'}" class="badge badge-success">✅ Hoàn thành</span>
         <span th:if="${order.status == 'KHIEU_NAI'}" class="badge badge-danger">🚨 Đơn rủi ro</span>
-        <span th:unless="${order.status == 'CHO_XAC_NHAN' or order.status == 'CHO_LAY_HANG' or order.status == 'DANG_GIAO' or order.status == 'DA_GIAO' or order.status == 'HOAN_THANH' or order.status == 'KHIEU_NAI'}"
+        <span th:if="${order.status == 'DA_HUY'}" class="badge badge-muted">🛑 Đã huỷ</span>
+        <span th:if="${order.status == 'DA_HOAN_HANG'}" class="badge badge-info">↩️ Đã hoàn hàng</span>
+        <span th:unless="${order.status == 'CHO_XAC_NHAN' or order.status == 'CHO_LAY_HANG' or order.status == 'DANG_GIAO' or order.status == 'DA_GIAO' or order.status == 'HOAN_THANH' or order.status == 'KHIEU_NAI' or order.status == 'DA_HUY' or order.status == 'DA_HOAN_HANG'}"
               class="badge badge-muted" th:text="${order.status}"></span>
+    </div>
+
+    <!-- HUỶ ĐƠN (chỉ khi admin chưa xác nhận) -->
+    <div class="card cancel-order-box" th:if="${order.status == 'CHO_XAC_NHAN'}">
+        <h3>🛑 Bạn có thể huỷ đơn hàng này</h3>
+        <p>Đơn hàng chưa được người bán xác nhận, bạn có thể huỷ bất cứ lúc nào.</p>
+        <a th:href="@{/orders/cancel/{id}(id=${order.id})}"
+           onclick="return confirm('Bạn chắc chắn muốn huỷ đơn hàng này?')"
+           class="btn btn-cancel-order">🛑 Huỷ đơn hàng</a>
+    </div>
+
+    <!-- THÔNG BÁO HOÀN TIỀN (đơn đã CK thành công nhưng bị huỷ trước khi xác nhận) -->
+    <div class="card refund-notice-box"
+         th:if="${order.status == 'DA_HUY' and payment != null and payment.paymentMethod == 'BANKING' and (payment.paymentStatus == 'THANH_CONG' or payment.paymentStatus == 'DA_THANH_TOAN')}">
+        <h3>💰 Đơn hàng đã huỷ — Hoàn tiền</h3>
+        <p>
+            Bạn đã chuyển khoản thành công cho đơn này trước khi huỷ. Số tiền
+            <b th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></b>
+            sẽ được hoàn về tài khoản ngân hàng của bạn <b>trong vòng 24h</b> kể từ thời điểm bạn đã thanh toán.
+        </p>
+        <p style="margin-top:8px;font-size:13px;color:#888;">
+            Đảm bảo thông tin ngân hàng trong <a th:href="@{/profile}">Thông tin cá nhân</a> của bạn là chính xác để nhận hoàn tiền nhanh nhất.
+        </p>
     </div>
 
     <!-- THÔNG TIN ĐƠN HÀNG -->
@@ -168,6 +193,22 @@
 
         </div>
 
+    </div>
+
+    <!-- YÊU CẦU HOÀN HÀNG (trong vòng 3 ngày kể từ khi xác nhận đã nhận hàng) -->
+    <div class="card return-request-box" th:if="${order.status == 'HOAN_THANH'}">
+        <h3>↩️ Không hài lòng với sản phẩm?</h3>
+        <p th:if="${returnOrder == null}">
+            Bạn có thể yêu cầu hoàn hàng trong vòng 3 ngày kể từ khi xác nhận đã nhận hàng.
+        </p>
+        <a th:if="${returnOrder == null and returnEligible}"
+           th:href="@{/returns/new/{id}(id=${order.id})}" class="btn btn-return-request">↩️ Yêu cầu hoàn hàng</a>
+        <p th:if="${returnOrder == null and !returnEligible}" style="color:#c62828;font-size:13px;">
+            Đã quá hạn 3 ngày được yêu cầu hoàn hàng cho đơn này.
+        </p>
+        <a th:if="${returnOrder != null}" th:href="@{/returns/{id}(id=${returnOrder.id})}" class="btn btn-return-request">
+            📋 Xem yêu cầu hoàn hàng đã gửi
+        </a>
     </div>
 
     <a th:href="@{/orders}" class="btn btn-back">← Quay lại lịch sử đơn hàng</a>

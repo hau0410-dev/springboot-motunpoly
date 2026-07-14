@@ -11,9 +11,11 @@ import jakarta.servlet.http.HttpSession;
 import poly.edu.entity.Order;
 import poly.edu.entity.OrderItem;
 import poly.edu.entity.Payment;
+import poly.edu.entity.ReturnOrder;
 import poly.edu.entity.User;
 import poly.edu.repository.OrderItemRespository;
 import poly.edu.repository.OrderRepository;
+import poly.edu.repository.ReturnOrderRepository;
 import poly.edu.service.*;
 
 @Controller
@@ -30,6 +32,9 @@ public class UserOrderController {
     
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private ReturnOrderRepository returnOrderRepo;
 
     // ===== DANH SÁCH ĐƠN HÀNG =====
     @GetMapping
@@ -74,9 +79,42 @@ public class UserOrderController {
         model.addAttribute("order", order);
         model.addAttribute("items", items);
         model.addAttribute("payment", payment);
-        
+
+        // ===== Thông tin phục vụ khu vực "Yêu cầu hoàn hàng" =====
+        ReturnOrder returnOrder = returnOrderRepo.findByOrder_Id(id);
+        model.addAttribute("returnOrder", returnOrder);
+
+        boolean returnEligible = false;
+        if ("HOAN_THANH".equals(order.getStatus()) && order.getCompletedDate() != null) {
+            returnEligible = !java.time.LocalDateTime.now().isAfter(order.getCompletedDate().plusDays(3));
+        }
+        model.addAttribute("returnEligible", returnEligible);
 
         return "user/order-detail";
+    }
+
+    // ===== KHÁCH HUỶ ĐƠN (chỉ khi admin chưa xác nhận - CHO_XAC_NHAN) =====
+    @GetMapping("/cancel/{id}")
+    public String cancel(@PathVariable("id") Integer id, HttpSession session) {
+
+        User user = (User) session.getAttribute("user");
+
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        Order order = orderRepo.findById(id).orElse(null);
+
+        if (order != null
+                && order.getUser() != null
+                && order.getUser().getId().equals(user.getId())
+                && "CHO_XAC_NHAN".equals(order.getStatus())) {
+
+            order.setStatus("DA_HUY");
+            orderRepo.save(order);
+        }
+
+        return "redirect:/orders/" + id;
     }
 
     // ===== KHÁCH XÁC NHẬN ĐÃ NHẬN HÀNG: DA_GIAO -> HOAN_THANH =====
@@ -97,6 +135,7 @@ public class UserOrderController {
                 && "DA_GIAO".equals(order.getStatus())) {
 
             order.setStatus("HOAN_THANH");
+            order.setCompletedDate(java.time.LocalDateTime.now());
             orderRepo.save(order);
         }
 
