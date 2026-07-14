@@ -13,45 +13,116 @@
         <div th:replace="admin/layout/header :: header"></div>
         <div class="content-body">
 
-            <h2 class="page-title">💰 Quản lý doanh thu</h2>
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px;">
+                <h2 class="page-title" style="margin:0;">💰 Quản lý doanh thu</h2>
+                <a th:href="@{/admin/revenue/sync}" class="btn btn-primary" style="text-decoration:none;">
+                    🔄 Đồng bộ từ đơn hàng đã hoàn thành
+                </a>
+            </div>
 
             <!-- STAT ROW -->
             <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);">
                 <div class="stat-box">
-                    <div class="stat-num" th:text="${#numbers.formatDecimal(totalRevenue,0,'COMMA',0,'POINT')} + 'đ'">0đ</div>
-                    <div class="stat-label">Tổng doanh thu</div>
+                    <div class="stat-num" th:text="${#numbers.formatDecimal(totalRevenue != null ? totalRevenue : 0,0,'COMMA',0,'POINT')} + 'đ'">0đ</div>
+                    <div class="stat-label">💵 Tổng doanh thu (theo bộ lọc)</div>
                 </div>
                 <div class="stat-box" style="border-top-color:#0ea5e9">
-                    <div class="stat-num" th:text="${#numbers.formatDecimal(maxToday,0,'COMMA',0,'POINT')} + 'đ'">0đ</div>
-                    <div class="stat-label">Cao nhất hôm nay</div>
+                    <div class="stat-num" th:text="${#numbers.formatDecimal(maxInRange != null ? maxInRange : 0,0,'COMMA',0,'POINT')} + 'đ'">0đ</div>
+                    <div class="stat-label">📈 Đơn cao nhất</div>
                 </div>
                 <div class="stat-box" style="border-top-color:#16a34a">
-                    <div class="stat-num" th:text="${#numbers.formatDecimal(avgToday,0,'COMMA',0,'POINT')} + 'đ'">0đ</div>
-                    <div class="stat-label">Trung bình</div>
+                    <div class="stat-num" th:text="${#numbers.formatDecimal(avgInRange != null ? avgInRange : 0,0,'COMMA',0,'POINT')} + 'đ'">0đ</div>
+                    <div class="stat-label">📊 Trung bình / đơn</div>
                 </div>
             </div>
 
             <!-- FILTER -->
             <div class="card">
-                <div class="filter-bar">
-                    <form action="/admin/revenue/filter" style="display:flex;gap:8px;align-items:center;">
-                        <label style="font-weight:600;font-size:13px;">Ngày</label>
-                        <input type="date" name="date">
-                        <button type="submit" class="btn btn-primary">Lọc</button>
-                    </form>
-                    <form action="/admin/revenue/search" style="display:flex;gap:8px;align-items:center;">
-                        <label style="font-weight:600;font-size:13px;">Từ số tiền</label>
-                        <input type="number" name="amount" placeholder=">= VNĐ" style="width:160px;">
-                        <button type="submit" class="btn btn-primary">Tìm</button>
-                    </form>
-                </div>
+                <form method="get" action="/admin/revenue" id="filterForm">
+                    <div class="rf-filter-card">
+
+                        <!-- Chọn khoảng thời gian -->
+                        <div class="rf-row">
+                            <div class="rf-row-label">Khoảng TG</div>
+                            <div class="rf-pill-group">
+                                <a th:href="@{/admin/revenue(preset='all',groupBy=${groupBy})}"
+                                   class="rf-pill" th:classappend="${preset == 'all'} ? ' active'">Tất cả</a>
+                                <a th:href="@{/admin/revenue(preset='today',groupBy=${groupBy})}"
+                                   class="rf-pill" th:classappend="${preset == 'today'} ? ' active'">Hôm nay</a>
+                                <a th:href="@{/admin/revenue(preset='week',groupBy=${groupBy})}"
+                                   class="rf-pill" th:classappend="${preset == 'week'} ? ' active'">Tuần này</a>
+                                <a th:href="@{/admin/revenue(preset='month',groupBy=${groupBy})}"
+                                   class="rf-pill" th:classappend="${preset == 'month'} ? ' active'">Tháng này</a>
+                                <a th:href="@{/admin/revenue(preset='year',groupBy=${groupBy})}"
+                                   class="rf-pill" th:classappend="${preset == 'year'} ? ' active'">Năm này</a>
+                                <a href="#" onclick="showCustom(); return false;"
+                                   class="rf-pill" th:classappend="${preset == 'custom'} ? ' active'" id="customPill">Tuỳ chọn…</a>
+                            </div>
+                        </div>
+
+                        <!-- Khoảng ngày tuỳ chọn (chỉ hiện khi chọn "Tuỳ chọn") -->
+                        <div class="rf-row rf-custom-range" id="customRange" th:classappend="${preset == 'custom'} ? ' show'">
+                            <div class="rf-row-label"></div>
+                            <input type="hidden" name="preset" value="custom">
+                            <label style="font-size:13px;color:#888;">Từ</label>
+                            <input type="date" name="from" th:value="${fromParam}">
+                            <label style="font-size:13px;color:#888;">Đến</label>
+                            <input type="date" name="to" th:value="${toParam}">
+                        </div>
+
+                        <!-- Chọn cách gom nhóm biểu đồ -->
+                        <div class="rf-row">
+                            <div class="rf-row-label">Biểu đồ theo</div>
+                            <div class="rf-pill-group">
+                                <a th:href="@{/admin/revenue(preset=${preset},from=${fromParam},to=${toParam},groupBy='day')}"
+                                   class="rf-pill" th:classappend="${groupBy == 'day'} ? ' active'">Ngày</a>
+                                <a th:href="@{/admin/revenue(preset=${preset},from=${fromParam},to=${toParam},groupBy='week')}"
+                                   class="rf-pill" th:classappend="${groupBy == 'week'} ? ' active'">Tuần</a>
+                                <a th:href="@{/admin/revenue(preset=${preset},from=${fromParam},to=${toParam},groupBy='month')}"
+                                   class="rf-pill" th:classappend="${groupBy == 'month'} ? ' active'">Tháng</a>
+                                <a th:href="@{/admin/revenue(preset=${preset},from=${fromParam},to=${toParam},groupBy='year')}"
+                                   class="rf-pill" th:classappend="${groupBy == 'year'} ? ' active'">Năm</a>
+                            </div>
+                        </div>
+
+                        <!-- Lọc thêm theo số tiền tối thiểu (chỉ ảnh hưởng bảng danh sách) -->
+                        <div class="rf-row">
+                            <div class="rf-row-label">Từ số tiền</div>
+                            <input type="number" name="minAmount" class="rf-amount-input" placeholder=">= VNĐ" th:value="${minAmount}">
+                            <input type="hidden" name="groupBy" th:value="${groupBy}">
+                            <div class="rf-apply-row" style="flex:1;">
+                                <button type="submit" class="btn btn-primary">✅ Áp dụng</button>
+                                <a href="/admin/revenue" class="btn btn-secondary" style="text-decoration:none;">↺ Đặt lại</a>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
             </div>
 
             <div style="display:grid;grid-template-columns:1fr 300px;gap:22px;align-items:start;">
 
                 <div>
+                    <!-- CHART -->
+                    <div class="card" style="margin-bottom:22px;">
+                        <h3 style="margin:0 0 14px;font-size:15px;border-left:4px solid #f59e0b;padding-left:10px;">
+                            📊 Biểu đồ doanh thu
+                            (<span th:switch="${groupBy}">
+                                <span th:case="'week'">theo tuần</span>
+                                <span th:case="'month'">theo tháng</span>
+                                <span th:case="'year'">theo năm</span>
+                                <span th:case="*">theo ngày</span>
+                            </span>)
+                        </h3>
+                        <div th:if="${chartLabels == null or chartLabels.isEmpty()}"
+                             style="text-align:center;color:#aaa;padding:40px 0;font-size:14px;">
+                            Không có dữ liệu doanh thu trong khoảng thời gian này.
+                        </div>
+                        <canvas id="revenueChart" height="90" th:unless="${chartLabels == null or chartLabels.isEmpty()}"></canvas>
+                    </div>
+
                     <!-- TABLE -->
-                    <div class="table-wrap" style="margin-bottom:22px;">
+                    <div class="table-wrap">
                         <table>
                             <thead>
                                 <tr>
@@ -61,36 +132,42 @@
                             </thead>
                             <tbody>
                                 <tr th:each="r : ${revenues}">
-                                    <td th:text="${r.customerName}"></td>
-                                    <td th:text="${r.productName}"></td>
+                                    <td style="text-align:left;" th:text="${r.customerName}"></td>
+                                    <td style="text-align:left;" th:text="${r.productName}"></td>
                                     <td th:text="${#numbers.formatDecimal(r.price,0,'COMMA',0,'POINT')} + 'đ'"></td>
                                     <td th:text="${r.quantity}"></td>
                                     <td style="color:#16a34a;font-weight:700;" th:text="${#numbers.formatDecimal(r.subtotal,0,'COMMA',0,'POINT')} + 'đ'"></td>
-                                    <td th:text="${r.createdDate}"></td>
+                                    <td th:text="${r.createdDate != null ? #temporals.format(r.createdDate,'dd/MM/yyyy HH:mm') : '—'}"></td>
                                     <td>
                                         <a th:href="@{'/admin/revenue/delete/' + ${r.id}}" class="btn btn-sm btn-danger">🗑️</a>
                                     </td>
                                 </tr>
+                                <tr th:if="${revenues == null or revenues.isEmpty()}">
+                                    <td colspan="7" style="color:#aaa;padding:30px 0;">Chưa có dữ liệu.</td>
+                                </tr>
                             </tbody>
                         </table>
-                    </div>
-
-                    <!-- CHART -->
-                    <div class="card">
-                        <h3 style="margin:0 0 14px;font-size:15px;border-left:4px solid #f59e0b;padding-left:10px;">📊 Biểu đồ doanh thu</h3>
-                        <canvas id="revenueChart"></canvas>
                     </div>
                 </div>
 
                 <!-- TOP PRODUCTS -->
                 <div class="card">
-                    <h3 style="margin:0 0 14px;font-size:15px;border-left:4px solid #f59e0b;padding-left:10px;">🏆 Top sản phẩm</h3>
+                    <h3 style="margin:0 0 14px;font-size:15px;border-left:4px solid #f59e0b;padding-left:10px;">🏆 Top sản phẩm bán chạy</h3>
+                    <div style="font-size:11px;color:#aaa;margin:-10px 0 12px;">(theo đúng khoảng thời gian đang lọc ở trên)</div>
                     <table style="min-width:0;">
-                        <thead><tr><th style="text-align:left;">Sản phẩm</th><th>SL</th></tr></thead>
+                        <thead><tr><th style="text-align:left;">Sản phẩm</th><th>SL bán</th></tr></thead>
                         <tbody>
-                            <tr th:each="p : ${topProducts}">
-                                <td style="text-align:left;" th:text="${p[0]}"></td>
+                            <tr th:each="p, iStat : ${topProducts}">
+                                <td style="text-align:left;">
+                                    <span th:if="${iStat.index == 0}">🥇</span>
+                                    <span th:if="${iStat.index == 1}">🥈</span>
+                                    <span th:if="${iStat.index == 2}">🥉</span>
+                                    <span th:text="${p[0]}"></span>
+                                </td>
                                 <td><b th:text="${p[1]}"></b></td>
+                            </tr>
+                            <tr th:if="${topProducts == null or topProducts.isEmpty()}">
+                                <td colspan="2" style="color:#aaa;padding:20px 0;">Chưa có dữ liệu.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -106,25 +183,60 @@
     let labels = /*[[${chartLabels}]]*/ [];
     let data   = /*[[${chartData}]]*/  [];
 
-    new Chart(document.getElementById('revenueChart'), {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Doanh thu (đ)',
-                data: data,
-                backgroundColor: 'rgba(245,158,11,.7)',
-                borderColor: '#d97706',
-                borderWidth: 1,
-                borderRadius: 6
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
+    const ctx = document.getElementById('revenueChart');
+
+    if (ctx) {
+        const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(245,158,11,.35)');
+        gradient.addColorStop(1, 'rgba(245,158,11,0)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Doanh thu',
+                    data: data,
+                    fill: true,
+                    backgroundColor: gradient,
+                    borderColor: '#d97706',
+                    borderWidth: 2.5,
+                    pointBackgroundColor: '#d97706',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    tension: 0.35
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (item) => new Intl.NumberFormat('vi-VN').format(item.parsed.y) + 'đ'
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: (v) => new Intl.NumberFormat('vi-VN').format(v) + 'đ'
+                        },
+                        grid: { color: '#f0f0f0' }
+                    },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    function showCustom() {
+        document.getElementById('customRange').classList.add('show');
+        document.getElementById('customPill').classList.add('active');
+    }
 /*]]>*/
 </script>
 </body>

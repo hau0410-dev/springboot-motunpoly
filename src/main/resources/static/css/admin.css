@@ -447,3 +447,86 @@ tbody tr:last-child td { border-bottom: none; }
 .u-price, .price {
     white-space: nowrap;
 }
+
+/* ===== REVENUE FILTER PILLS ===== */
+.rf-filter-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.rf-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.rf-row-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    width: 90px;
+    flex-shrink: 0;
+}
+
+.rf-pill-group {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.rf-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1.5px solid #e5e7eb;
+    background: #fff;
+    color: #555;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all .15s;
+}
+.rf-pill:hover { border-color: #f59e0b; color: #d97706; }
+.rf-pill.active {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(245,158,11,.3);
+}
+
+.rf-custom-range {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.rf-custom-range.show { display: flex; }
+.rf-custom-range input[type="date"] {
+    padding: 8px 12px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.rf-amount-input {
+    padding: 8px 12px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 13px;
+    width: 150px;
+}
+
+.rf-apply-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 4px;
+    border-top: 1px solid #f0f0f0;
+}

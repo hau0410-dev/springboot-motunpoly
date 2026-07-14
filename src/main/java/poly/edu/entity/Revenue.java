@@ -23,6 +23,9 @@ public class Revenue {
 
     private LocalDateTime createdDate;
 
+    // Liên kết tới OrderItem gốc, dùng để đồng bộ kiểu cộng dồn (không tính trùng, không cần xoá sạch bảng)
+    private Integer orderItemId;
+
     // ===== Getter Setter =====
 
     public Integer getId() {
@@ -79,5 +82,13 @@ public class Revenue {
 
     public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public Integer getOrderItemId() {
+        return orderItemId;
+    }
+
+    public void setOrderItemId(Integer orderItemId) {
+        this.orderItemId = orderItemId;
     }
 }

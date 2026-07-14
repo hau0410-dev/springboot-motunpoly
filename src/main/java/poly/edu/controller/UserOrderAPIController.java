@@ -5,9 +5,11 @@ import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpSession;
 import poly.edu.entity.Order;
 import poly.edu.entity.OrderItem;
 import poly.edu.entity.Payment;
+import poly.edu.entity.User;
 import poly.edu.repository.OrderItemRespository;
 import poly.edu.repository.OrderRepository;
 import poly.edu.service.PaymentService;
@@ -27,9 +29,19 @@ public class UserOrderAPIController {
 
     // ===== POLLING TRẠNG THÁI THANH TOÁN (dùng ở trang chờ quét QR) =====
     @GetMapping("/{id}/payment-status")
-    public Map<String, Object> paymentStatus(@PathVariable("id") Integer id) {
+    public Map<String, Object> paymentStatus(@PathVariable("id") Integer id, HttpSession session) {
 
         Map<String, Object> data = new HashMap<>();
+
+        User user = (User) session.getAttribute("user");
+        Order order = orderRepo.findById(id).orElse(null);
+
+        // Chặn hỏi trạng thái thanh toán của đơn hàng người khác (kiểm tra quyền sở hữu)
+        if (user == null || order == null || order.getUser() == null
+                || !order.getUser().getId().equals(user.getId())) {
+            data.put("status", "KHONG_TIM_THAY");
+            return data;
+        }
 
         Payment payment = paymentService.findByOrderId(id);
 

@@ -55,6 +55,7 @@ public class RoleInterceptor implements HandlerInterceptor {
             || uri.startsWith("/cart/checkout")
             || uri.startsWith("/cart/pay")
             || uri.startsWith("/cart/buynow")
+            || uri.startsWith("/cart/payment-waiting")
             || uri.startsWith("/change-password");
 
         if (needLogin && user == null) {

@@ -8,64 +8,98 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import poly.edu.entity.Revenue;
-import java.time.LocalDate;
 
 public interface RevenueRepository extends JpaRepository<Revenue, Integer> {
 
-    @Query("SELECT SUM(r.subtotal) FROM Revenue r")
-    Double getTotalRevenue();
-
-    @Query("SELECT r FROM Revenue r WHERE r.subtotal >= :amount")
-    List<Revenue> searchByAmount(@Param("amount") Double amount);
-
-    // Doanh thu cao nhất hôm nay
+    // ===== DANH SÁCH DÒNG DOANH THU: lọc theo khoảng thời gian + số tiền tối thiểu (mọi tham số có thể NULL = bỏ qua điều kiện đó) =====
     @Query(value = """
-        SELECT MAX(subtotal)
-        FROM revenue
-        WHERE CAST(created_date AS DATE) = CAST(GETDATE() AS DATE)
+        SELECT * FROM revenue
+        WHERE (:from IS NULL OR created_date >= :from)
+          AND (:to IS NULL OR created_date < DATEADD(day, 1, :to))
+          AND (:minAmount IS NULL OR subtotal >= :minAmount)
+        ORDER BY created_date DESC
         """, nativeQuery = true)
-    Double getMaxToday();
+    List<Revenue> findFiltered(@Param("from") Date from, @Param("to") Date to, @Param("minAmount") Double minAmount);
 
-    // Doanh thu trung bình hôm nay
+    // ===== TỔNG / CAO NHẤT / TRUNG BÌNH TRONG KHOẢNG THỜI GIAN ĐANG LỌC =====
     @Query(value = """
-        SELECT AVG(subtotal)
-        FROM revenue
-        WHERE CAST(created_date AS DATE) = CAST(GETDATE() AS DATE)
+        SELECT SUM(subtotal) FROM revenue
+        WHERE (:from IS NULL OR created_date >= :from)
+          AND (:to IS NULL OR created_date < DATEADD(day, 1, :to))
         """, nativeQuery = true)
-    Double getAvgToday();
+    Double getTotalInRange(@Param("from") Date from, @Param("to") Date to);
 
-    // Lọc theo ngày
     @Query(value = """
-        SELECT * 
-        FROM revenue
-        WHERE CAST(created_date AS DATE) = :date
+        SELECT MAX(subtotal) FROM revenue
+        WHERE (:from IS NULL OR created_date >= :from)
+          AND (:to IS NULL OR created_date < DATEADD(day, 1, :to))
         """, nativeQuery = true)
-    List<Revenue> findByDate(@Param("date") Date sqlDate);
+    Double getMaxInRange(@Param("from") Date from, @Param("to") Date to);
 
-    // Ngày cho biểu đồ
     @Query(value = """
-            SELECT CAST(created_date AS DATE)
-            FROM revenue
-            GROUP BY CAST(created_date AS DATE)
-            ORDER BY CAST(created_date AS DATE)
-            """, nativeQuery = true)
-    List<LocalDate> getChartDates();
+        SELECT AVG(subtotal) FROM revenue
+        WHERE (:from IS NULL OR created_date >= :from)
+          AND (:to IS NULL OR created_date < DATEADD(day, 1, :to))
+        """, nativeQuery = true)
+    Double getAvgInRange(@Param("from") Date from, @Param("to") Date to);
 
-    // Tổng tiền theo ngày
+    // ===== DỮ LIỆU BIỂU ĐỒ: gom theo NGÀY =====
     @Query(value = """
-        SELECT SUM(subtotal)
+        SELECT CAST(created_date AS DATE) AS d, SUM(subtotal) AS total
         FROM revenue
+        WHERE (:from IS NULL OR created_date >= :from)
+          AND (:to IS NULL OR created_date < DATEADD(day, 1, :to))
         GROUP BY CAST(created_date AS DATE)
         ORDER BY CAST(created_date AS DATE)
         """, nativeQuery = true)
-    List<Double> getChartTotals();
+    List<Object[]> getChartByDay(@Param("from") Date from, @Param("to") Date to);
 
-    // Top sản phẩm bán chạy
+    // ===== DỮ LIỆU BIỂU ĐỒ: gom theo TUẦN (ISO week, tránh lệch năm) =====
+    @Query(value = """
+        SELECT YEAR(created_date) AS yr, DATEPART(iso_week, created_date) AS wk, SUM(subtotal) AS total
+        FROM revenue
+        WHERE (:from IS NULL OR created_date >= :from)
+          AND (:to IS NULL OR created_date < DATEADD(day, 1, :to))
+        GROUP BY YEAR(created_date), DATEPART(iso_week, created_date)
+        ORDER BY YEAR(created_date), DATEPART(iso_week, created_date)
+        """, nativeQuery = true)
+    List<Object[]> getChartByWeek(@Param("from") Date from, @Param("to") Date to);
+
+    // ===== DỮ LIỆU BIỂU ĐỒ: gom theo THÁNG =====
+    @Query(value = """
+        SELECT YEAR(created_date) AS yr, MONTH(created_date) AS mo, SUM(subtotal) AS total
+        FROM revenue
+        WHERE (:from IS NULL OR created_date >= :from)
+          AND (:to IS NULL OR created_date < DATEADD(day, 1, :to))
+        GROUP BY YEAR(created_date), MONTH(created_date)
+        ORDER BY YEAR(created_date), MONTH(created_date)
+        """, nativeQuery = true)
+    List<Object[]> getChartByMonth(@Param("from") Date from, @Param("to") Date to);
+
+    // ===== DỮ LIỆU BIỂU ĐỒ: gom theo NĂM =====
+    @Query(value = """
+        SELECT YEAR(created_date) AS yr, SUM(subtotal) AS total
+        FROM revenue
+        WHERE (:from IS NULL OR created_date >= :from)
+          AND (:to IS NULL OR created_date < DATEADD(day, 1, :to))
+        GROUP BY YEAR(created_date)
+        ORDER BY YEAR(created_date)
+        """, nativeQuery = true)
+    List<Object[]> getChartByYear(@Param("from") Date from, @Param("to") Date to);
+
+    // ===== TOP SẢN PHẨM BÁN CHẠY TRONG KHOẢNG THỜI GIAN ĐANG LỌC =====
     @Query(value = """
         SELECT product_name, SUM(quantity) as total_qty
         FROM revenue
+        WHERE (:from IS NULL OR created_date >= :from)
+          AND (:to IS NULL OR created_date < DATEADD(day, 1, :to))
         GROUP BY product_name
         ORDER BY total_qty DESC
         """, nativeQuery = true)
-    List<Object[]> getTopProducts();
+    List<Object[]> getTopProducts(@Param("from") Date from, @Param("to") Date to);
+
+    // Danh sách orderItemId đã được tính doanh thu rồi -> dùng để đồng bộ kiểu cộng dồn,
+    // tránh tính trùng và không cần xoá sạch bảng mỗi lần đồng bộ.
+    @Query("SELECT r.orderItemId FROM Revenue r WHERE r.orderItemId IS NOT NULL")
+    List<Integer> findAllSyncedOrderItemIds();
 }

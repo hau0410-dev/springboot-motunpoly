@@ -7,14 +7,85 @@
             <span>MotunPoly</span>
         </a>
 
-        <!-- SEARCH -->
+        <!-- SEARCH + BỘ LỌC TỔNG QUAN -->
         <div class="search-wrapper">
-            <form class="search-box" th:action="@{/}" method="get">
+            <form class="search-box" th:action="@{/}" method="get" id="mainSearchForm">
                 <input type="text" name="keyword"
                        placeholder="Tìm phụ tùng xe máy..."
                        th:value="${keyword}">
+
+                <!-- Giữ lại các điều kiện lọc đang chọn khi bấm tìm bằng từ khoá -->
+                <input type="hidden" name="category" th:value="${selectedCategory}">
+                <input type="hidden" name="min" th:value="${selectedMin}">
+                <input type="hidden" name="max" th:value="${selectedMax}">
+                <input type="hidden" name="brand" th:value="${selectedBrand}">
+                <input type="hidden" name="vehicleType" th:value="${selectedVehicleType}">
+
+                <button type="button" class="filter-toggle-btn" onclick="toggleFilterPanel(event)" title="Bộ lọc tổng quan">
+                    ⚙️ Lọc
+                </button>
                 <button type="submit">🔍</button>
             </form>
+
+            <!-- PANEL LỌC TỔNG QUAN -->
+            <div class="filter-panel" id="filterPanel">
+
+                <div class="filter-panel-row">
+                    <label>Danh mục</label>
+                    <select name="fp-category" id="fp-category">
+                        <option value="">-- Tất cả danh mục --</option>
+                        <option th:each="c : ${categories}"
+                                th:value="${c.id}"
+                                th:text="${c.name}"
+                                th:selected="${selectedCategory != null and selectedCategory == c.id}"></option>
+                    </select>
+                </div>
+
+                <div class="filter-panel-row">
+                    <label>Loại xe</label>
+                    <select name="fp-vehicleType" id="fp-vehicleType">
+                        <option value="">-- Tất cả loại xe --</option>
+                        <option value="Xe tay ga" th:selected="${selectedVehicleType == 'Xe tay ga'}">🛵 Xe tay ga</option>
+                        <option value="Xe số" th:selected="${selectedVehicleType == 'Xe số'}">🏍️ Xe số</option>
+                        <option value="Xe côn tay" th:selected="${selectedVehicleType == 'Xe côn tay'}">🔥 Xe côn tay</option>
+                        <option value="Xe phân khối lớn" th:selected="${selectedVehicleType == 'Xe phân khối lớn'}">🏁 Xe phân khối lớn</option>
+                    </select>
+                </div>
+
+                <div class="filter-panel-row">
+                    <label>Hãng xe</label>
+                    <select name="fp-brand" id="fp-brand">
+                        <option value="">-- Tất cả hãng --</option>
+                        <option value="Honda" th:selected="${selectedBrand == 'Honda'}">Honda</option>
+                        <option value="Yamaha" th:selected="${selectedBrand == 'Yamaha'}">Yamaha</option>
+                        <option value="Suzuki" th:selected="${selectedBrand == 'Suzuki'}">Suzuki</option>
+                        <option value="Kawasaki" th:selected="${selectedBrand == 'Kawasaki'}">Kawasaki</option>
+                        <option value="SYM" th:selected="${selectedBrand == 'SYM'}">SYM</option>
+                        <option value="Piaggio" th:selected="${selectedBrand == 'Piaggio'}">Piaggio</option>
+                        <option value="Đa hãng" th:selected="${selectedBrand == 'Đa hãng'}">Đa hãng</option>
+                    </select>
+                </div>
+
+                <div class="filter-panel-row">
+                    <label>Khoảng giá</label>
+                    <div class="filter-price-presets">
+                        <button type="button" onclick="setPriceRange(0,500000)">Dưới 500k</button>
+                        <button type="button" onclick="setPriceRange(500000,1000000)">500k - 1tr</button>
+                        <button type="button" onclick="setPriceRange(1000000,3000000)">1tr - 3tr</button>
+                        <button type="button" onclick="setPriceRange(3000000,null)">Trên 3tr</button>
+                    </div>
+                    <div class="filter-price-inputs">
+                        <input type="number" id="fp-min" placeholder="Từ (đ)" th:value="${selectedMin}">
+                        <span>—</span>
+                        <input type="number" id="fp-max" placeholder="Đến (đ)" th:value="${selectedMax}">
+                    </div>
+                </div>
+
+                <div class="filter-panel-actions">
+                    <a href="/" class="filter-reset-btn">↺ Xoá lọc</a>
+                    <button type="button" class="filter-apply-btn" onclick="applyFilterPanel()">✅ Áp dụng</button>
+                </div>
+            </div>
         </div>
 
         <!-- CART -->
@@ -54,3 +125,51 @@
 
     </div>
 </header>
+
+<script>
+    function toggleFilterPanel(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const panel = document.getElementById('filterPanel');
+        panel.classList.toggle('show');
+    }
+
+    function setPriceRange(min, max) {
+        document.getElementById('fp-min').value = min;
+        document.getElementById('fp-max').value = (max === null) ? '' : max;
+    }
+
+    function applyFilterPanel() {
+        const params = new URLSearchParams(window.location.search);
+
+        const keywordInput = document.querySelector('#mainSearchForm input[name="keyword"]');
+        const keyword = keywordInput ? keywordInput.value : '';
+
+        const category = document.getElementById('fp-category').value;
+        const vehicleType = document.getElementById('fp-vehicleType').value;
+        const brand = document.getElementById('fp-brand').value;
+        const min = document.getElementById('fp-min').value;
+        const max = document.getElementById('fp-max').value;
+
+        const url = new URL('/', window.location.origin);
+
+        if (keyword) url.searchParams.set('keyword', keyword);
+        if (category) url.searchParams.set('category', category);
+        if (vehicleType) url.searchParams.set('vehicleType', vehicleType);
+        if (brand) url.searchParams.set('brand', brand);
+        if (min) url.searchParams.set('min', min);
+        if (max) url.searchParams.set('max', max);
+
+        window.location.href = url.toString();
+    }
+
+    // Đóng panel khi bấm ra ngoài
+    document.addEventListener('click', function (e) {
+        const panel = document.getElementById('filterPanel');
+        const toggleBtn = document.querySelector('.filter-toggle-btn');
+        if (!panel) return;
+        if (!panel.contains(e.target) && e.target !== toggleBtn) {
+            panel.classList.remove('show');
+        }
+    });
+</script>

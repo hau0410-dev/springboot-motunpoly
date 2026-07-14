@@ -89,6 +89,9 @@ public class HomeController {
         model.addAttribute("selectedBrand", brand);
         model.addAttribute("selectedVehicleType", vehicleType);
         model.addAttribute("selectedPartsBrand", partsBrand);
+        model.addAttribute("selectedCategory", categoryId);   
+        model.addAttribute("selectedMin", min);                
+        model.addAttribute("selectedMax", max);                
         model.addAttribute("content", "home/index");
 
         model.addAttribute("promoMap", buildPromoMap(productPage.getContent(), session));

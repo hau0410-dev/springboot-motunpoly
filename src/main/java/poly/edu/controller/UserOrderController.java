@@ -53,9 +53,21 @@ public class UserOrderController {
 
     // ===== CHI TIẾT ĐƠN HÀNG =====
     @GetMapping("/{id}")
-    public String detail(@PathVariable("id") Integer id, Model model) {
+    public String detail(@PathVariable("id") Integer id, HttpSession session, Model model) {
+
+        User user = (User) session.getAttribute("user");
+
+        if (user == null) {
+            return "redirect:/login";
+        }
 
         Order order = orderRepo.findById(id).orElse(null);
+
+        // Chặn xem đơn hàng của người khác (kiểm tra quyền sở hữu)
+        if (order == null || order.getUser() == null || !order.getUser().getId().equals(user.getId())) {
+            return "redirect:/orders";
+        }
+
         List<OrderItem> items = orderItemRepo.findByOrderId(id);
         Payment payment = paymentService.findByOrderId(id);
 

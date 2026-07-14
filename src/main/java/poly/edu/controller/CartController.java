@@ -385,12 +385,19 @@ public class CartController {
 
     // ===== TRANG CHỜ THANH TOÁN QUA QR (SePay) =====
     @GetMapping("/payment-waiting/{orderId}")
-    public String paymentWaiting(@PathVariable("orderId") Integer orderId, Model model) {
+    public String paymentWaiting(@PathVariable("orderId") Integer orderId, HttpSession session, Model model) {
+
+        User user = (User) session.getAttribute("user");
+
+        if (user == null) {
+            return "redirect:/login";
+        }
 
         Order order = orderRepo.findById(orderId).orElse(null);
 
-        if (order == null) {
-            return "redirect:/";
+        // Chặn xem trang chờ thanh toán của đơn hàng người khác (kiểm tra quyền sở hữu)
+        if (order == null || order.getUser() == null || !order.getUser().getId().equals(user.getId())) {
+            return "redirect:/orders";
         }
 
         Payment payment = paymentService.findByOrderId(orderId);
