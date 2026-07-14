@@ -50,9 +50,10 @@
                             <tr>
                                 <td style="color:#888;">TT Thanh toán</td>
                                 <td>
-                                    <span th:if="${payment != null and payment.paymentStatus == 'DA_THANH_TOAN'}" class="badge badge-success">✅ Đã thanh toán</span>
-                                    <span th:if="${payment != null and payment.paymentStatus == 'CHO_THANH_TOAN'}" class="badge badge-pending">⏳ Chờ thanh toán</span>
-                                    <span th:if="${payment != null and payment.paymentStatus == 'CHO_XAC_NHAN'}" class="badge badge-info">🏦 Chờ xác nhận CK</span>
+                                    <span th:if="${payment != null and payment.paymentMethod == 'COD' and payment.paymentStatus == 'CHO_THANH_TOAN'}" class="badge badge-pending">💵 Chưa thanh toán (COD)</span>
+                                    <span th:if="${payment != null and payment.paymentMethod == 'COD' and (payment.paymentStatus == 'THANH_CONG' or payment.paymentStatus == 'DA_THANH_TOAN')}" class="badge badge-success">✅ Đã thu tiền COD</span>
+                                    <span th:if="${payment != null and payment.paymentMethod == 'BANKING' and (payment.paymentStatus == 'CHO_THANH_TOAN' or payment.paymentStatus == 'CHO_XAC_NHAN')}" class="badge badge-info">🏦 Chờ chuyển khoản</span>
+                                    <span th:if="${payment != null and payment.paymentMethod == 'BANKING' and (payment.paymentStatus == 'THANH_CONG' or payment.paymentStatus == 'DA_THANH_TOAN')}" class="badge badge-success">✅ Đã chuyển khoản</span>
                                     <span th:if="${payment == null}" class="badge badge-muted">—</span>
                                 </td>
                             </tr>
@@ -73,12 +74,14 @@
                          style="margin-top:14px;padding:12px;background:#fff8f5;border:1px solid #ffe0d6;border-radius:10px;">
                         <p style="margin:4px 0;font-size:13px;"><b style="color:#d97706;">🏦 Ngân hàng khách:</b> <span th:text="${payment.customerBank}"></span></p>
                         <p style="margin:4px 0;font-size:13px;"><b style="color:#d97706;">STK khách:</b> <span th:text="${payment.customerAccount}"></span></p>
+                        <p th:if="${payment.paymentContent != null}" style="margin:4px 0;font-size:13px;"><b style="color:#d97706;">Mã nội dung CK:</b> <span th:text="${payment.paymentContent}"></span></p>
+                        <p th:if="${payment.transactionId != null}" style="margin:4px 0;font-size:13px;"><b style="color:#d97706;">Mã GD SePay:</b> <span th:text="${payment.transactionId}"></span></p>
                     </div>
                 </div>
             </div>
 
             <!-- ACTIONS -->
-            <div class="card" style="margin-bottom:22px;" th:if="${order.status == 'CHO_XAC_NHAN' or order.status == 'KHIEU_NAI' or (payment != null and payment.paymentStatus == 'CHO_XAC_NHAN')}">
+            <div class="card" style="margin-bottom:22px;" th:if="${order.status == 'CHO_XAC_NHAN' or order.status == 'KHIEU_NAI' or (payment != null and (payment.paymentStatus == 'CHO_THANH_TOAN' or payment.paymentStatus == 'CHO_XAC_NHAN'))}">
                 <div style="display:flex;gap:12px;flex-wrap:wrap;">
                     <a th:if="${order.status == 'CHO_XAC_NHAN'}"
                        th:href="@{/admin/orders/update/{id}(id=${order.id})}"
@@ -86,9 +89,12 @@
                     <a th:if="${order.status == 'KHIEU_NAI'}"
                        th:href="@{/admin/orders/resolve/{id}(id=${order.id})}"
                        class="btn btn-primary">🔁 Xử lý đơn rủi ro (giao lại)</a>
-                    <a th:if="${payment != null and payment.paymentStatus == 'CHO_XAC_NHAN'}"
+                    <a th:if="${payment != null and payment.paymentMethod == 'BANKING' and (payment.paymentStatus == 'CHO_THANH_TOAN' or payment.paymentStatus == 'CHO_XAC_NHAN')}"
                        th:href="@{/admin/orders/confirm-payment/{id}(id=${order.id})}"
                        class="btn btn-primary">✅ Xác nhận đã nhận tiền CK</a>
+                    <a th:if="${payment != null and payment.paymentMethod == 'COD' and payment.paymentStatus == 'CHO_THANH_TOAN'}"
+                       th:href="@{/admin/orders/confirm-payment/{id}(id=${order.id})}"
+                       class="btn btn-primary">💵 Xác nhận đã thu tiền COD</a>
                 </div>
             </div>
 

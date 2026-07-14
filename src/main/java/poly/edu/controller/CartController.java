@@ -3,6 +3,7 @@ package poly.edu.controller;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +21,7 @@ import poly.edu.entity.User;
 import poly.edu.model.Cart;
 import poly.edu.model.CartItem;
 import poly.edu.repository.OrderItemRespository;
+import poly.edu.repository.OrderRepository;
 import poly.edu.service.OrderService;
 import poly.edu.service.ProductService;
 
@@ -35,14 +37,25 @@ public class CartController {
     @Autowired
     private OrderService orderService;
 
-    
     @Autowired
     private OrderItemRespository orderItemRepo;
-    
+
     @Autowired
     private PaymentService paymentService;
-    
-    
+
+    @Autowired
+    private OrderRepository orderRepo;
+
+    @Value("${sepay.bank.account}")
+    private String bankAccount;
+
+    @Value("${sepay.bank.name}")
+    private String bankName;
+
+    @Value("${sepay.bank.holder}")
+    private String bankHolder;
+
+
     @GetMapping
     public String viewCart(HttpSession session, Model model) {
         Cart cart = (Cart) session.getAttribute("cart");
@@ -75,7 +88,6 @@ public class CartController {
             return "redirect:/";
         }
 
-        // ===== KIỂM TRA TỒN KHO =====
         if (p.getStock() == null) {
             p.setStock(0);
         }
@@ -101,7 +113,7 @@ public class CartController {
 
         return "redirect:/cart";
     }
-    // ===== MUA NGAY (tách riêng khỏi giỏ hàng) =====
+
     @PostMapping("/buynow/{id}")
     public String buyNow(
             @PathVariable("id") Integer id,
@@ -157,10 +169,8 @@ public class CartController {
             cart.remove(id);
         }
         return "redirect:/cart";
-        
     }
 
-    // ===== TĂNG / GIẢM SỐ LƯỢNG SẢN PHẨM TRONG GIỎ =====
     @PostMapping("/update/{id}")
     public String updateQuantity(
             @PathVariable("id") Integer id,
@@ -177,7 +187,6 @@ public class CartController {
             qty = 1;
         }
 
-        // ===== KIỂM TRA TỒN KHO =====
         Product p = productService.findById(id);
 
         if (p != null) {
@@ -202,6 +211,7 @@ public class CartController {
 
         return "redirect:/cart";
     }
+
     @GetMapping("/checkout")
     public String checkout(
             @RequestParam(value = "mode", required = false) String mode,
@@ -229,7 +239,6 @@ public class CartController {
         model.addAttribute("cart", cart);
         model.addAttribute("mode", mode);
 
-        // ===== GỢI Ý ĐIỀN SẴN THÔNG TIN CHUYỂN KHOẢN (theo user đăng nhập) =====
         User user = (User) session.getAttribute("user");
         if (user != null) {
             Payment lastBanking = paymentService.findLastBankingInfo(user.getId());
@@ -243,6 +252,7 @@ public class CartController {
 
         return "cart/checkout";
     }
+
     @PostMapping("/pay")
     public String pay(
     		@RequestParam("paymentMethod") String paymentMethod,
@@ -262,7 +272,6 @@ public class CartController {
         if (cart == null || cart.isEmpty()) {
             return isBuyNow ? "redirect:/" : "redirect:/cart";
         }
-     // ===== KIỂM TRA TOÀN BỘ TỒN KHO TRƯỚC =====
 
         for (CartItem c : cart.getItems()) {
 
@@ -296,9 +305,9 @@ public class CartController {
                 return isBuyNow ? "redirect:/" : "redirect:/cart";
             }
         }
-        
+
         // ===== 1. TẠO ORDER =====
-        
+
         Order order = new Order();
 
         User user = (User) session.getAttribute("user");
@@ -314,10 +323,9 @@ public class CartController {
         order.setTotalAmount(cart.getTotalAmount());
         order.setStatus("CHO_XAC_NHAN");
         order.setCreatedDate(LocalDateTime.now());
-       
 
         orderService.save(order);
-        
+
         Payment payment = new Payment();
 
         payment.setOrder(order);
@@ -328,23 +336,23 @@ public class CartController {
         }
 
         if("BANKING".equals(paymentMethod)){
-            payment.setPaymentStatus("CHO_XAC_NHAN");
+            payment.setPaymentStatus("CHO_THANH_TOAN");
             payment.setCustomerBank(customerBank);
             payment.setCustomerAccount(customerAccount);
+            // order.getId() đã có giá trị ngay sau orderService.save() (GenerationType.IDENTITY)
+            payment.setPaymentContent("DH" + order.getId());
         }
 
         payment.setPaymentDate(LocalDateTime.now());
 
         paymentService.save(payment);
-        
+
         for (CartItem c : cart.getItems()) {
 
             OrderItem item = new OrderItem();
 
             Product product =
                     productService.findById(c.getProductId());
-
-            // ===== TRỪ TỒN KHO =====
 
             product.setStock(
                     product.getStock() - c.getQuantity()
@@ -357,7 +365,6 @@ public class CartController {
             item.setQuantity(c.getQuantity());
             item.setPrice(c.getPrice());
             item.setSubtotal(c.getQuantity() * c.getPrice());
-            
 
             orderItemRepo.save(item);
         }
@@ -368,7 +375,37 @@ public class CartController {
             session.removeAttribute("cart");
         }
 
+        // ===== BANKING: đưa khách sang trang chờ quét QR thay vì báo thành công ngay =====
+        if ("BANKING".equals(paymentMethod)) {
+            return "redirect:/cart/payment-waiting/" + order.getId();
+        }
+
         return "cart/success";
+    }
+
+    // ===== TRANG CHỜ THANH TOÁN QUA QR (SePay) =====
+    @GetMapping("/payment-waiting/{orderId}")
+    public String paymentWaiting(@PathVariable("orderId") Integer orderId, Model model) {
+
+        Order order = orderRepo.findById(orderId).orElse(null);
+
+        if (order == null) {
+            return "redirect:/";
+        }
+
+        Payment payment = paymentService.findByOrderId(orderId);
+
+        if (payment != null && "THANH_CONG".equals(payment.getPaymentStatus())) {
+            return "redirect:/orders/" + orderId;
+        }
+
+        model.addAttribute("order", order);
+        model.addAttribute("payment", payment);
+        model.addAttribute("bankAccount", bankAccount);
+        model.addAttribute("bankName", bankName);
+        model.addAttribute("bankHolder", bankHolder);
+
+        return "cart/payment-waiting";
     }
 
 }

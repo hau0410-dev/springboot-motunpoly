@@ -51,24 +51,22 @@ public class AdminOrderController {
     // ===== CHI TIẾT ĐƠN HÀNG =====
     @GetMapping("/{id}")
     public String orderDetail(@PathVariable("id") Integer id, Model model) {
-    	
-    	
-    	
-        Order order = 
+
+        Order order =
         		orderService.findById(id);
-        
-        List<OrderItem> items = 
+
+        List<OrderItem> items =
         		orderItemRepo.findByOrderId(id);
-        
+
         Payment payment =
                 paymentService.findByOrderId(id);
-        
+
         model.addAttribute("order", order);
         model.addAttribute("items", items);
         model.addAttribute("payment", payment);
-        
+
         return "admin/order-detail";
-        
+
     }
 
     // ===== ADMIN XÁC NHẬN ĐƠN: CHO_XAC_NHAN -> CHO_LAY_HANG =====
@@ -99,6 +97,8 @@ public class AdminOrderController {
 
         return "redirect:/admin/orders/" + id;
     }
+
+    // ===== ADMIN XÁC NHẬN ĐÃ NHẬN TIỀN (BANKING: xác nhận CK / COD: xác nhận đã thu hộ) =====
     @GetMapping("/confirm-payment/{id}")
     public String confirmPayment(
             @PathVariable("id") Integer id) {
@@ -106,7 +106,7 @@ public class AdminOrderController {
         Payment payment = paymentService.findByOrderId(id);
 
         if (payment != null) {
-            payment.setPaymentStatus("DA_THANH_TOAN");
+            payment.setPaymentStatus("THANH_CONG");
             paymentService.save(payment);
         }
 

@@ -14,6 +14,34 @@
 
             <h2 class="page-title">🏠 Dashboard</h2>
 
+            <!-- ===== BANNER THÔNG BÁO ĐƠN HÀNG MỚI ===== -->
+            <div class="new-order-banner" th:if="${newOrders != null and !newOrders.isEmpty()}">
+                <div class="new-order-banner-head" th:onclick="|location.href='@{/admin/orders}'|">
+                    <span class="new-order-banner-icon">🔔</span>
+                    <span class="new-order-banner-title">
+                        Bạn có <b th:text="${newOrders.size()}"></b> đơn hàng mới vừa đặt — đang chờ xác nhận
+                    </span>
+                    <span class="new-order-banner-arrow">Xem lịch sử đặt hàng →</span>
+                </div>
+
+                <div class="new-order-banner-list">
+                    <div class="new-order-item" th:each="o : ${newOrders}">
+                        <div class="new-order-item-info" th:onclick="|location.href='@{/admin/orders/{id}(id=${o.id})}'|">
+                            <b th:text="'#' + ${o.id} + ' — ' + ${o.fullname}"></b>
+                            <span th:text="${#numbers.formatDecimal(o.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></span>
+                        </div>
+                        <div class="new-order-item-actions">
+                            <a th:href="@{/admin/orders/update/{id}(id=${o.id})}"
+                               class="btn btn-sm btn-primary"
+                               onclick="event.stopPropagation()">✅ Đổi trạng thái sang đã xác nhận</a>
+                            <a th:href="@{/admin/orders/{id}(id=${o.id})}"
+                               class="btn btn-sm btn-secondary"
+                               onclick="event.stopPropagation()">👁 Xem chi tiết đơn</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="stat-grid">
                 <div class="stat-box">
                     <div class="stat-num" th:text="${totalProducts ?: 0}">0</div>

@@ -84,6 +84,13 @@
 .u-badge-wait    { background: #fefce8; color: #92400e; border: 1px solid #fde68a; }
 .u-badge-info    { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
 .u-badge-danger  { background: #fff1f2; color: #be123c; border: 1px solid #fecdd3; }
+
+.u-shipper-mini {
+    margin-top: 6px;
+    font-size: 11px;
+    color: #2563eb;
+    font-weight: 600;
+}
 .u-badge-muted   { background: #f9fafb; color: #9ca3af; border: 1px solid #e5e7eb; }
 
 /* BUTTON */

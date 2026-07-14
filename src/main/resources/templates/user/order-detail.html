@@ -11,7 +11,7 @@
 
 <div class="order-detail-page">
 
-    <!-- TIÊU ĐỀ -->
+    <!-- TIÊU ĐỀ -->	
     <div class="order-detail-header">
         <h2>🧾 Chi tiết đơn hàng <span th:text="'#' + ${order.id}"></span></h2>
 
@@ -47,14 +47,17 @@
             <div class="info-row">
                 <span>Trạng thái thanh toán</span>
 
-                <span th:if="${payment != null and payment.paymentStatus == 'CHO_THANH_TOAN'}"
-                      class="badge badge-pending">⏳ Chờ thanh toán</span>
+                <span th:if="${payment != null and payment.paymentMethod == 'COD' and payment.paymentStatus == 'CHO_THANH_TOAN'}"
+                      class="badge badge-pending">💵 Chưa thanh toán (COD)</span>
 
-                <span th:if="${payment != null and payment.paymentStatus == 'DA_THANH_TOAN'}"
-                      class="badge badge-success">✅ Đã thanh toán</span>
+                <span th:if="${payment != null and payment.paymentMethod == 'COD' and (payment.paymentStatus == 'THANH_CONG' or payment.paymentStatus == 'DA_THANH_TOAN')}"
+                      class="badge badge-success">✅ Đã thu tiền COD</span>
 
-                <span th:if="${payment != null and payment.paymentStatus == 'CHO_XAC_NHAN'}"
-                      class="badge badge-info">🏦 Chờ xác nhận chuyển khoản</span>
+                <span th:if="${payment != null and payment.paymentMethod == 'BANKING' and (payment.paymentStatus == 'CHO_THANH_TOAN' or payment.paymentStatus == 'CHO_XAC_NHAN')}"
+                      class="badge badge-info">🏦 Chờ chuyển khoản</span>
+
+                <span th:if="${payment != null and payment.paymentMethod == 'BANKING' and (payment.paymentStatus == 'THANH_CONG' or payment.paymentStatus == 'DA_THANH_TOAN')}"
+                      class="badge badge-success">✅ Đã chuyển khoản</span>
 
                 <span th:if="${payment == null}" class="badge badge-muted">Chưa có</span>
             </div>
@@ -64,7 +67,6 @@
                 <b th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></b>
             </div>
         </div>
-
     </div>
 
     <!-- SẢN PHẨM -->
@@ -86,6 +88,21 @@
                 <td class="price" th:text="${#numbers.formatDecimal(i.subtotal,0,'COMMA',0,'POINT')} + 'đ'"></td>
             </tr>
         </table>
+    </div>
+
+    <!-- THÔNG TIN SHIPPER (khi đơn đang được giao) -->
+    <div class="card shipper-info-card" th:if="${order.status == 'DANG_GIAO' and order.shipper != null}">
+        <h3>🚚 Thông tin người giao hàng</h3>
+        <div class="shipper-info-row">
+            <img class="shipper-avatar"
+                 th:src="@{/imges/{img}(img=${order.shipper.avatar != null ? order.shipper.avatar : 'avatar.png'})}"
+                 alt="shipper avatar">
+            <div class="shipper-info-text">
+                <div class="info-row"><span>Shipper</span><b th:text="${order.shipper.fullName}"></b></div>
+                <div class="info-row" th:if="${order.shipper.email != null}"><span>Email liên hệ</span><b th:text="${order.shipper.email}"></b></div>
+                <div class="shipper-note">📦 Đơn hàng của bạn đang trên đường giao đến, vui lòng để ý điện thoại nhé!</div>
+            </div>
+        </div>
     </div>
 
     <!-- XÁC NHẬN GIAO HÀNG (khi shipper báo đã giao, chờ khách xác nhận) -->

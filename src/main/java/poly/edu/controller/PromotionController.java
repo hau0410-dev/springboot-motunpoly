@@ -38,8 +38,7 @@ public class PromotionController {
 
         model.addAttribute("totalSpent", totalSpent);
         model.addAttribute("promotions", promotions);
-        model.addAttribute("content", "user/promotions");
 
-        return "layout/main";
+        return "user/promotions";
     }
 }

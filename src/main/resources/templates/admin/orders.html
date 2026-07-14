@@ -54,9 +54,10 @@
                             <td style="color:#d97706;font-weight:700;"
                                 th:text="${#numbers.formatDecimal(o.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></td>
                             <td>
-                                <span th:if="${o.payment != null and o.payment.paymentStatus == 'DA_THANH_TOAN'}" class="badge badge-success">✅ Đã TT</span>
-                                <span th:if="${o.payment != null and o.payment.paymentStatus == 'CHO_THANH_TOAN'}" class="badge badge-pending">⏳ Chờ TT</span>
-                                <span th:if="${o.payment != null and o.payment.paymentStatus == 'CHO_XAC_NHAN'}" class="badge badge-info">🏦 Chờ XN CK</span>
+                                <span th:if="${o.payment != null and o.payment.paymentMethod == 'COD' and o.payment.paymentStatus == 'CHO_THANH_TOAN'}" class="badge badge-pending">💵 Chưa TT (COD)</span>
+                                <span th:if="${o.payment != null and o.payment.paymentMethod == 'COD' and (o.payment.paymentStatus == 'THANH_CONG' or o.payment.paymentStatus == 'DA_THANH_TOAN')}" class="badge badge-success">✅ Đã thu COD</span>
+                                <span th:if="${o.payment != null and o.payment.paymentMethod == 'BANKING' and (o.payment.paymentStatus == 'CHO_THANH_TOAN' or o.payment.paymentStatus == 'CHO_XAC_NHAN')}" class="badge badge-info">🏦 Chờ CK</span>
+                                <span th:if="${o.payment != null and o.payment.paymentMethod == 'BANKING' and (o.payment.paymentStatus == 'THANH_CONG' or o.payment.paymentStatus == 'DA_THANH_TOAN')}" class="badge badge-success">✅ Đã CK</span>
                                 <span th:if="${o.payment == null}" class="badge badge-muted">—</span>
                             </td>
                             <td>

@@ -292,6 +292,83 @@ tbody tr:last-child td { border-bottom: none; }
 .badge-danger   { background:#fef2f2; color:#dc2626; }
 .badge-muted    { background:#f0f0f0; color:#888; }
 
+/* ===== BANNER THÔNG BÁO ĐƠN HÀNG MỚI ===== */
+.new-order-banner {
+    background: linear-gradient(135deg, #fff7ed, #fffbeb);
+    border: 1px solid #fcd34d;
+    border-left: 5px solid #f59e0b;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(245,158,11,.08);
+    animation: newOrderPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes newOrderPulse {
+    0%, 100% { box-shadow: 0 2px 8px rgba(245,158,11,.08); }
+    50% { box-shadow: 0 2px 16px rgba(245,158,11,.28); }
+}
+
+.new-order-banner-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    cursor: pointer;
+}
+
+.new-order-banner-icon { font-size: 22px; }
+
+.new-order-banner-title {
+    flex: 1;
+    font-size: 14px;
+    color: #92400e;
+}
+
+.new-order-banner-title b { color: #b45309; font-size: 16px; }
+
+.new-order-banner-arrow {
+    font-size: 12px;
+    font-weight: 700;
+    color: #b45309;
+    white-space: nowrap;
+}
+
+.new-order-banner-list {
+    border-top: 1px dashed #fcd34d;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.new-order-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 18px;
+    border-bottom: 1px solid #fef3c7;
+    flex-wrap: wrap;
+    background: #fff;
+}
+
+.new-order-item:last-child { border-bottom: none; }
+
+.new-order-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    cursor: pointer;
+}
+
+.new-order-item-info b { font-size: 13px; color: #222; }
+.new-order-item-info span { font-size: 12px; color: #d97706; font-weight: 700; }
+
+.new-order-item-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
 /* ===== STAT BOXES (dashboard) ===== */
 .stat-grid {
     display: grid;

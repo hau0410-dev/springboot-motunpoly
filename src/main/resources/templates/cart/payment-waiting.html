@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quét mã QR để thanh toán — MotunPoly</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/cart.css}">
+</head>
+<body>
+<div th:replace="layout/header :: header"></div>
+
+<div class="pw-wrap">
+
+    <!-- ===== KHỐI CHỜ THANH TOÁN ===== -->
+    <div class="pw-card" id="waitingBlock">
+
+        <div class="pw-order-id">Đơn hàng #<span th:text="${order.id}"></span></div>
+        <div class="pw-amount" th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></div>
+
+        <div class="pw-qr-frame">
+            <span class="pw-qr-corner tl"></span>
+            <span class="pw-qr-corner tr"></span>
+            <span class="pw-qr-corner bl"></span>
+            <span class="pw-qr-corner br"></span>
+            <img th:src="@{https://vietqr.app/img(acc=${bankAccount},bank=${bankName},amount=${order.totalAmount},des=${payment.paymentContent},template='qronly')}"
+                 alt="Mã QR thanh toán SePay">
+        </div>
+
+        <div class="pw-info">
+            <div class="pw-info-row">
+                <span>Ngân hàng</span>
+                <span class="pw-info-value" th:text="${bankName}"></span>
+            </div>
+            <div class="pw-info-row">
+                <span>Chủ tài khoản</span>
+                <span class="pw-info-value" th:text="${bankHolder}"></span>
+            </div>
+            <div class="pw-info-row">
+                <span>Số tài khoản</span>
+                <span class="pw-info-value">
+                    <span th:text="${bankAccount}" id="accVal"></span>
+                    <button type="button" class="pw-copy-btn" onclick="copyText('accVal', this)" title="Sao chép">📋</button>
+                </span>
+            </div>
+            <div class="pw-info-row pw-highlight">
+                <span>Nội dung CK</span>
+                <span class="pw-info-value">
+                    <span th:text="${payment.paymentContent}" id="contentVal"></span>
+                    <button type="button" class="pw-copy-btn" onclick="copyText('contentVal', this)" title="Sao chép">📋</button>
+                </span>
+            </div>
+        </div>
+
+        <div class="pw-hint">
+            📱 Mở app ngân hàng, quét mã QR — nội dung và số tiền đã tự điền sẵn.<br>
+            <b>Giữ nguyên nội dung chuyển khoản</b> để hệ thống tự xác nhận đơn hàng.
+        </div>
+
+        <div class="pw-status-box">
+            <span class="pw-spinner"></span>
+            <span>Đang chờ thanh toán</span>
+            <span class="pw-timer" id="timer">15:00</span>
+        </div>
+    </div>
+
+    <!-- ===== KHỐI THÀNH CÔNG (ẩn, JS sẽ hiện lên khi webhook báo thành công) ===== -->
+    <div class="success-page pw-success-pop" id="successBlock" style="display:none;margin:0;">
+        <div class="success-check">✓</div>
+        <h2>Thanh toán thành công!</h2>
+        <p>Đơn hàng #<span th:text="${order.id}"></span> đã được xác nhận thanh toán. Cảm ơn bạn đã tin tưởng MotunPoly.</p>
+        <div class="success-actions">
+            <a href="/" class="btn-success-primary">🏠 Tiếp tục mua sắm</a>
+            <a th:href="@{/orders/{id}(id=${order.id})}" class="btn-success-outline">📦 Xem đơn hàng</a>
+        </div>
+    </div>
+
+</div>
+
+<div th:replace="layout/footer"></div>
+
+<script th:inline="javascript">
+    const orderId = /*[[${order.id}]]*/ 0;
+    let pollTimer = null;
+    let secondsLeft = 15 * 60; // đếm ngược 15 phút, chỉ mang tính hiển thị
+
+    function formatTime(s) {
+        const m = Math.floor(s / 60);
+        const sec = s % 60;
+        return String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+    }
+
+    function tickTimer() {
+        if (secondsLeft <= 0) return;
+        secondsLeft--;
+        const el = document.getElementById('timer');
+        if (el) el.textContent = formatTime(secondsLeft);
+    }
+
+    function copyText(elId, btn) {
+        const text = document.getElementById(elId).textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            const original = btn.textContent;
+            btn.textContent = '✓';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = original;
+                btn.classList.remove('copied');
+            }, 1200);
+        });
+    }
+
+    function checkPaymentStatus() {
+        fetch('/api/orders/' + orderId + '/payment-status')
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'THANH_CONG') {
+                    clearInterval(pollTimer);
+                    document.getElementById('waitingBlock').style.display = 'none';
+                    document.getElementById('successBlock').style.display = 'block';
+                }
+            })
+            .catch(err => console.error('Lỗi kiểm tra trạng thái thanh toán:', err));
+    }
+
+    checkPaymentStatus();
+    pollTimer = setInterval(checkPaymentStatus, 3000);
+    setInterval(tickTimer, 1000);
+</script>
+
+</body>
+</html>

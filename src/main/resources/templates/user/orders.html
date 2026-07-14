@@ -38,9 +38,10 @@
                     <td class="u-price" th:text="${#numbers.formatDecimal(o.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></td>
                     <td style="font-size:13px;" th:text="${o.payment != null ? o.payment.paymentMethod : '—'}"></td>
                     <td>
-                        <span th:if="${o.payment != null and o.payment.paymentStatus == 'DA_THANH_TOAN'}" class="u-badge u-badge-ok">✅ Đã TT</span>
-                        <span th:if="${o.payment != null and o.payment.paymentStatus == 'CHO_THANH_TOAN'}" class="u-badge u-badge-wait">⏳ Chờ TT</span>
-                        <span th:if="${o.payment != null and o.payment.paymentStatus == 'CHO_XAC_NHAN'}" class="u-badge u-badge-info">🏦 Chờ XN</span>
+                        <span th:if="${o.payment != null and o.payment.paymentMethod == 'COD' and o.payment.paymentStatus == 'CHO_THANH_TOAN'}" class="u-badge u-badge-wait">💵 Chưa TT (COD)</span>
+                        <span th:if="${o.payment != null and o.payment.paymentMethod == 'COD' and (o.payment.paymentStatus == 'THANH_CONG' or o.payment.paymentStatus == 'DA_THANH_TOAN')}" class="u-badge u-badge-ok">✅ Đã thu COD</span>
+                        <span th:if="${o.payment != null and o.payment.paymentMethod == 'BANKING' and (o.payment.paymentStatus == 'CHO_THANH_TOAN' or o.payment.paymentStatus == 'CHO_XAC_NHAN')}" class="u-badge u-badge-info">🏦 Chờ CK</span>
+                        <span th:if="${o.payment != null and o.payment.paymentMethod == 'BANKING' and (o.payment.paymentStatus == 'THANH_CONG' or o.payment.paymentStatus == 'DA_THANH_TOAN')}" class="u-badge u-badge-ok">✅ Đã CK</span>
                         <span th:if="${o.payment == null}" class="u-badge u-badge-muted">—</span>
                     </td>
                     <td>
@@ -50,6 +51,9 @@
                         <span th:if="${o.status == 'DA_GIAO'}" class="u-badge u-badge-wait">📬 Chờ xác nhận</span>
                         <span th:if="${o.status == 'HOAN_THANH'}" class="u-badge u-badge-ok">✅ Hoàn thành</span>
                         <span th:if="${o.status == 'KHIEU_NAI'}" class="u-badge u-badge-danger">🚨 Rủi ro</span>
+                        <div th:if="${o.status == 'DANG_GIAO' and o.shipper != null}" class="u-shipper-mini">
+                            🚚 <span th:text="${o.shipper.fullName}"></span>
+                        </div>
                     </td>
                     <td>
                         <a th:href="@{/orders/{id}(id=${o.id})}" class="u-btn">Xem →</a>

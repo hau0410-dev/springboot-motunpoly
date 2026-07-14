@@ -31,6 +31,14 @@ public class Payment {
     @Column(name = "customer_account")
     private String customerAccount;
 
+    // Mã giao dịch (trường "id" SePay trả về) - dùng để chống xử lý webhook trùng lặp
+    @Column(name = "transaction_id", unique = true)
+    private String transactionId;
+
+    // Nội dung chuyển khoản duy nhất gắn với đơn hàng, ví dụ: DH105
+    @Column(name = "payment_content")
+    private String paymentContent;
+
     // ===== Getter Setter =====
 
     public Integer getId() {
@@ -87,5 +95,21 @@ public class Payment {
 
     public void setCustomerAccount(String customerAccount) {
         this.customerAccount = customerAccount;
+    }
+
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
+
+    public String getPaymentContent() {
+        return paymentContent;
+    }
+
+    public void setPaymentContent(String paymentContent) {
+        this.paymentContent = paymentContent;
     }
 }

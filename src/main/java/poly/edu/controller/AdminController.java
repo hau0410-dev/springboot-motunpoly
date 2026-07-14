@@ -70,6 +70,10 @@ public class AdminController {
 
         model.addAttribute("totalRevenue", revenue);
 
+        // ===== ĐƠN HÀNG MỚI (CHỜ XÁC NHẬN) - HIỂN THỊ BANNER THÔNG BÁO =====
+        List<Order> newOrders = orderRepo.findByStatus("CHO_XAC_NHAN");
+        model.addAttribute("newOrders", newOrders);
+
         return "admin/index";
     }
     
