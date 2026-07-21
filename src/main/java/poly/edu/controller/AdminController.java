@@ -100,7 +100,7 @@ public class AdminController {
 
     @PostMapping("/products/save")
     public String save(@ModelAttribute Product product,
-                       @RequestParam("imageFile") MultipartFile imageFile,
+                       @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                        @RequestParam(value = "galleryFiles", required = false) List<MultipartFile> galleryFiles,
                        HttpSession session) {
 
@@ -117,7 +117,8 @@ public class AdminController {
         }
 
         // ===== UPLOAD ẢNH ĐẠI DIỆN =====
-        if (!imageFile.isEmpty()) {
+        // Không chọn ảnh mới -> giữ nguyên đường dẫn ảnh cũ (không bắt buộc phải add lại ảnh cũ)
+        if (imageFile != null && !imageFile.isEmpty()) {
             try {
                 String fileName = System.currentTimeMillis() + "_" + imageFile.getOriginalFilename();
 

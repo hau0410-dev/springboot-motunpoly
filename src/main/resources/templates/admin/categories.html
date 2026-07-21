@@ -20,15 +20,20 @@
                     <h3 style="margin:0 0 18px;font-size:15px;border-left:4px solid #f59e0b;padding-left:10px;">
                         <span th:text="${category.id != null} ? '✏️ Cập nhật' : '➕ Thêm danh mục'">Thêm</span>
                     </h3>
-                    <form th:action="@{/admin/categories/save}" method="post">
+                    <form th:action="@{/admin/categories/save}" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="id" th:value="${category.id}">
                         <div class="form-group">
                             <label>Tên danh mục</label>
                             <input type="text" name="name" th:value="${category.name}" required>
                         </div>
                         <div class="form-group">
-                            <label>Icon (emoji)</label>
-                            <input type="text" name="icon" th:value="${category.icon}" placeholder="VD: 🔧">
+                            <label>Icon (ảnh)</label>
+                            <input type="file" name="iconFile" accept="image/*">
+                            <div th:if="${category.icon != null}" style="margin-top:8px;">
+                                <img th:src="@{'/imges/' + ${category.icon}}"
+                                     style="width:48px;height:48px;object-fit:contain;border-radius:8px;border:1px solid #e0e0e0;background:#fff;">
+                            </div>
+                            <small style="color:#888;">Để trống nếu không muốn đổi icon</small>
                         </div>
                         <div class="form-group">
                             <label>Trạng thái</label>
@@ -52,7 +57,11 @@
                         <tbody>
                             <tr th:each="c : ${categories}">
                                 <td th:text="${c.id}"></td>
-                                <td style="font-size:20px;" th:text="${c.icon ?: '🔧'}"></td>
+                                <td>
+                                    <img th:if="${c.icon != null}" th:src="@{'/imges/' + ${c.icon}}"
+                                         style="width:28px;height:28px;object-fit:contain;border-radius:6px;border:1px solid #e0e0e0;background:#fff;">
+                                    <span th:unless="${c.icon != null}" style="font-size:20px;">🔧</span>
+                                </td>
                                 <td><a th:href="@{'/admin/categories/edit/' + ${c.id}}" style="color:#d97706;font-weight:700;" th:text="${c.name}"></a></td>
                                 <td>
                                     <span th:if="${c.isActive}" class="badge badge-success">✅ Hoạt động</span>

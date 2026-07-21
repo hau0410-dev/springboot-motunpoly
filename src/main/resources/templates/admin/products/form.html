@@ -83,6 +83,7 @@
                         <div class="form-group">
                             <label>Ảnh đại diện</label>
                             <input type="file" name="imageFile" accept="image/*">
+                            <small style="color:#888;">Để trống nếu không muốn đổi ảnh, hệ thống sẽ tự giữ ảnh hiện tại</small>
                             <div th:if="${product.image != null}" class="current-image">
                                 <img th:src="@{'/imges/' + ${product.image}}">
                             </div>

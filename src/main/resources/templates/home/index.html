@@ -22,7 +22,8 @@
            th:each="c, catStat : ${categories}"
            th:if="${catStat.index < 12}"
            th:href="@{/(category=${c.id})}">
-            <span class="category-icon" th:text="${c.icon ?: '🔧'}"></span>
+            <img th:if="${c.icon != null}" class="category-icon" th:src="@{'/imges/' + ${c.icon}}" style="width:32px;height:32px;object-fit:contain;">
+            <span th:unless="${c.icon != null}" class="category-icon" th:text="'🔧'"></span>
             <span class="category-name" th:text="${c.name}">Danh mục</span>
         </a>
     </div>
