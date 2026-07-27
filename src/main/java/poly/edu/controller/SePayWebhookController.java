@@ -114,6 +114,8 @@ public class SePayWebhookController {
         }
 
         // ===== 6. CẬP NHẬT TRẠNG THÁI THANH TOÁN THÀNH CÔNG =====
+        // Chỉ cập nhật Payment, KHÔNG đụng vào Order.status — Admin vẫn là người xác nhận đơn
+        // thủ công (giống hệt luồng COD), dù thanh toán đã được SePay xác nhận tự động ở đây.
         payment.setPaymentStatus("THANH_CONG");
         payment.setTransactionId(transactionId);
         payment.setPaymentDate(LocalDateTime.now());

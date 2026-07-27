@@ -92,7 +92,9 @@ public class AdminController {
     @GetMapping("/products/create")
     public String createForm(Model model, HttpSession session) {
         model.addAttribute("product", new Product());
-        model.addAttribute("categories", categoryService.findAll());
+        model.addAttribute("categories", categoryService.findByType("PRODUCT"));
+        model.addAttribute("brands", categoryService.findByType("BRAND"));
+        model.addAttribute("partsBrands", categoryService.findByType("PARTS_BRAND"));
         model.addAttribute("images", new java.util.ArrayList<ProductImage>());
         return "admin/products/form";
     }
@@ -201,7 +203,9 @@ public class AdminController {
                        Model model,
                        HttpSession session) {
         model.addAttribute("product", productService.findById(id));
-        model.addAttribute("categories", categoryService.findAll());
+        model.addAttribute("categories", categoryService.findByType("PRODUCT"));
+        model.addAttribute("brands", categoryService.findByType("BRAND"));
+        model.addAttribute("partsBrands", categoryService.findByType("PARTS_BRAND"));
         model.addAttribute("images", productImageRepository.findByProduct_IdOrderBySortOrderAsc(id));
         return "admin/products/form";
     }

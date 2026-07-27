@@ -42,11 +42,31 @@ public class Cart {
         return items.values();
     }
 
+    public CartItem getItem(Integer productId) {
+        return items.get(productId);
+    }
+
+    // Tổng tiền THỰC TẾ khách phải trả (đã áp khuyến mãi PERCENT/AMOUNT nếu có, chưa gồm ship)
     public double getTotalAmount() {
         return items.values()
                 .stream()
                 .mapToDouble(CartItem::getTotalPrice)
                 .sum();
+    }
+
+    // Tổng tiền GỐC (chưa áp khuyến mãi) - dùng để hiển thị gạch đỏ khi có ưu đãi
+    public double getOriginalTotalAmount() {
+        return items.values()
+                .stream()
+                .mapToDouble(CartItem::getTotalOriginalPrice)
+                .sum();
+    }
+
+    // Số tiền được giảm nhờ khuyến mãi (PERCENT/AMOUNT). Khuyến mãi GIFT không làm giảm số này
+    // (giá trị "được tặng" không quy đổi ra tiền giảm ở đây, chỉ hiện ở nhãn promo).
+    public double getDiscountAmount() {
+        double discount = getOriginalTotalAmount() - getTotalAmount();
+        return Math.max(discount, 0);
     }
 
     public boolean isEmpty() {

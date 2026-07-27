@@ -265,7 +265,8 @@ body { background: #f8f8f8; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; 
 }
 
 .checkout-card input,
-.checkout-card textarea {
+.checkout-card textarea,
+.checkout-card select {
     width: 100%;
     padding: 12px 14px;
     border: 1.5px solid #e0e0e0;
@@ -277,12 +278,70 @@ body { background: #f8f8f8; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; 
 }
 
 .checkout-card input:focus,
-.checkout-card textarea:focus {
+.checkout-card textarea:focus,
+.checkout-card select:focus {
     outline: none;
     border-color: #111;
 }
 
+.checkout-card select {
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23555' stroke-width='2' fill='none' fill-rule='evenodd'/%3E%3C/svg%3E") no-repeat right 14px center;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    padding-right: 36px;
+}
+.checkout-card select:invalid { color: #999; }
+
 .checkout-card textarea { min-height: 80px; resize: vertical; }
+
+/* ===== KHUYẾN MÃI (giá gốc gạch đỏ / nhãn ưu đãi) ===== */
+.price-old {
+    text-decoration: line-through;
+    color: #aaa;
+    font-size: 12px;
+    display: block;
+    font-weight: 500;
+}
+
+.promo-chip {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 2px 9px;
+    border-radius: 20px;
+    background: #fff3e0;
+    color: #c2410c;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .2px;
+}
+.promo-chip.gift { background: #e8f5e9; color: #1b7a3d; }
+
+.bonus-note {
+    font-size: 11px;
+    color: #1b7a3d;
+    font-weight: 700;
+    margin-top: 3px;
+}
+
+.discount-row span:last-child { color: #c2410c; font-weight: 700; }
+
+/* ===== FREESHIP BANNER (khách hàng thân thiết) ===== */
+.freeship-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-left: 4px solid #16a34a;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #15803d;
+    margin-bottom: 18px;
+}
 
 /* Payment method */
 .payment-method-grid {
@@ -408,6 +467,10 @@ body { background: #f8f8f8; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; 
     margin-top: 4px;
     border-top: 2px solid #111;
 }
+
+.shipping-value { font-weight: 700; }
+.shipping-value.pending { color: #999; font-style: italic; font-weight: 500; }
+.shipping-value.free { color: #16a34a; }
 
 /* Place order button */
 .btn-place-order {

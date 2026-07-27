@@ -18,6 +18,10 @@ public class Category {
     @Column(name = "is_active")
     private Boolean isActive = true;
 
+    // Loại: PRODUCT (danh mục sản phẩm) | BRAND (hãng xe) | PARTS_BRAND (hãng phụ tùng)
+    @Column(name = "type")
+    private String type = "PRODUCT";
+
     // ===== Constructor =====
     public Category() {
     }
@@ -60,5 +64,13 @@ public class Category {
 
     public void setIsActive(Boolean isActive) {
         this.isActive = isActive;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

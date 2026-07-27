@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpSession;
 import poly.edu.entity.Order;
 import poly.edu.entity.OrderItem;
 import poly.edu.entity.Product;
+import poly.edu.entity.Promotion;
 import poly.edu.entity.User;
 import poly.edu.model.Cart;
 import poly.edu.model.CartItem;
@@ -24,9 +25,13 @@ import poly.edu.repository.OrderItemRespository;
 import poly.edu.repository.OrderRepository;
 import poly.edu.service.OrderService;
 import poly.edu.service.ProductService;
+import poly.edu.service.PromotionService;
+import poly.edu.service.ShippingService;
 
 import poly.edu.entity.Payment;
 import poly.edu.service.PaymentService;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/cart")
@@ -46,6 +51,12 @@ public class CartController {
     @Autowired
     private OrderRepository orderRepo;
 
+    @Autowired
+    private PromotionService promotionService;
+
+    @Autowired
+    private ShippingService shippingService;
+
     @Value("${sepay.bank.account}")
     private String bankAccount;
 
@@ -64,6 +75,9 @@ public class CartController {
             cart = new Cart();
             session.setAttribute("cart", cart);
         }
+
+        Integer userId = currentUserId(session);
+        refreshCartPromotions(cart, userId);
 
         model.addAttribute("cart", cart);
         return "cart/index";
@@ -92,10 +106,25 @@ public class CartController {
             p.setStock(0);
         }
 
-        if (qty > p.getStock()) {
+        Integer userId = currentUserId(session);
+
+        // Tổng số lượng khách MUỐN có trong giỏ sau khi thêm (cộng dồn với số đã có sẵn)
+        CartItem existed = cart.getItem(id);
+        int existingQty = (existed != null) ? existed.getQuantity() : 0;
+        int wantQty = existingQty + qty;
+
+        CartItem preview = new CartItem();
+        preview.setProductId(id);
+        preview.setQuantity(wantQty);
+        applyPromotion(preview, userId);
+
+        int needed = wantQty + preview.getBonusQuantity();
+
+        if (needed > p.getStock()) {
             session.setAttribute(
                 "stockMessage",
-                "Sản phẩm chỉ còn " + p.getStock() + " trong kho!"
+                "Sản phẩm chỉ còn " + p.getStock() + " trong kho"
+                + (preview.getBonusQuantity() > 0 ? " (chương trình mua 1 tặng 1 cần gấp đôi số lượng tồn kho)!" : "!")
             );
 
             return "redirect:/cart";
@@ -104,12 +133,19 @@ public class CartController {
         CartItem item = new CartItem();
         item.setProductId(p.getId());
         item.setProductName(p.getName());
-        item.setPrice(p.getPrice());
         item.setImage(p.getImage());
         item.setQuantity(qty);
         item.setStock(p.getStock());
+        applyPromotion(item, userId);
 
         cart.add(item);
+
+        // Sau khi Cart merge số lượng (nếu sản phẩm đã có sẵn trong giỏ), tính lại khuyến mãi
+        // theo đúng TỔNG số lượng mới (vì khuyến mãi mua-1-tặng-1 phụ thuộc vào số lượng)
+        CartItem merged = cart.getItem(id);
+        if (merged != null) {
+            applyPromotion(merged, userId);
+        }
 
         return "redirect:/cart";
     }
@@ -142,17 +178,31 @@ public class CartController {
             return "redirect:/product/detail?id=" + id;
         }
 
-        if (qty > p.getStock()) {
-            qty = p.getStock();
-        }
+        Integer userId = currentUserId(session);
 
         CartItem item = new CartItem();
         item.setProductId(p.getId());
         item.setProductName(p.getName());
-        item.setPrice(p.getPrice());
         item.setImage(p.getImage());
         item.setQuantity(qty);
         item.setStock(p.getStock());
+        applyPromotion(item, userId);
+
+        // Nếu (số lượng mua + số lượng tặng) vượt tồn kho -> giảm số lượng mua cho vừa đủ
+        int needed = item.getQuantity() + item.getBonusQuantity();
+        if (needed > p.getStock()) {
+            int maxPaidQty = (item.getBonusQuantity() > 0) ? p.getStock() / 2 : p.getStock();
+            item.setQuantity(Math.max(maxPaidQty, 0));
+            applyPromotion(item, userId); // tính lại số lượng tặng theo qty mới
+        }
+
+        if (item.getQuantity() <= 0) {
+            session.setAttribute(
+                "stockMessage",
+                p.getName() + " hiện đã hết hàng!"
+            );
+            return "redirect:/product/detail?id=" + id;
+        }
 
         Cart buyNowCart = new Cart();
         buyNowCart.add(item);
@@ -188,16 +238,25 @@ public class CartController {
         }
 
         Product p = productService.findById(id);
+        Integer userId = currentUserId(session);
 
         if (p != null) {
             int stock = (p.getStock() == null) ? 0 : p.getStock();
 
-            if (qty > stock) {
-                qty = stock;
+            CartItem preview = new CartItem();
+            preview.setProductId(id);
+            preview.setQuantity(qty);
+            applyPromotion(preview, userId);
+
+            int maxPaidQty = (preview.getBonusQuantity() > 0) ? stock / 2 : stock;
+
+            if (qty > maxPaidQty) {
+                qty = maxPaidQty;
 
                 session.setAttribute(
                     "stockMessage",
-                    p.getName() + " chỉ còn " + stock + " sản phẩm trong kho!"
+                    p.getName() + " chỉ còn " + stock + " sản phẩm trong kho"
+                    + (preview.getBonusQuantity() > 0 ? " (chương trình mua 1 tặng 1 cần gấp đôi số lượng tồn kho)!" : "!")
                 );
             }
 
@@ -208,6 +267,11 @@ public class CartController {
         }
 
         cart.update(id, qty);
+
+        CartItem updated = cart.getItem(id);
+        if (updated != null) {
+            applyPromotion(updated, userId);
+        }
 
         return "redirect:/cart";
     }
@@ -236,8 +300,17 @@ public class CartController {
             mode = "cart";
         }
 
+        Integer userId = currentUserId(session);
+        refreshCartPromotions(cart, userId);
+
         model.addAttribute("cart", cart);
         model.addAttribute("mode", mode);
+
+        // ===== THÔNG TIN PHÍ SHIP =====
+        boolean freeShip = promotionService.isFreeShipEligible(userId);
+        model.addAttribute("freeShip", freeShip);
+        model.addAttribute("districts", shippingService.getSupportedDistricts());
+        model.addAttribute("shippingFees", shippingService.getFeeTable());
 
         User user = (User) session.getAttribute("user");
         if (user != null) {
@@ -260,6 +333,7 @@ public class CartController {
             @RequestParam("email") String email,
             @RequestParam("phone") String phone,
             @RequestParam("address") String address,
+            @RequestParam("district") String district,
             @RequestParam(value = "customerBank", required = false) String customerBank,
             @RequestParam(value = "customerAccount", required = false) String customerAccount,
             @RequestParam(value = "mode", required = false) String mode,
@@ -272,6 +346,12 @@ public class CartController {
         if (cart == null || cart.isEmpty()) {
             return isBuyNow ? "redirect:/" : "redirect:/cart";
         }
+
+        Integer userId = currentUserId(session);
+
+        // Luôn tính lại khuyến mãi tại đúng thời điểm đặt hàng (không tin dữ liệu cũ trong session
+        // phòng trường hợp khuyến mãi/điều kiện khách hàng thân thiết vừa thay đổi)
+        refreshCartPromotions(cart, userId);
 
         for (CartItem c : cart.getItems()) {
 
@@ -292,7 +372,9 @@ public class CartController {
                 product.setStock(0);
             }
 
-            if (product.getStock() < c.getQuantity()) {
+            int needed = c.getQuantity() + c.getBonusQuantity();
+
+            if (product.getStock() < needed) {
 
                 session.setAttribute(
                         "stockMessage",
@@ -305,6 +387,16 @@ public class CartController {
                 return isBuyNow ? "redirect:/" : "redirect:/cart";
             }
         }
+
+        // ===== TÍNH TOÁN GIÁ TRỊ ĐƠN HÀNG (server tự tính, không tin số tiền client gửi lên) =====
+        double originalAmount = cart.getOriginalTotalAmount();   // tổng giá GỐC
+        double chargeAmount = cart.getTotalAmount();             // đã áp khuyến mãi PERCENT/AMOUNT
+        double discountAmount = cart.getDiscountAmount();        // = originalAmount - chargeAmount
+
+        boolean freeShip = promotionService.isFreeShipEligible(userId);
+        long shippingFee = shippingService.calculateFee(district, freeShip);
+
+        double finalTotal = chargeAmount + shippingFee;
 
         // ===== 1. TẠO ORDER =====
 
@@ -320,7 +412,11 @@ public class CartController {
         order.setEmail(email);
         order.setPhone(phone);
         order.setAddress(address);
-        order.setTotalAmount(cart.getTotalAmount());
+        order.setDistrict(district);
+        order.setOriginalAmount(originalAmount);
+        order.setDiscountAmount(discountAmount);
+        order.setShippingFee((double) shippingFee);
+        order.setTotalAmount(finalTotal);
         order.setStatus("CHO_XAC_NHAN");
         order.setCreatedDate(LocalDateTime.now());
 
@@ -354,16 +450,23 @@ public class CartController {
             Product product =
                     productService.findById(c.getProductId());
 
+            // Số lượng THỰC XUẤT KHO = số lượng khách mua + số lượng tặng kèm (nếu có mua 1 tặng 1)
+            int totalTaken = c.getQuantity() + c.getBonusQuantity();
+
             product.setStock(
-                    product.getStock() - c.getQuantity()
+                    product.getStock() - totalTaken
             );
 
             productService.save(product);
 
             item.setOrder(order);
             item.setProduct(product);
-            item.setQuantity(c.getQuantity());
+            item.setQuantity(totalTaken);
+            item.setBonusQuantity(c.getBonusQuantity());
             item.setPrice(c.getPrice());
+            item.setOriginalPrice(c.getOriginalPrice());
+            item.setPromoLabel(c.getPromoLabel());
+            // Tiền chỉ tính trên số lượng THỰC TRẢ TIỀN (không tính hàng tặng)
             item.setSubtotal(c.getQuantity() * c.getPrice());
 
             orderItemRepo.save(item);
@@ -413,6 +516,93 @@ public class CartController {
         model.addAttribute("bankHolder", bankHolder);
 
         return "cart/payment-waiting";
+    }
+
+    // =========================================================================================
+    // ===== HELPER: lấy userId hiện tại từ session (null nếu là khách vãng lai) =====
+    // =========================================================================================
+    private Integer currentUserId(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        return (user != null) ? user.getId() : null;
+    }
+
+    // =========================================================================================
+    // ===== HELPER: áp khuyến mãi (nếu có) lên 1 CartItem =====
+    // - PERCENT / AMOUNT : giảm trực tiếp vào đơn giá
+    // - GIFT (mua 1 tặng 1): giữ nguyên giá, tặng kèm số lượng bằng đúng số lượng khách mua
+    //   (tỉ lệ 1:1 - mua 1 tặng 1, mua 2 tặng 2...), số lượng tặng này VẪN bị trừ vào tồn kho.
+    // =========================================================================================
+    private void applyPromotion(CartItem item, Integer userId) {
+
+        Product product = productService.findById(item.getProductId());
+
+        if (product == null || product.getPrice() == null) {
+            item.setOriginalPrice(0);
+            item.setPrice(0);
+            item.setBonusQuantity(0);
+            item.setPromoLabel(null);
+            item.setPromoType(null);
+            return;
+        }
+
+        double original = product.getPrice();
+        item.setOriginalPrice(original);
+        item.setStock(product.getStock());
+        item.setProductName(product.getName());
+        item.setImage(product.getImage());
+
+        List<Promotion> eligible = promotionService.getEligiblePromotions(userId);
+        Promotion promo = promotionService.getPromotionForProduct(item.getProductId(), eligible);
+
+        if (promo == null || promo.getDiscountType() == null) {
+            item.setPrice(original);
+            item.setBonusQuantity(0);
+            item.setPromoLabel(null);
+            item.setPromoType(null);
+            return;
+        }
+
+        item.setPromoLabel(promo.getBadgeText());
+        item.setPromoType(promo.getDiscountType());
+
+        switch (promo.getDiscountType()) {
+
+            case "PERCENT": {
+                double percent = (promo.getDiscountValue() == null) ? 0 : promo.getDiscountValue();
+                double finalPrice = original - (original * percent / 100);
+                item.setPrice(Math.max(finalPrice, 0));
+                item.setBonusQuantity(0);
+                break;
+            }
+
+            case "AMOUNT": {
+                double amount = (promo.getDiscountValue() == null) ? 0 : promo.getDiscountValue();
+                double finalPrice = original - amount;
+                item.setPrice(Math.max(finalPrice, 0));
+                item.setBonusQuantity(0);
+                break;
+            }
+
+            case "GIFT": {
+                // Mua 1 tặng 1: giá không đổi, tặng kèm số lượng = số lượng khách mua
+                item.setPrice(original);
+                item.setBonusQuantity(item.getQuantity());
+                break;
+            }
+
+            default: {
+                // FREESHIP hoặc loại khác không tác động lên giá sản phẩm
+                item.setPrice(original);
+                item.setBonusQuantity(0);
+            }
+        }
+    }
+
+    // Tính lại khuyến mãi cho TOÀN BỘ sản phẩm trong giỏ (gọi mỗi khi hiển thị / trước khi đặt hàng)
+    private void refreshCartPromotions(Cart cart, Integer userId) {
+        for (CartItem item : cart.getItems()) {
+            applyPromotion(item, userId);
+        }
     }
 
 }

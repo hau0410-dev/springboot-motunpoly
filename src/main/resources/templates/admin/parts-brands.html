@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý hãng phụ tùng</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="admin-container">
+    <div th:replace="admin/layout/sidebar :: sidebar"></div>
+    <div class="content">
+        <div th:replace="admin/layout/header :: header"></div>
+        <div class="content-body">
+
+            <h2 class="page-title">🔧 Quản lý hãng phụ tùng</h2>
+
+            <div style="display:grid;grid-template-columns:300px 1fr;gap:22px;align-items:start;">
+
+                <div class="card">
+                    <h3 style="margin:0 0 18px;font-size:15px;border-left:4px solid #f59e0b;padding-left:10px;">
+                        <span th:text="${partsBrand.id != null} ? '✏️ Cập nhật' : '➕ Thêm hãng phụ tùng'">Thêm</span>
+                    </h3>
+                    <form th:action="@{/admin/parts-brands/save}" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="id" th:value="${partsBrand.id}">
+                        <div class="form-group">
+                            <label>Tên hãng phụ tùng</label>
+                            <input type="text" name="name" th:value="${partsBrand.name}" placeholder="VD: Brembo" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Logo</label>
+                            <input type="file" name="iconFile" accept="image/*">
+                            <div th:if="${partsBrand.icon != null}" style="margin-top:8px;">
+                                <img th:src="@{'/imges/' + ${partsBrand.icon}}"
+                                     style="width:48px;height:48px;object-fit:contain;border-radius:8px;border:1px solid #e0e0e0;background:#fff;">
+                            </div>
+                            <small style="color:#888;">Để trống nếu không muốn đổi logo</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Trạng thái</label>
+                            <select name="isActive">
+                                <option value="true" th:selected="${partsBrand.isActive == true}">✅ Hoạt động</option>
+                                <option value="false" th:selected="${partsBrand.isActive == false}">🔒 Tắt</option>
+                            </select>
+                        </div>
+                        <div style="display:flex;gap:10px;">
+                            <button type="submit" class="btn btn-primary" style="flex:1;">💾 Lưu</button>
+                            <a th:href="@{/admin/parts-brands}" class="btn btn-secondary">➕ Mới</a>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>ID</th><th>Logo</th><th>Tên hãng phụ tùng</th><th>Trạng thái</th><th>Thao tác</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p : ${partsBrands}">
+                                <td th:text="${p.id}"></td>
+                                <td>
+                                    <img th:if="${p.icon != null}" th:src="@{'/imges/' + ${p.icon}}"
+                                         style="width:28px;height:28px;object-fit:contain;border-radius:6px;border:1px solid #e0e0e0;background:#fff;">
+                                    <span th:unless="${p.icon != null}" style="font-size:20px;">🔧</span>
+                                </td>
+                                <td><a th:href="@{'/admin/parts-brands/edit/' + ${p.id}}" style="color:#d97706;font-weight:700;" th:text="${p.name}"></a></td>
+                                <td>
+                                    <span th:if="${p.isActive}" class="badge badge-success">✅ Hoạt động</span>
+                                    <span th:unless="${p.isActive}" class="badge badge-muted">🔒 Tắt</span>
+                                </td>
+                                <td>
+                                    <a th:href="@{'/admin/parts-brands/edit/' + ${p.id}}" class="btn btn-sm btn-secondary">✏️</a>
+                                    <a th:href="@{'/admin/parts-brands/delete/' + ${p.id}}" onclick="return confirm('Xoá hãng phụ tùng này?')" class="btn btn-sm btn-danger">🗑️</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

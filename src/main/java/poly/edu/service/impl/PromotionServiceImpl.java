@@ -108,4 +108,25 @@ public class PromotionServiceImpl implements PromotionService {
 
         return best;
     }
+
+    // ===== KHÁCH HÀNG THÂN THIẾT: đủ điều kiện 1 khuyến mãi loại FREESHIP đang active =====
+    // Tái sử dụng đúng cơ chế minTotalSpent hiện có (Admin cấu hình ngưỡng qua trang Quản lý khuyến mãi,
+    // chỉ cần tạo 1 khuyến mãi discountType = "FREESHIP", không cần gắn sản phẩm nào).
+    @Override
+    public boolean isFreeShipEligible(Integer userId) {
+
+        if (userId == null) {
+            return false;
+        }
+
+        List<Promotion> eligible = getEligiblePromotions(userId);
+
+        for (Promotion p : eligible) {
+            if ("FREESHIP".equals(p.getDiscountType())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

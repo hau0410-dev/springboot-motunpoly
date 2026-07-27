@@ -22,12 +22,17 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> getActiveCategories() {
-        return categoryRepository.findByIsActiveTrue();
+        return categoryRepository.findByIsActiveTrueAndType("PRODUCT");
     }
 
     @Override
     public List<Category> findAll() {
         return categoryRepository.findAll();
+    }
+
+    @Override
+    public List<Category> findByType(String type) {
+        return categoryRepository.findByType(type);
     }
 
     @Override

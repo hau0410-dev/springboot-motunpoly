@@ -50,6 +50,7 @@
                                 <option value="PERCENT" th:selected="${promotion.discountType == 'PERCENT'}">Giảm %</option>
                                 <option value="AMOUNT" th:selected="${promotion.discountType == 'AMOUNT'}">Giảm tiền cố định</option>
                                 <option value="GIFT" th:selected="${promotion.discountType == 'GIFT'}">Tặng quà / Mua 1 tặng 1</option>
+                                <option value="FREESHIP" th:selected="${promotion.discountType == 'FREESHIP'}">🚚 Miễn phí vận chuyển (khách hàng thân thiết)</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -69,6 +70,9 @@
                         </div>
                         <div class="form-group">
                             <label>Áp dụng cho sản phẩm</label>
+                            <div style="font-size:12px;color:#888;margin-bottom:4px;">
+                                (Bỏ trống nếu chọn loại "🚚 Miễn phí vận chuyển" ở trên — khuyến mãi này áp dụng cho cả đơn hàng, không gắn theo sản phẩm)
+                            </div>
                             <div class="product-checklist">
                                 <label th:each="p : ${products}" class="product-check-item">
                                     <input type="checkbox" name="productIds" th:value="${p.id}" th:checked="${selectedIds.contains(p.id)}">

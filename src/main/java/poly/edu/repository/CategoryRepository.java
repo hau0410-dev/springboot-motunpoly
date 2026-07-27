@@ -7,4 +7,8 @@ import java.util.List;
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
     List<Category> findByIsActiveTrue();
+
+    List<Category> findByType(String type);
+
+    List<Category> findByIsActiveTrueAndType(String type);
 }

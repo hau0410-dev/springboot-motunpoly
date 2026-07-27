@@ -52,6 +52,10 @@
         <div class="checkout-card">
             <div class="checkout-card-title">Thông tin giao hàng</div>
 
+            <div th:if="${freeShip}" class="freeship-banner">
+                🎉 Bạn là khách hàng thân thiết — được <u>Miễn phí vận chuyển</u> cho đơn hàng này!
+            </div>
+
             <form th:action="@{/cart/pay}" method="post" id="checkoutForm">
                 <input type="hidden" name="mode" th:value="${mode}">
                 <input type="hidden" name="paymentMethod" id="paymentMethodHidden" value="COD">
@@ -67,8 +71,14 @@
                 <label>Số điện thoại</label>
                 <input type="text" name="phone" placeholder="0901 234 567" required>
 
+                <label>Quận/Huyện (TP.HCM)</label>
+                <select name="district" id="districtSelect" required onchange="recalcSummary()">
+                    <option value="" disabled selected>-- Chọn khu vực giao hàng --</option>
+                    <option th:each="d : ${districts}" th:value="${d}" th:text="${d}"></option>
+                </select>
+
                 <label>Địa chỉ giao hàng</label>
-                <textarea name="address" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/TP" required></textarea>
+                <textarea name="address" placeholder="Số nhà, tên đường, phường/xã" required></textarea>
 
                 <!-- Ô nhập bank info (ẩn, chỉ hiện khi Banking) -->
                 <div id="bankFields" style="display:none;">
@@ -96,22 +106,38 @@
                 <div style="flex:1;min-width:0;">
                     <div class="ci-name" th:text="${item.productName}"></div>
                     <div class="ci-meta" th:text="'x' + ${item.quantity}"></div>
+                    <span th:if="${item.hasPromo}" class="promo-chip" th:classappend="${item.promoType == 'GIFT'} ? 'gift' : ''"
+                          th:text="${item.promoLabel}"></span>
                 </div>
-                <div class="ci-price" th:text="${#numbers.formatDecimal(item.totalPrice,0,'COMMA',0,'POINT')} + 'đ'"></div>
+                <div style="text-align:right;">
+                    <span th:if="${item.promoType == 'PERCENT' or item.promoType == 'AMOUNT'}" class="price-old"
+                          th:text="${#numbers.formatDecimal(item.totalOriginalPrice,0,'COMMA',0,'POINT')} + 'đ'"></span>
+                    <div class="ci-price" th:text="${#numbers.formatDecimal(item.totalPrice,0,'COMMA',0,'POINT')} + 'đ'"></div>
+                </div>
             </div>
         </div>
 
+        <div class="checkout-subtotal" th:if="${cart.discountAmount > 0}">
+            <span>Tạm tính (giá gốc)</span>
+            <span class="price-old" style="font-size:13px;"
+                  th:text="${#numbers.formatDecimal(cart.originalTotalAmount,0,'COMMA',0,'POINT')} + 'đ'"></span>
+        </div>
+        <div class="checkout-subtotal discount-row" th:if="${cart.discountAmount > 0}">
+            <span>Ưu đãi</span>
+            <span th:text="'-' + ${#numbers.formatDecimal(cart.discountAmount,0,'COMMA',0,'POINT')} + 'đ'"></span>
+        </div>
         <div class="checkout-subtotal">
-            <span>Tạm tính</span>
-            <span th:text="${#numbers.formatDecimal(cart.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></span>
+            <span>Tạm tính (sau ưu đãi)</span>
+            <span id="subtotalDisplay" th:text="${#numbers.formatDecimal(cart.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></span>
         </div>
         <div class="checkout-subtotal">
             <span>Vận chuyển</span>
-            <span style="color:#16a34a;font-weight:700;">Miễn phí</span>
+            <span id="shippingDisplay" class="shipping-value" th:classappend="${freeShip} ? 'free' : 'pending'"
+                  th:text="${freeShip} ? 'Miễn phí' : '-- chọn khu vực --'"></span>
         </div>
         <div class="checkout-grand-total">
             <span>Tổng cộng</span>
-            <span th:text="${#numbers.formatDecimal(cart.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></span>
+            <span id="grandTotalDisplay" th:text="${#numbers.formatDecimal(cart.totalAmount,0,'COMMA',0,'POINT')} + 'đ'"></span>
         </div>
     </div>
 
@@ -119,26 +145,65 @@
 
 <div th:replace="layout/footer"></div>
 
-<script>
-function togglePayment(method) {
-    document.getElementById('paymentMethodHidden').value = method;
-    var bankInfo  = document.getElementById('bankingInfo');
-    var bankFields = document.getElementById('bankFields');
-    if (method === 'BANKING') {
-        bankInfo.style.display  = 'block';
-        bankFields.style.display = 'block';
-    } else {
-        bankInfo.style.display  = 'none';
-        bankFields.style.display = 'none';
+<script th:inline="javascript">
+    // Bảng phí ship (đồng bộ với server - giá trị THẬT vẫn luôn được server tính lại khi đặt hàng)
+    var SHIPPING_FEES = /*[[${shippingFees}]]*/ {};
+    var FREE_SHIP = /*[[${freeShip}]]*/ false;
+    var SUBTOTAL_AFTER_DISCOUNT = /*[[${cart.totalAmount}]]*/ 0;
+
+    function formatVND(n) {
+        return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "đ";
     }
-}
 
-function syncBankFields() {
-    document.getElementById('bankInput').value    = document.getElementById('bankInputVisible').value;
-    document.getElementById('accountInput').value = document.getElementById('accountInputVisible').value;
-}
+    function recalcSummary() {
+        var district = document.getElementById('districtSelect').value;
+        var shippingEl = document.getElementById('shippingDisplay');
+        var fee = 0;
 
-togglePayment('COD');
+        if (FREE_SHIP) {
+            fee = 0;
+        } else if (district && SHIPPING_FEES.hasOwnProperty(district)) {
+            fee = SHIPPING_FEES[district];
+        } else {
+            shippingEl.textContent = '-- chọn khu vực --';
+            shippingEl.classList.add('pending');
+            shippingEl.classList.remove('free');
+            document.getElementById('grandTotalDisplay').textContent = formatVND(SUBTOTAL_AFTER_DISCOUNT);
+            return;
+        }
+
+        shippingEl.classList.remove('pending');
+        if (fee === 0) {
+            shippingEl.textContent = 'Miễn phí';
+            shippingEl.classList.add('free');
+        } else {
+            shippingEl.textContent = formatVND(fee);
+            shippingEl.classList.remove('free');
+        }
+
+        document.getElementById('grandTotalDisplay').textContent = formatVND(SUBTOTAL_AFTER_DISCOUNT + fee);
+    }
+
+    function togglePayment(method) {
+        document.getElementById('paymentMethodHidden').value = method;
+        var bankInfo  = document.getElementById('bankingInfo');
+        var bankFields = document.getElementById('bankFields');
+        if (method === 'BANKING') {
+            bankInfo.style.display  = 'block';
+            bankFields.style.display = 'block';
+        } else {
+            bankInfo.style.display  = 'none';
+            bankFields.style.display = 'none';
+        }
+    }
+
+    function syncBankFields() {
+        document.getElementById('bankInput').value    = document.getElementById('bankInputVisible').value;
+        document.getElementById('accountInput').value = document.getElementById('accountInputVisible').value;
+    }
+
+    togglePayment('COD');
+    recalcSummary();
 </script>
 </body>
 </html>

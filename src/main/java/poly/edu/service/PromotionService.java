@@ -24,4 +24,7 @@ public interface PromotionService {
 
     // Khuyến mãi áp dụng cho 1 sản phẩm cụ thể, dựa trên danh sách khuyến mãi user đã đủ điều kiện
     Promotion getPromotionForProduct(Integer productId, List<Promotion> eligiblePromotions);
+
+    // Khách hàng thân thiết (tổng chi tiêu đủ điều kiện 1 khuyến mãi loại FREESHIP đang active) -> miễn phí ship
+    boolean isFreeShipEligible(Integer userId);
 }

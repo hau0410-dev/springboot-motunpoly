@@ -18,7 +18,7 @@ public class CategoryAPIController {
     // ===== 1. DANH SÁCH =====
     @GetMapping
     public List<Category> list() {
-        return categoryService.findAll();
+        return categoryService.findByType("PRODUCT");
     }
 
     // ===== 2. CHI TIẾT =====

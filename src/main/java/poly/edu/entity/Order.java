@@ -32,6 +32,23 @@ public class Order {
     private String address;
     
 
+    // Tổng tiền GỐC hàng hoá, chưa áp khuyến mãi, chưa cộng ship (để hiển thị gạch đỏ)
+    @Column(name = "original_amount")
+    private Double originalAmount;
+
+    // Số tiền được giảm nhờ khuyến mãi (PERCENT/AMOUNT áp lên sản phẩm)
+    @Column(name = "discount_amount")
+    private Double discountAmount;
+
+    // Phí vận chuyển thực tế của đơn (0đ nếu khách hàng thân thiết được freeship)
+    @Column(name = "shipping_fee")
+    private Double shippingFee;
+
+    // Quận/huyện giao hàng - dùng để tính phí ship
+    private String district;
+
+    // Tổng tiền CUỐI CÙNG khách phải thanh toán = (originalAmount - discountAmount) + shippingFee
+    // Giữ nguyên ý nghĩa cũ (đây là số tiền SePay webhook đối chiếu khi xác nhận thanh toán)
     private Double totalAmount;
 
     private String status; // ĐANG_GIAO / DA_GIAO
@@ -90,6 +107,43 @@ public class Order {
 
     public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+    public Double getOriginalAmount() {
+        return originalAmount;
+    }
+
+    public void setOriginalAmount(Double originalAmount) {
+        this.originalAmount = originalAmount;
+    }
+
+    public Double getDiscountAmount() {
+        return discountAmount;
+    }
+
+    public void setDiscountAmount(Double discountAmount) {
+        this.discountAmount = discountAmount;
+    }
+
+    public Double getShippingFee() {
+        return shippingFee;
+    }
+
+    public void setShippingFee(Double shippingFee) {
+        this.shippingFee = shippingFee;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    // Có đang được giảm giá hay không (để template hiển thị gạch đỏ)
+    public boolean isHasDiscount() {
+        return discountAmount != null && discountAmount > 0;
     }
 
     public String getStatus() {

@@ -15,11 +15,22 @@
             <h2 class="page-title">🛒 Quản lý sản phẩm</h2>
 
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+                <div class="search-box" style="position:relative;flex:1;max-width:340px;">
+                    <input type="text" id="productSearchInput"
+                           placeholder="🔍 Tìm theo tên hoặc ID sản phẩm..."
+                           autocomplete="off"
+                           style="width:100%;padding:9px 14px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:13px;"
+                           oninput="filterProductTable()">
+                </div>
                 <a th:href="@{/admin/products/create}" class="btn btn-primary">➕ Thêm sản phẩm</a>
             </div>
 
+            <div id="productSearchEmpty" style="display:none;padding:16px;text-align:center;color:#999;font-size:13px;">
+                Không tìm thấy sản phẩm nào khớp với từ khoá.
+            </div>
+
             <div class="table-wrap">
-                <table>
+                <table id="productTable">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -34,7 +45,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="p : ${products}">
+                        <tr th:each="p : ${products}" th:attr="data-name=${p.name}, data-id=${p.id}">
                             <td th:text="${p.id}"></td>
                             <td>
                                 <img th:src="@{'/imges/' + ${p.image}}"
@@ -80,5 +91,41 @@
         </div>
     </div>
 </div>
+
+<script>
+    function normalize(str) {
+        // Bỏ dấu tiếng Việt để tìm không cần gõ đúng dấu (vd gõ "xich" vẫn ra "Xích")
+        return str
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/đ/g, 'd');
+    }
+
+    function filterProductTable() {
+        var keyword = normalize(document.getElementById('productSearchInput').value.trim());
+        var rows = document.querySelectorAll('#productTable tbody tr');
+        var visibleCount = 0;
+
+        rows.forEach(function (row) {
+            var name = normalize(row.getAttribute('data-name') || '');
+            var id = (row.getAttribute('data-id') || '');
+            var match = keyword === '' || name.indexOf(keyword) !== -1 || id.indexOf(keyword) !== -1;
+            row.style.display = match ? '' : 'none';
+            if (match) visibleCount++;
+        });
+
+        document.getElementById('productSearchEmpty').style.display = (visibleCount === 0) ? 'block' : 'none';
+    }
+
+    // Cho phép gõ tìm ngay khi vào trang, không cần bấm chuột vào ô tìm kiếm trước
+    document.addEventListener('keydown', function (e) {
+        var active = document.activeElement;
+        var isTypingElsewhere = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA');
+        if (!isTypingElsewhere && e.key.length === 1) {
+            document.getElementById('productSearchInput').focus();
+        }
+    });
+</script>
 </body>
 </html>
