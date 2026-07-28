@@ -3,6 +3,7 @@ package poly.edu.controller;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpSession;
@@ -62,15 +63,20 @@ public class UserOrderAPIController {
 
     // ===== 2. CHI TIẾT ĐƠN HÀNG =====
     @GetMapping("/{id}")
-    public Map<String, Object> detail(@PathVariable("id") Integer id) {
+    public ResponseEntity<Map<String, Object>> detail(@PathVariable("id") Integer id) {
 
         Order order = orderRepo.findById(id).orElse(null);
+
+        if (order == null) {
+            return ResponseEntity.notFound().build(); // FIX: 404 thay vì 200 với order=null
+        }
+
         List<OrderItem> items = orderItemRepo.findByOrderId(id);
 
         Map<String, Object> data = new HashMap<>();
         data.put("order", order);
         data.put("items", items);
 
-        return data;
+        return ResponseEntity.ok(data);
     }
 }

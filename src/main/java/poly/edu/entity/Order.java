@@ -11,53 +11,80 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
-    
+
     @ManyToOne
     @JoinColumn(name="user_id")
     private User user;
-    
+
     @ManyToOne
     @JoinColumn(name = "shipper_id")
     private User shipper;
-    
+
     @OneToOne(mappedBy = "order")
     private Payment payment;
-    
+
     private String fullname;
     private String email;
     private String phone;
     private String address;
-    
 
-    // Tổng tiền GỐC hàng hoá, chưa áp khuyến mãi, chưa cộng ship (để hiển thị gạch đỏ)
     @Column(name = "original_amount")
     private Double originalAmount;
 
-    // Số tiền được giảm nhờ khuyến mãi (PERCENT/AMOUNT áp lên sản phẩm)
     @Column(name = "discount_amount")
     private Double discountAmount;
 
-    // Phí vận chuyển thực tế của đơn (0đ nếu khách hàng thân thiết được freeship)
     @Column(name = "shipping_fee")
     private Double shippingFee;
 
-    // Quận/huyện giao hàng - dùng để tính phí ship
     private String district;
 
-    // Tổng tiền CUỐI CÙNG khách phải thanh toán = (originalAmount - discountAmount) + shippingFee
-    // Giữ nguyên ý nghĩa cũ (đây là số tiền SePay webhook đối chiếu khi xác nhận thanh toán)
     private Double totalAmount;
 
-    private String status; // ĐANG_GIAO / DA_GIAO
+    private String status;
 
     private LocalDateTime createdDate;
 
     @Column(name = "completed_date")
-    private LocalDateTime completedDate; // Ngày khách xác nhận "Đã nhận hàng" (HOAN_THANH) - dùng tính hạn 3 ngày hoàn trả
-    
+    private LocalDateTime completedDate;
+
+    // ===== THÊM MỚI: mô hình lai NỘI BỘ (TP.HCM) / GHN (ngoài tỉnh) =====
+    @Column(name = "shipping_method")
+    private String shippingMethod = "NOI_BO";
+
+    @Column(name = "ghn_to_province_id")
+    private Integer ghnToProvinceId;
+
+    @Column(name = "ghn_to_district_id")
+    private Integer ghnToDistrictId;
+
+    @Column(name = "ghn_to_ward_code")
+    private String ghnToWardCode;
+
+    @Column(name = "ghn_order_code")
+    private String ghnOrderCode;
+
+    @Column(name = "ghn_status")
+    private String ghnStatus;
+
+    @Column(name = "ghn_fee")
+    private Double ghnFee;
+
+    @Column(name = "ghn_expected_delivery")
+    private LocalDateTime ghnExpectedDelivery;
+
+    // FIX: THÊM MỚI - tên chữ (Tỉnh/Quận/Phường) để hiển thị địa chỉ đầy đủ, khỏi phải gọi lại GHN
+    @Column(name = "ghn_to_province_name")
+    private String ghnToProvinceName;
+
+    @Column(name = "ghn_to_district_name")
+    private String ghnToDistrictName;
+
+    @Column(name = "ghn_to_ward_name")
+    private String ghnToWardName;
 
     // ===== Getter & Setter =====
 
@@ -141,7 +168,6 @@ public class Order {
         this.district = district;
     }
 
-    // Có đang được giảm giá hay không (để template hiển thị gạch đỏ)
     public boolean isHasDiscount() {
         return discountAmount != null && discountAmount > 0;
     }
@@ -169,6 +195,7 @@ public class Order {
     public void setCompletedDate(LocalDateTime completedDate) {
         this.completedDate = completedDate;
     }
+
     public List<OrderItem> getOrderItems() {
         return orderItems;
     }
@@ -176,10 +203,12 @@ public class Order {
     public void setOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
     }
+
     @PrePersist
     public void prePersist() {
         this.createdDate = LocalDateTime.now();
     }
+
     public User getShipper() {
         return shipper;
     }
@@ -187,6 +216,7 @@ public class Order {
     public void setShipper(User shipper) {
         this.shipper = shipper;
     }
+
     public User getUser() {
         return user;
     }
@@ -194,7 +224,7 @@ public class Order {
     public void setUser(User user) {
         this.user = user;
     }
-    
+
     public Payment getPayment() {
         return payment;
     }
@@ -202,5 +232,53 @@ public class Order {
     public void setPayment(Payment payment) {
         this.payment = payment;
     }
-   
+
+    public String getShippingMethod() { return shippingMethod; }
+    public void setShippingMethod(String shippingMethod) { this.shippingMethod = shippingMethod; }
+
+    public Integer getGhnToProvinceId() { return ghnToProvinceId; }
+    public void setGhnToProvinceId(Integer ghnToProvinceId) { this.ghnToProvinceId = ghnToProvinceId; }
+
+    public Integer getGhnToDistrictId() { return ghnToDistrictId; }
+    public void setGhnToDistrictId(Integer ghnToDistrictId) { this.ghnToDistrictId = ghnToDistrictId; }
+
+    public String getGhnToWardCode() { return ghnToWardCode; }
+    public void setGhnToWardCode(String ghnToWardCode) { this.ghnToWardCode = ghnToWardCode; }
+
+    public String getGhnOrderCode() { return ghnOrderCode; }
+    public void setGhnOrderCode(String ghnOrderCode) { this.ghnOrderCode = ghnOrderCode; }
+
+    public String getGhnStatus() { return ghnStatus; }
+    public void setGhnStatus(String ghnStatus) { this.ghnStatus = ghnStatus; }
+
+    public Double getGhnFee() { return ghnFee; }
+    public void setGhnFee(Double ghnFee) { this.ghnFee = ghnFee; }
+
+    public LocalDateTime getGhnExpectedDelivery() { return ghnExpectedDelivery; }
+    public void setGhnExpectedDelivery(LocalDateTime ghnExpectedDelivery) { this.ghnExpectedDelivery = ghnExpectedDelivery; }
+
+    public String getGhnToProvinceName() { return ghnToProvinceName; }
+    public void setGhnToProvinceName(String ghnToProvinceName) { this.ghnToProvinceName = ghnToProvinceName; }
+
+    public String getGhnToDistrictName() { return ghnToDistrictName; }
+    public void setGhnToDistrictName(String ghnToDistrictName) { this.ghnToDistrictName = ghnToDistrictName; }
+
+    public String getGhnToWardName() { return ghnToWardName; }
+    public void setGhnToWardName(String ghnToWardName) { this.ghnToWardName = ghnToWardName; }
+
+    // FIX: gộp địa chỉ đầy đủ để hiển thị (thay vì chỉ hiện mỗi order.address như code gốc)
+    public String getFullAddress() {
+        StringBuilder sb = new StringBuilder();
+        if (address != null) sb.append(address);
+
+        if ("GHN".equals(shippingMethod)) {
+            if (ghnToWardName != null) sb.append(", ").append(ghnToWardName);
+            if (ghnToDistrictName != null) sb.append(", ").append(ghnToDistrictName);
+            if (ghnToProvinceName != null) sb.append(", ").append(ghnToProvinceName);
+        } else {
+            if (district != null) sb.append(", ").append(district);
+            sb.append(", TP. Hồ Chí Minh");
+        }
+        return sb.toString();
+    }
 }

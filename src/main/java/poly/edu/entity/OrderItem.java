@@ -1,5 +1,7 @@
 package poly.edu.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore; // FIX: chống lỗi vòng lặp JSON (StackOverflowError)
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -40,8 +42,12 @@ public class OrderItem {
     // Số tiền khách THỰC SỰ trả cho dòng sản phẩm này = price * (quantity - bonusQuantity)
     private Double subtotal;
 
+    // FIX: @JsonIgnore để khi trả Order (có List<OrderItem>) ra JSON, mỗi OrderItem
+    // không cố serialize lại "order" -> "orderItems" -> "order" ... gây StackOverflowError.
+    // Muốn xem order_id của item thì đã có sẵn API GET /api/admin/orders/{id}/items rồi.
     @ManyToOne
     @JoinColumn(name = "order_id")
+    @JsonIgnore
     private Order order;
 
     @ManyToOne

@@ -37,7 +37,10 @@ public class AuthAPIController {
                            @RequestParam("password") String password,
                            @RequestParam("email") String email) {
 
-        User existingUser = userService.login(username, password);
+        // FIX: trước đây dùng userService.login(username, password) để check trùng -> sai logic
+        // (login yêu cầu đúng cả password mới trả về user, nên không phát hiện được trùng username
+        // nếu người dùng nhập sai password). Giờ check thẳng theo username.
+        User existingUser = userService.findByUsername(username);
 
         if (existingUser != null) {
             return "Tên đăng nhập đã tồn tại";
@@ -51,7 +54,13 @@ public class AuthAPIController {
         user.setEnabled(true);
         user.setFullName(username);
 
-        return userService.register(user);
+        try {
+            return userService.register(user);
+        } catch (Exception e) {
+            // FIX: bắt lỗi ràng buộc (VD username/email trùng ở tầng DB) trả message rõ ràng
+            // thay vì để Postman nhận HTML lỗi 500 mặc định.
+            return "Đăng ký thất bại: " + e.getMessage();
+        }
     }
 
     // ===== 3. LOGOUT =====

@@ -2,6 +2,8 @@ package poly.edu.entity;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore; // FIX
+
 import jakarta.persistence.*;
 
 @Entity
@@ -12,8 +14,10 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    // FIX: @JsonIgnore để tránh vòng lặp Order -> payment -> order -> payment ...
     @OneToOne
     @JoinColumn(name = "order_id")
+    @JsonIgnore
     private Order order;
 
     @Column(name = "payment_method")

@@ -34,7 +34,7 @@
                             <tr><td style="color:#888;width:120px;">Khách hàng</td><td><b th:text="${order.fullname}"></b></td></tr>
                             <tr><td style="color:#888;">Email</td><td th:text="${order.email}"></td></tr>
                             <tr><td style="color:#888;">SĐT</td><td th:text="${order.phone}"></td></tr>
-                            <tr><td style="color:#888;">Địa chỉ</td><td th:text="${order.address}"></td></tr>
+                            <tr><td style="color:#888;">Địa chỉ</td><td th:text="${order.fullAddress}"></td></tr>
                             <tr><td style="color:#888;">Ngày đặt</td><td th:text="${#temporals.format(order.createdDate,'dd/MM/yyyy HH:mm')}"></td></tr>
                             <tr th:if="${order.shipper != null}"><td style="color:#888;">Shipper</td><td><b th:text="${order.shipper.fullName}"></b></td></tr>
                         </tbody>

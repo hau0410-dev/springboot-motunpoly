@@ -61,7 +61,12 @@ public class ShipperController {
         }
 
         // đơn đã được admin xác nhận, đang chờ shipper lấy hàng (chưa ai nhận)
-        List<Order> waitingOrders = orderRepo.findByStatus("CHO_LAY_HANG");
+        // FIX: chỉ lấy đơn giao NỘI BỘ (TP.HCM) - đơn GHN không qua tay shipper của mình,
+        // shipper GHN thật sự tới lấy, không phải shipper trong hệ thống này.
+        List<Order> waitingOrders = orderRepo.findByStatus("CHO_LAY_HANG")
+                .stream()
+                .filter(o -> !"GHN".equals(o.getShippingMethod()))
+                .collect(java.util.stream.Collectors.toList());
 
         // đơn mà chính shipper này đang giao
         List<Order> myOrders = orderRepo.findByStatusAndShipper_Id("DANG_GIAO", shipper.getId());

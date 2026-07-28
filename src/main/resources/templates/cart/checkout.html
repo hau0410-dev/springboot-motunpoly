@@ -53,7 +53,7 @@
             <div class="checkout-card-title">Thông tin giao hàng</div>
 
             <div th:if="${freeShip}" class="freeship-banner">
-                🎉 Bạn là khách hàng thân thiết — được <u>Miễn phí vận chuyển</u> cho đơn hàng này!
+                🎉 Bạn là khách hàng thân thiết — được <u>Miễn phí vận chuyển</u> cho đơn hàng này (áp dụng trong TP.HCM)!
             </div>
 
             <form th:action="@{/cart/pay}" method="post" id="checkoutForm">
@@ -71,14 +71,42 @@
                 <label>Số điện thoại</label>
                 <input type="text" name="phone" placeholder="0901 234 567" required>
 
-                <label>Quận/Huyện (TP.HCM)</label>
-                <select name="district" id="districtSelect" required onchange="recalcSummary()">
-                    <option value="" disabled selected>-- Chọn khu vực giao hàng --</option>
-                    <option th:each="d : ${districts}" th:value="${d}" th:text="${d}"></option>
+                <label>Tỉnh/Thành phố</label>
+                <select id="provinceSelect" onchange="onProvinceChange()" required>
+                    <option value="" disabled selected>-- Chọn tỉnh/thành --</option>
+                    <option th:each="p : ${ghnProvinces}"
+                            th:value="${p.provinceId}"
+                            th:text="${p.provinceName}"
+                            th:attr="data-name=${p.provinceName}"></option>
                 </select>
+                <input type="hidden" name="provinceId" id="provinceIdInput">
 
-                <label>Địa chỉ giao hàng</label>
-                <textarea name="address" placeholder="Số nhà, tên đường, phường/xã" required></textarea>
+                <!-- KHỐI TP.HCM -->
+                <div id="tphcmBlock">
+                    <label>Quận/Huyện (TP.HCM)</label>
+                    <select name="district" id="districtSelect" onchange="recalcSummary()">
+                        <option value="" disabled selected>-- Chọn khu vực giao hàng --</option>
+                        <option th:each="d : ${districts}" th:value="${d}" th:text="${d}"></option>
+                    </select>
+                </div>
+
+                <!-- KHỐI NGOÀI TP.HCM -->
+                <div id="otherProvinceBlock" style="display:none;">
+                    <label>Phường/Xã</label>
+                    <select id="wardSelect" onchange="onWardChange()">
+                        <option value="">-- Chọn tỉnh/thành trước --</option>
+                    </select>
+                    <div id="wardLoading" class="ward-loading" style="display:none;">Đang tải danh sách phường/xã...</div>
+                    <input type="hidden" name="toDistrictId" id="toDistrictIdInput">
+                    <input type="hidden" name="toWardCode" id="toWardCodeInput">
+                    <input type="hidden" name="toProvinceName" id="toProvinceNameInput">
+                    <input type="hidden" name="toDistrictName" id="toDistrictNameInput">
+                    <input type="hidden" name="toWardName" id="toWardNameInput">
+                    <div class="ghn-note">⚠️ Đơn hàng ngoài TP.HCM giao qua đối tác vận chuyển GHN, không áp dụng ưu đãi miễn phí vận chuyển của khách hàng thân thiết.</div>
+                </div>
+
+                <label>Địa chỉ (số nhà, tên đường, phường/xã cũ nếu có)</label>
+                <textarea name="address" placeholder="VD: 12 Nguyễn Văn Cừ" required></textarea>
 
                 <!-- Ô nhập bank info (ẩn, chỉ hiện khi Banking) -->
                 <div id="bankFields" style="display:none;">
@@ -146,21 +174,126 @@
 <div th:replace="layout/footer"></div>
 
 <script th:inline="javascript">
-    // Bảng phí ship (đồng bộ với server - giá trị THẬT vẫn luôn được server tính lại khi đặt hàng)
     var SHIPPING_FEES = /*[[${shippingFees}]]*/ {};
     var FREE_SHIP = /*[[${freeShip}]]*/ false;
     var SUBTOTAL_AFTER_DISCOUNT = /*[[${cart.totalAmount}]]*/ 0;
+    var TPHCM_PROVINCE_ID = /*[[${tphcmProvinceId}]]*/ 202;
 
     function formatVND(n) {
         return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "đ";
     }
 
+    function onProvinceChange() {
+        var sel = document.getElementById('provinceSelect');
+        var provinceId = parseInt(sel.value);
+        document.getElementById('provinceIdInput').value = provinceId;
+
+        var isTphcm = (provinceId === TPHCM_PROVINCE_ID);
+
+        document.getElementById('tphcmBlock').style.display = isTphcm ? 'block' : 'none';
+        document.getElementById('otherProvinceBlock').style.display = isTphcm ? 'none' : 'block';
+
+        document.getElementById('districtSelect').required = isTphcm;
+        document.getElementById('wardSelect').required = !isTphcm;
+
+        if (isTphcm) {
+            recalcSummary();
+        } else {
+            loadWards(provinceId);
+        }
+    }
+
+    function loadWards(provinceId) {
+        var wardSelect = document.getElementById('wardSelect');
+        var loading = document.getElementById('wardLoading');
+
+        wardSelect.innerHTML = '<option value="">-- Đang tải --</option>';
+        loading.style.display = 'block';
+
+        fetch('/api/shipping/wards?provinceId=' + provinceId)
+            .then(function (res) { return res.json(); })
+            .then(function (wards) {
+                wardSelect.innerHTML = '<option value="" disabled selected>-- Chọn phường/xã --</option>';
+                wards.forEach(function (w) {
+                    var opt = document.createElement('option');
+                    opt.value = w.wardCode;
+                    opt.textContent = w.wardName + ' (' + w.districtName + ')';
+                    opt.setAttribute('data-district-id', w.districtId);
+                    opt.setAttribute('data-ward-name', w.wardName);
+                    opt.setAttribute('data-district-name', w.districtName);
+                    wardSelect.appendChild(opt);
+                });
+                loading.style.display = 'none';
+            })
+            .catch(function () {
+                wardSelect.innerHTML = '<option value="">Lỗi tải dữ liệu, thử lại</option>';
+                loading.style.display = 'none';
+            });
+    }
+
+    function onWardChange() {
+        var wardSelect = document.getElementById('wardSelect');
+        var selectedOption = wardSelect.options[wardSelect.selectedIndex];
+        var wardCode = wardSelect.value;
+        var districtId = selectedOption ? selectedOption.getAttribute('data-district-id') : null;
+
+        if (!wardCode || !districtId) return;
+
+        document.getElementById('toWardCodeInput').value = wardCode;
+        document.getElementById('toDistrictIdInput').value = districtId;
+        document.getElementById('toWardNameInput').value = selectedOption.getAttribute('data-ward-name');
+        document.getElementById('toDistrictNameInput').value = selectedOption.getAttribute('data-district-name');
+
+        var provinceSelect = document.getElementById('provinceSelect');
+        var provinceOption = provinceSelect.options[provinceSelect.selectedIndex];
+        document.getElementById('toProvinceNameInput').value = provinceOption ? provinceOption.getAttribute('data-name') : '';
+
+        var shippingEl = document.getElementById('shippingDisplay');
+        shippingEl.textContent = 'Đang tính phí...';
+        shippingEl.classList.add('pending');
+
+        fetch('/api/shipping/fee', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                provinceId: parseInt(document.getElementById('provinceIdInput').value),
+                toDistrictId: parseInt(districtId),
+                toWardCode: wardCode,
+                weightGram: 500 * getTotalQty()
+            })
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+            shippingEl.classList.remove('pending');
+            shippingEl.textContent = formatVND(data.fee);
+            document.getElementById('grandTotalDisplay').textContent = formatVND(SUBTOTAL_AFTER_DISCOUNT + data.fee);
+        })
+        .catch(function () {
+            shippingEl.textContent = 'Không tính được phí, thử lại';
+        });
+    }
+
+    function getTotalQty() {
+        var qty = 0;
+        document.querySelectorAll('.ci-meta').forEach(function (el) {
+            var n = parseInt(el.textContent.replace('x', '').trim());
+            if (!isNaN(n)) qty += n;
+        });
+        return qty || 1;
+    }
+
     function recalcSummary() {
+        var provinceSel = document.getElementById('provinceSelect');
+        var provinceId = parseInt(provinceSel.value);
+        var isTphcm = (provinceId === TPHCM_PROVINCE_ID);
+
         var district = document.getElementById('districtSelect').value;
         var shippingEl = document.getElementById('shippingDisplay');
         var fee = 0;
 
-        if (FREE_SHIP) {
+        var freeShipApplies = FREE_SHIP && isTphcm;
+
+        if (freeShipApplies) {
             fee = 0;
         } else if (district && SHIPPING_FEES.hasOwnProperty(district)) {
             fee = SHIPPING_FEES[district];
@@ -180,7 +313,6 @@
             shippingEl.textContent = formatVND(fee);
             shippingEl.classList.remove('free');
         }
-
         document.getElementById('grandTotalDisplay').textContent = formatVND(SUBTOTAL_AFTER_DISCOUNT + fee);
     }
 
@@ -203,7 +335,6 @@
     }
 
     togglePayment('COD');
-    recalcSummary();
 </script>
 </body>
 </html>
