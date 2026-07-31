@@ -42,5 +42,30 @@
                     <input type="email" name="email" placeholder="email@example.com" required>
                 </div>
             </div>
+ <div class="input-group">
+                <label>Mật khẩu mới</label>
+                <div class="input-box">
+                    <span class="input-icon">🔒</span>
+                    <input type="password" name="newPassword" id="newPw" placeholder="Mật khẩu mới" required>
+                    <span class="toggle-eye" onclick="togglePw('newPw',this)">👁️</span>
+                </div>
+            </div>
 
+            <button type="submit" class="auth-btn">Đặt lại mật khẩu →</button>
+
+        </form>
+
+        <a href="/login" class="auth-back">← Quay lại đăng nhập</a>
+    </div>
+</div>
+
+<script>
+function togglePw(id, el) {
+    var input = document.getElementById(id);
+    input.type = input.type === 'password' ? 'text' : 'password';
+    el.textContent = input.type === 'password' ? '👁️' : '🙈';
+}
+</script>
+</body>
+</html>                                                                                    
            
